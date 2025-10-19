@@ -1,0 +1,13 @@
+/* Compact Table Styles */
+.compact-table {
+    font-size: 11px;
+}
+.compact-table th,
+.compact-table td {
+    padding: 0.375rem 0.375rem;
+}
+.compact-table th {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
