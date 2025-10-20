@@ -1,0 +1,841 @@
+<?php
+
+namespace App\Livewire;
+
+use Livewire\Component;
+
+use App\Models\Person;
+use App\Models\Organisation;
+use Livewire\WithPagination;
+use Illuminate\Database\Eloquent\Builder;
+use App\Helpers\OrganizationHelperNew as OrganizationHelper;
+use App\Models\CommunicationFilterProfile;
+use Illuminate\Support\Facades\Auth;
+
+class PersonSearch extends Component
+{
+   use WithPagination;
+
+    // Search properties
+    public $search = '';
+    public $searchBy = 'global'; // Updated default to global
+    public $classification = '';
+    public $gender = '';
+    public $organisationId = '';
+    public $roleType = '';
+    public $status = 'active'; // Default to active
+    public $city = '';
+    public $district = '';
+    public $country = '';
+    public $ageFrom = '';
+    public $ageTo = '';
+    
+    // UI properties
+    public $perPage = 6; 
+    public $showAdvanced = false;
+    public $selectedPersons = [];
+    public $selectAll = false;
+    public $viewMode = 'grid';
+
+    public $showSaveFilterModal = false;
+    public $filterProfileName = '';
+    public $filterProfileDescription = '';
+    public $isSharedProfile = false;
+    public $loadedProfileId = null;
+    public $availableProfiles = [];
+    public $showLoadProfileModal = false;
+
+     public $showCreateFilterDrawer = false;
+    public $showViewFiltersDrawer = false;
+
+    public $profileSearch = '';
+    
+    // Data
+    public $organisations = [];
+    public $classifications = [];
+    public $roleTypes = [];
+
+    protected $queryString = [
+        'search' => ['except' => ''],
+        'searchBy' => ['except' => 'global'],
+        'classification' => ['except' => ''],
+        'gender' => ['except' => ''],
+        'organisationId' => ['except' => ''],
+        'status' => ['except' => 'active'],
+        'viewMode' => ['except' => 'grid'],
+        'page' => ['except' => 1],
+
+    ];
+
+    protected $listeners = [
+        'setStatus' => 'setStatus',
+        'setViewMode' => 'setViewMode',
+        'profileSaved' => 'refreshProfiles',
+    ];
+
+    public function mount()
+    {
+        $this->resetPage();
+        $this->loadAvailableProfiles();
+
+         $this->getOrganisationsProperty();
+        $this->getClassificationsProperty();
+        $this->getRoleTypesProperty();
+    }
+
+    public function loadAvailableProfiles()
+    {
+        $query = CommunicationFilterProfile::where(function($q) {
+            $q->where('user_id', Auth::id())
+              ->orWhere('is_shared', true);
+        })
+        ->where('organisation_id', Auth::user()->organisation_id);
+
+        if ($this->profileSearch) {
+            $query->where(function($q) {
+                $q->where('name', 'like', '%' . $this->profileSearch . '%')
+                  ->orWhere('description', 'like', '%' . $this->profileSearch . '%');
+            });
+        }
+
+        $this->availableProfiles = $query->orderByDesc('last_used_at')
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(function($profile) {
+                return [
+                    'id' => $profile->id,
+                    'name' => $profile->name,
+                    'description' => $profile->description,
+                    'filter_criteria' => $profile->filter_criteria,
+                    'is_shared' => $profile->is_shared,
+                    'user_id' => $profile->user_id,
+                    'usage_count' => $profile->usage_count,
+                    'last_used_at' => $profile->last_used_at,
+                ];
+            })
+            ->toArray();
+    }
+
+    public function getHasActiveFiltersProperty()
+    {
+        return !empty($this->search) || 
+               !empty($this->classification) || 
+               !empty($this->gender) || 
+               !empty($this->organisationId) || 
+               $this->status !== 'active' || 
+               !empty($this->city) || 
+               !empty($this->district) || 
+               !empty($this->country) || 
+               !empty($this->ageFrom) || 
+               !empty($this->ageTo);
+    }
+
+    public function getCurrentFiltersArray()
+    {
+        $filters = [];
+        
+        if (!empty($this->search)) $filters['search'] = $this->search;
+        if (!empty($this->searchBy) && $this->searchBy !== 'global') $filters['search_by'] = $this->searchBy;
+        if (!empty($this->classification)) $filters['classification'] = $this->classification;
+        if (!empty($this->gender)) $filters['gender'] = $this->gender;
+        if (!empty($this->organisationId)) $filters['organisation_id'] = $this->organisationId;
+        if (!empty($this->roleType)) $filters['role_type'] = $this->roleType;
+        if ($this->status !== 'active') $filters['status'] = $this->status;
+        if (!empty($this->city)) $filters['city'] = $this->city;
+        if (!empty($this->district)) $filters['district'] = $this->district;
+        if (!empty($this->country)) $filters['country'] = $this->country;
+        if (!empty($this->ageFrom)) $filters['age_from'] = $this->ageFrom;
+        if (!empty($this->ageTo)) $filters['age_to'] = $this->ageTo;
+        
+        return $filters;
+    }
+
+    public function openSaveFilterModal()
+    {
+        if (!$this->hasActiveFilters) {
+            $this->showError('Please apply some filters before saving a profile.');
+            return;
+        }
+
+        $this->filterProfileName = '';
+        $this->filterProfileDescription = '';
+        $this->isSharedProfile = false;
+        $this->showSaveFilterModal = true;
+    }
+
+    public function saveFilterProfile()
+    {
+        $this->validate([
+            'filterProfileName' => 'required|string|max:255',
+            'filterProfileDescription' => 'nullable|string|max:500',
+        ], [
+            'filterProfileName.required' => 'Please enter a name for this filter profile.',
+        ]);
+
+        $organization = OrganizationHelper::getCurrentOrganization();
+        
+        if (!$organization) {
+            $this->showError('No organization selected. Cannot save filter profile.');
+            return;
+        }
+
+        try {
+            $profile = CommunicationFilterProfile::create([
+                'name' => $this->filterProfileName,
+                'description' => $this->filterProfileDescription,
+                'user_id' => Auth::id(),
+                'organisation_id' => $organization->id,
+                'filter_criteria' => $this->getCurrentFiltersArray(),
+                'is_shared' => $this->isSharedProfile,
+                'is_active' => true,
+                'last_used_at' => now(),
+            ]);
+
+            $this->loadedProfileId = $profile->id;
+            $this->showSuccess("Filter profile '{$this->filterProfileName}' saved successfully!");
+            $this->closeSaveFilterModal();
+            $this->loadAvailableProfiles();
+            
+        } catch (\Exception $e) {
+            $this->showError('Failed to save filter profile. Please try again.');
+        }
+    }
+
+    public function openLoadProfileModal()
+    {
+        $this->loadAvailableProfiles();
+        $this->showLoadProfileModal = true;
+    }
+
+    public function loadFilterProfile($profileId)
+    {
+        $organization = OrganizationHelper::getCurrentOrganization();
+        
+        $profile = CommunicationFilterProfile::accessibleBy(Auth::id(), $organization->id)
+            ->find($profileId);
+
+        if (!$profile) {
+            $this->showError('Filter profile not found or you do not have access to it.');
+            return;
+        }
+
+        try {
+            // Clear existing filters first
+            $this->clearFilters();
+            
+            // Load filters from profile
+            $criteria = $profile->filter_criteria;
+            
+            if (isset($criteria['search'])) $this->search = $criteria['search'];
+            if (isset($criteria['search_by'])) $this->searchBy = $criteria['search_by'];
+            if (isset($criteria['classification'])) $this->classification = $criteria['classification'];
+            if (isset($criteria['gender'])) $this->gender = $criteria['gender'];
+            if (isset($criteria['organisation_id'])) $this->organisationId = $criteria['organisation_id'];
+            if (isset($criteria['role_type'])) $this->roleType = $criteria['role_type'];
+            if (isset($criteria['status'])) $this->status = $criteria['status'];
+            if (isset($criteria['city'])) $this->city = $criteria['city'];
+            if (isset($criteria['district'])) $this->district = $criteria['district'];
+            if (isset($criteria['country'])) $this->country = $criteria['country'];
+            if (isset($criteria['age_from'])) $this->ageFrom = $criteria['age_from'];
+            if (isset($criteria['age_to'])) $this->ageTo = $criteria['age_to'];
+
+            // Update last used timestamp
+            $profile->update(['last_used_at' => now()]);
+            
+            $this->loadedProfileId = $profile->id;
+            $this->showSuccess("Filter profile '{$profile->name}' loaded successfully!");
+            $this->closeLoadProfileModal();
+            $this->resetPage();
+            
+        } catch (\Exception $e) {
+            $this->showError('Failed to load filter profile. Please try again.');
+        }
+    }
+
+    // NEW: Delete a filter profile
+    public function deleteFilterProfile($profileId)
+    {
+        $organization = OrganizationHelper::getCurrentOrganization();
+        
+        $profile = CommunicationFilterProfile::accessibleBy(Auth::id(), $organization->id)
+            ->find($profileId);
+
+        if (!$profile) {
+            $this->showError('Filter profile not found or you do not have access to it.');
+            return;
+        }
+
+        // Check if user can delete this profile
+        if ($profile->user_id !== Auth::id()) {
+            $this->showError('You can only delete your own filter profiles.');
+            return;
+        }
+
+        try {
+            $profileName = $profile->name;
+            $profile->delete();
+            
+            if ($this->loadedProfileId === $profileId) {
+                $this->loadedProfileId = null;
+            }
+            
+            $this->showSuccess("Filter profile '{$profileName}' deleted successfully!");
+            $this->loadAvailableProfiles();
+            
+        } catch (\Exception $e) {
+            $this->showError('Failed to delete filter profile. Please try again.');
+        }
+    }
+
+    // NEW: Clear current profile selection
+    public function clearCurrentProfile()
+    {
+        $this->loadedProfileId = null;
+        $this->showSuccess('Filter profile selection cleared.');
+    }
+
+    // NEW: Close modals
+    public function closeSaveFilterModal()
+    {
+        $this->showSaveFilterModal = false;
+        $this->filterProfileName = '';
+        $this->filterProfileDescription = '';
+        $this->isSharedProfile = false;
+    }
+
+    public function closeLoadProfileModal()
+    {
+        $this->showLoadProfileModal = false;
+    }
+
+    public function refreshProfiles()
+    {
+        $this->loadAvailableProfiles();
+    }
+    
+    public function updatingSearch()
+    {
+        $this->resetPage();
+        $this->loadedProfileId = null;
+    }
+
+    public function updatingSearchBy()
+    {
+        $this->resetPage();
+        $this->loadedProfileId = null;
+    }
+
+    public function updatingClassification()
+    {
+        $this->resetPage();
+        $this->loadedProfileId = null;
+    }
+
+    public function updatingGender()
+    {
+        $this->resetPage();
+        $this->loadedProfileId = null;
+    }
+
+    public function updatingOrganisationId()
+    {
+        $this->resetPage();
+        $this->loadedProfileId = null;
+    }
+
+    public function updatingStatus()
+    {
+        $this->resetPage();
+        $this->loadedProfileId = null;
+    }
+
+    public function toggleAdvanced()
+    {
+        $this->showAdvanced = !$this->showAdvanced;
+    }
+
+    public function clearFilters()
+    {
+        $this->reset([
+            'search',
+            'classification', 
+            'gender',
+            'organisationId',
+            'roleType',
+            'city',
+            'district',
+            'country',
+            'ageFrom',
+            'ageTo'
+        ]);
+        
+        // Keep some defaults
+        $this->status = 'active';
+        $this->searchBy = 'global';
+        $this->loadedProfileId = null;
+        $this->resetPage();
+        
+        // Emit event for JavaScript
+        $this->dispatch('filtersCleared');
+    }
+
+    public function setStatus($status)
+    {
+        $this->status = $status;
+        $this->resetPage();
+    }
+
+    public function setViewMode($mode)
+    {
+        $this->viewMode = $mode;
+    }
+
+    public function updatedSelectAll($value)
+    {
+        if ($value) {
+            $this->selectedPersons = $this->getPersonsQuery()->pluck('id')->toArray();
+        } else {
+            $this->selectedPersons = [];
+        }
+    }
+
+    public function loadOrganisations()
+    {
+        $this->organisations = Organisation::where('status', 'active')
+            ->orderBy('legal_name')
+            ->get();
+    }
+
+    public function getPersonsQuery(): Builder
+    {
+        $query = Person::query()
+            ->with([
+                'phones' => function ($query) {
+                    $query->where('is_primary', true);
+                },
+                'emailAddresses' => function ($query) {
+                    $query->where('is_primary', true);
+                },
+                'identifiers',
+                'organisations' => function ($query) {
+                    $query->wherePivot('status', 'active');
+                }
+            ]);
+
+        // Apply search based on search type
+        if (!empty($this->search)) {
+            switch ($this->searchBy) {
+                case 'name':
+                    $query->searchByName($this->search);
+                    break;
+                
+                case 'person_id':
+                    $query->where('person_id', 'like', "%{$this->search}%");
+                    break;
+                
+                case 'phone':
+                    $query->whereHas('phones', function ($q) {
+                        $q->where('number', 'like', "%{$this->search}%");
+                    });
+                    break;
+                
+                case 'email':
+                    $query->whereHas('emailAddresses', function ($q) {
+                        $q->where('email', 'like', "%{$this->search}%");
+                    });
+                    break;
+                
+                case 'identifier':
+                    $query->whereHas('identifiers', function ($q) {
+                        $q->where('identifier', 'like', "%{$this->search}%");
+                    });
+                    break;
+                
+                case 'global':
+                default:
+                    // Search across multiple fields
+                    $query->where(function ($q) {
+                        $q->searchByName($this->search)
+                          ->orWhere('person_id', 'like', "%{$this->search}%")
+                          ->orWhereHas('phones', function ($phoneQuery) {
+                              $phoneQuery->where('number', 'like', "%{$this->search}%");
+                          })
+                          ->orWhereHas('emailAddresses', function ($emailQuery) {
+                              $emailQuery->where('email', 'like', "%{$this->search}%");
+                          })
+                          ->orWhereHas('identifiers', function ($identifierQuery) {
+                              $identifierQuery->where('identifier', 'like', "%{$this->search}%");
+                          })
+                          ->orWhere('address', 'like', "%{$this->search}%")
+                          ->orWhere('city', 'like', "%{$this->search}%")
+                          ->orWhere('district', 'like', "%{$this->search}%");
+                    });
+                    break;
+            }
+        }
+
+        // Apply filters
+        if (!empty($this->classification)) {
+            $query->whereJsonContains('classification', $this->classification);
+        }
+
+        if (!empty($this->gender)) {
+            $query->where('gender', $this->gender);
+        }
+
+        if (!empty($this->status)) {
+            $query->where('status', $this->status);
+        }
+
+        if (!empty($this->city)) {
+            $query->where('city', 'like', "%{$this->city}%");
+        }
+
+        if (!empty($this->district)) {
+            $query->where('district', 'like', "%{$this->district}%");
+        }
+
+        if (!empty($this->country)) {
+            $query->where('country', 'like', "%{$this->country}%");
+        }
+
+        // Organisation filter
+        if (!empty($this->organisationId)) {
+            $query->whereHas('affiliations', function ($q) {
+                $q->where('organisation_id', $this->organisationId)
+                  ->where('status', 'active');
+                
+                if (!empty($this->roleType)) {
+                    $q->where('role_type', $this->roleType);
+                }
+            });
+        }
+
+        // Age filters
+        if (!empty($this->ageFrom) || !empty($this->ageTo)) {
+            $query->where(function ($q) {
+                if (!empty($this->ageFrom)) {
+                    $dateFrom = now()->subYears($this->ageFrom)->format('Y-m-d');
+                    $q->where('date_of_birth', '<=', $dateFrom);
+                }
+                
+                if (!empty($this->ageTo)) {
+                    $dateTo = now()->subYears($this->ageTo)->format('Y-m-d');
+                    $q->where('date_of_birth', '>=', $dateTo);
+                }
+            });
+        }
+
+        return $query->orderBy('created_at', 'desc');
+    }
+
+    public function getPersonsProperty()
+    {
+        return $this->getPersonsQuery()->paginate($this->perPage);
+    }
+
+    public function getOrganisationsProperty()
+    {
+        // return Organisation::where('status', 'active')->orderBy('created_at')->get();
+         return Organisation::active()->orderBy('legal_name')->get();
+    }
+
+    public function getClassificationsProperty()
+    {
+        // Get unique classifications from existing persons
+        return Person::whereNotNull('classification')
+            ->get()
+            ->pluck('classification')
+            ->flatten()
+            ->unique()
+            ->sort()
+            ->values();
+    }
+
+    public function getRoleTypesProperty()
+    {
+        // Common role types - you might want to make this configurable
+        return [
+            'patient' => 'Patient',
+            'staff' => 'Staff',
+            'student' => 'Student',
+            'member' => 'Member',
+            'volunteer' => 'Volunteer',
+            'board_member' => 'Board Member',
+            'administrator' => 'Administrator',
+        ];
+    }
+
+    public function exportSelected()
+    {
+        if (empty($this->selectedPersons)) {
+            session()->flash('error', 'No persons selected for export.');
+            return;
+        }
+
+        try {
+            // Get selected persons
+            $persons = Person::whereIn('id', $this->selectedPersons)
+                ->with(['phones', 'emailAddresses', 'identifiers', 'organisations'])
+                ->get();
+
+            // Here you would implement the actual export logic
+            // For now, we'll just show a success message
+            session()->flash('success', count($this->selectedPersons) . ' persons exported successfully.');
+            
+            // Clear selection after export
+            $this->selectedPersons = [];
+            $this->selectAll = false;
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'Export failed: ' . $e->getMessage());
+        }
+    }
+
+    public function getSearchSummaryProperty()
+    {
+        $activeFilters = [];
+        
+        if (!empty($this->search)) {
+            $activeFilters[] = "Search: \"{$this->search}\"";
+        }
+        
+        if (!empty($this->status)) {
+            $activeFilters[] = "Status: " . ucfirst($this->status);
+        }
+        
+        if (!empty($this->gender)) {
+            $activeFilters[] = "Gender: " . ucfirst($this->gender);
+        }
+        
+        if (!empty($this->classification)) {
+            $activeFilters[] = "Classification: " . ucfirst($this->classification);
+        }
+        
+        if (!empty($this->city)) {
+            $activeFilters[] = "City: {$this->city}";
+        }
+        
+        return implode(' • ', $activeFilters);
+    }
+
+
+    public function saveProfileAndRedirectToCommunication()
+{
+    // First save the profile
+    $this->validate([
+        'filterProfileName' => 'required|string|max:255',
+        'filterProfileDescription' => 'nullable|string|max:500',
+    ]);
+
+    $organization = OrganizationHelper::getCurrentOrganization();
+    
+    if (!$organization) {
+        $this->showError('No organization selected. Cannot save filter profile.');
+        return;
+    }
+
+    try {
+        $profile = CommunicationFilterProfile::create([
+            'name' => $this->filterProfileName,
+            'description' => $this->filterProfileDescription,
+            'user_id' => Auth::id(),
+            'organisation_id' => $organization->id,
+            'filter_criteria' => $this->getCurrentFiltersArray(),
+            'is_shared' => $this->isSharedProfile,
+            'is_active' => true,
+            'last_used_at' => now(),
+        ]);
+
+        $this->closeSaveFilterModal();
+        
+        // Redirect to communication module with profile pre-selected
+        return redirect()->route('communication.send')->with([
+            'success' => 'Filter profile saved successfully! You can now use it to send communications.',
+            'preselect_filter_profile' => $profile->id
+        ]);
+        
+    } catch (\Exception $e) {
+        $this->showError('Failed to save filter profile. Please try again.');
+    }
+}
+
+/**
+ * Auto-suggest profile name based on current filters
+ */
+public function getSuggestedProfileName()
+{
+    return \App\Services\FilterProfileIntegrationService::suggestProfileName(
+        $this->getCurrentFiltersArray()
+    );
+}
+
+/**
+ * Get current filter summary for display
+ */
+public function getCurrentFilterSummary()
+{
+    $filters = $this->getCurrentFiltersArray();
+    $summary = [];
+    
+    foreach ($filters as $key => $value) {
+        if (!empty($value)) {
+            $label = ucfirst(str_replace('_', ' ', $key));
+            $summary[] = $label . ': ' . (is_array($value) ? implode(', ', $value) : $value);
+        }
+    }
+    
+    return $summary;
+}
+
+/**
+ * Check if current filters match any existing profile
+ */
+public function getMatchingProfile()
+{
+    $currentFilters = $this->getCurrentFiltersArray();
+    $organization = OrganizationHelper::getCurrentOrganization();
+    
+    if (!$organization || empty($currentFilters)) {
+        return null;
+    }
+    
+    // Find profiles with similar criteria
+    $profiles = CommunicationFilterProfile::accessibleBy(Auth::id(), $organization->id)
+        ->where('is_active', true)
+        ->get();
+        
+    foreach ($profiles as $profile) {
+        $profileCriteria = $profile->filter_criteria;
+        
+        // Simple comparison - could be enhanced with fuzzy matching
+        if ($this->arraysAreSimilar($currentFilters, $profileCriteria)) {
+            return $profile;
+        }
+    }
+    
+    return null;
+}
+
+/**
+ * Compare two filter arrays for similarity
+ */
+private function arraysAreSimilar(array $array1, array $array2): bool
+{
+    // Remove empty values for comparison
+    $array1 = array_filter($array1);
+    $array2 = array_filter($array2);
+    
+    // If one is subset of the other with 80% match
+    $intersection = array_intersect_assoc($array1, $array2);
+    $union = array_merge($array1, $array2);
+    
+    if (empty($union)) return false;
+    
+    $similarity = count($intersection) / count($union);
+    return $similarity >= 0.8;
+}
+
+/**
+ * Apply a filter profile by ID (useful for URL parameters)
+ */
+public function applyProfileById($profileId)
+{
+    $organization = OrganizationHelper::getCurrentOrganization();
+    
+    $profile = CommunicationFilterProfile::accessibleBy(Auth::id(), $organization->id)
+        ->find($profileId);
+
+    if ($profile) {
+        $this->loadFilterProfile($profileId);
+        return true;
+    }
+    
+    return false;
+}
+
+/**
+ * Get quick filter suggestions based on popular combinations
+ */
+public function getQuickFilterSuggestions()
+{
+    $organization = OrganizationHelper::getCurrentOrganization();
+    
+    if (!$organization) {
+        return [];
+    }
+    
+    return \App\Services\FilterProfileIntegrationService::getPopularFilterCombinations(
+        $organization->id, 
+        5
+    );
+}
+
+/**
+ * Create a temporary profile (not saved to DB) for preview
+ */
+public function createTemporaryProfile()
+{
+    $filters = $this->getCurrentFiltersArray();
+    
+    if (empty($filters)) {
+        return null;
+    }
+    
+    return [
+        'name' => $this->getSuggestedProfileName(),
+        'filter_criteria' => $filters,
+        'person_count' => $this->persons ? $this->persons->total() : 0,
+        'is_temporary' => true,
+    ];
+}
+
+/**
+ * Mount with profile pre-loading (for URL parameters)
+ */
+public function mountWithProfile($profileId = null)
+{
+    $this->mount();
+    
+    if ($profileId) {
+        $this->applyProfileById($profileId);
+    }
+}
+
+/**
+ * Export current search results with profile context
+ */
+public function exportWithProfile()
+{
+    if (!$this->hasActiveFilters) {
+        $this->showError('Please apply some filters before exporting.');
+        return;
+    }
+
+    try {
+        // Create temporary profile for export context
+        $tempProfile = $this->createTemporaryProfile();
+        
+        // Here you would implement your export logic
+        // passing the profile context along with the data
+        
+        $this->showSuccess('Export started. You will receive a download link shortly.');
+        
+    } catch (\Exception $e) {
+        $this->showError('Export failed. Please try again.');
+    }
+}
+
+    public function render()
+    {
+        return view('livewire.person-search', [
+            'persons' => $this->persons,
+            'organisations' => $this->organisations,
+            'classifications' => $this->classifications,
+            'roleTypes' => $this->roleTypes,
+            'searchSummary' => $this->searchSummary,
+            'hasActiveFilters' => $this->hasActiveFilters,
+            'availableProfiles' => $this->availableProfiles,
+        ]);
+    }
+}

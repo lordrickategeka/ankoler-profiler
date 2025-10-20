@@ -287,4 +287,310 @@ class Person extends Model
     {
         return $query->where('status', 'active');
     }
+
+    public function scopeAdvancedSearch($query, array $criteria)
+{
+    // Name search
+    if (!empty($criteria['name'])) {
+        $query->searchByName($criteria['name']);
+    }
+
+    // Person ID search
+    if (!empty($criteria['person_id'])) {
+        $query->where('person_id', 'like', "%{$criteria['person_id']}%");
+    }
+
+    // Phone search
+    if (!empty($criteria['phone'])) {
+        $query->whereHas('phones', function ($q) use ($criteria) {
+            $q->where('phone_number', 'like', "%{$criteria['phone']}%");
+        });
+    }
+
+    // Email search
+    if (!empty($criteria['email'])) {
+        $query->whereHas('emailAddresses', function ($q) use ($criteria) {
+            $q->where('email', 'like', "%{$criteria['email']}%");
+        });
+    }
+
+    // Classification filter
+    if (!empty($criteria['classification'])) {
+        $query->whereJsonContains('classification', $criteria['classification']);
+    }
+
+    // Gender filter
+    if (!empty($criteria['gender'])) {
+        $query->where('gender', $criteria['gender']);
+    }
+
+    // Status filter
+    if (!empty($criteria['status'])) {
+        $query->where('status', $criteria['status']);
+    }
+
+    // Location filters
+    if (!empty($criteria['city'])) {
+        $query->where('city', 'like', "%{$criteria['city']}%");
+    }
+
+    if (!empty($criteria['district'])) {
+        $query->where('district', 'like', "%{$criteria['district']}%");
+    }
+
+    if (!empty($criteria['country'])) {
+        $query->where('country', 'like', "%{$criteria['country']}%");
+    }
+
+    // Age range filter
+    if (!empty($criteria['age_from']) || !empty($criteria['age_to'])) {
+        $query->where(function ($q) use ($criteria) {
+            if (!empty($criteria['age_from'])) {
+                $dateFrom = now()->subYears($criteria['age_from'])->format('Y-m-d');
+                $q->where('date_of_birth', '<=', $dateFrom);
+            }
+            
+            if (!empty($criteria['age_to'])) {
+                $dateTo = now()->subYears($criteria['age_to'])->format('Y-m-d');
+                $q->where('date_of_birth', '>=', $dateTo);
+            }
+        });
+    }
+
+    // Date range filters
+    if (!empty($criteria['created_from'])) {
+        $query->whereDate('created_at', '>=', $criteria['created_from']);
+    }
+
+    if (!empty($criteria['created_to'])) {
+        $query->whereDate('created_at', '<=', $criteria['created_to']);
+    }
+
+    // Organisation filter
+    if (!empty($criteria['organisation_id'])) {
+        $query->whereHas('affiliations', function ($q) use ($criteria) {
+            $q->where('organisation_id', $criteria['organisation_id'])
+              ->where('status', 'active');
+            
+            if (!empty($criteria['role_type'])) {
+                $q->where('role_type', $criteria['role_type']);
+            }
+        });
+    }
+
+    return $query;
+}
+
+/**
+ * Scope for searching by identifier
+ */
+public function scopeSearchByIdentifier($query, string $identifier, string $type = null)
+{
+    return $query->whereHas('identifiers', function ($q) use ($identifier, $type) {
+        $q->where('identifier_value', 'like', "%{$identifier}%");
+        
+        if ($type) {
+            $q->where('type', $type);
+        }
+    });
+}
+
+/**
+ * Scope for searching by phone number
+ */
+public function scopeSearchByPhone($query, string $phone)
+{
+    return $query->whereHas('phones', function ($q) use ($phone) {
+        $q->where('phone_number', 'like', "%{$phone}%");
+    });
+}
+
+/**
+ * Scope for searching by email
+ */
+public function scopeSearchByEmail($query, string $email)
+{
+    return $query->whereHas('emailAddresses', function ($q) use ($email) {
+        $q->where('email', 'like', "%{$email}%");
+    });
+}
+
+/**
+ * Scope for filtering by organisation
+ */
+public function scopeByOrganisation($query, int $organisationId, string $roleType = null)
+{
+    return $query->whereHas('affiliations', function ($q) use ($organisationId, $roleType) {
+        $q->where('organisation_id', $organisationId)
+          ->where('status', 'active');
+        
+        if ($roleType) {
+            $q->where('role_type', $roleType);
+        }
+    });
+}
+
+/**
+ * Scope for filtering by classification
+ */
+public function scopeByClassification($query, string $classification)
+{
+    return $query->whereJsonContains('classification', $classification);
+}
+
+/**
+ * Scope for filtering by age range
+ */
+public function scopeByAgeRange($query, int $ageFrom = null, int $ageTo = null)
+{
+    return $query->where(function ($q) use ($ageFrom, $ageTo) {
+        if ($ageFrom !== null) {
+            $dateFrom = now()->subYears($ageFrom)->format('Y-m-d');
+            $q->where('date_of_birth', '<=', $dateFrom);
+        }
+        
+        if ($ageTo !== null) {
+            $dateTo = now()->subYears($ageTo)->format('Y-m-d');
+            $q->where('date_of_birth', '>=', $dateTo);
+        }
+    });
+}
+
+/**
+ * Scope for global search across multiple fields
+ */
+public function scopeGlobalSearch($query, string $term)
+{
+    return $query->where(function ($q) use ($term) {
+        $q->searchByName($term)
+          ->orWhere('person_id', 'like', "%{$term}%")
+          ->orWhereHas('phones', function ($phoneQuery) use ($term) {
+              $phoneQuery->where('phone_number', 'like', "%{$term}%");
+          })
+          ->orWhereHas('emailAddresses', function ($emailQuery) use ($term) {
+              $emailQuery->where('email', 'like', "%{$term}%");
+          })
+          ->orWhereHas('identifiers', function ($identifierQuery) use ($term) {
+              $identifierQuery->where('identifier_value', 'like', "%{$term}%");
+          })
+          ->orWhere('address', 'like', "%{$term}%")
+          ->orWhere('city', 'like', "%{$term}%")
+          ->orWhere('district', 'like', "%{$term}%");
+    });
+}
+
+/**
+ * Get age calculated from date of birth
+ */
+public function getAgeAttribute(): ?int
+{
+    return $this->date_of_birth ? $this->date_of_birth->age : null;
+}
+
+/**
+ * Get formatted address
+ */
+public function getFormattedAddressAttribute(): string
+{
+    $parts = array_filter([
+        $this->address,
+        $this->city,
+        $this->district,
+        $this->country
+    ]);
+    
+    return implode(', ', $parts);
+}
+
+/**
+ * Check if person has specific classification
+ */
+public function hasClassification(string $classification): bool
+{
+    $classifications = $this->classification ?? [];
+    return in_array($classification, $classifications);
+}
+
+/**
+ * Get active affiliations with organisation details
+ */
+public function getActiveAffiliationsWithOrganisationsAttribute()
+{
+    return $this->affiliations()
+        ->with('organisation')
+        ->where('status', 'active')
+        ->get();
+}
+
+/**
+ * Search persons with export data
+ */
+public static function searchForExport(array $criteria)
+{
+    return self::advancedSearch($criteria)
+        ->with([
+            'phones' => function ($query) {
+                $query->where('is_primary', true);
+            },
+            'emailAddresses' => function ($query) {
+                $query->where('is_primary', true);
+            },
+            'identifiers',
+            'organisations' => function ($query) {
+                $query->wherePivot('status', 'active');
+            }
+        ])
+        ->select([
+            'id',
+            'person_id', 
+            'given_name',
+            'middle_name',
+            'family_name',
+            'date_of_birth',
+            'gender',
+            'classification',
+            'address',
+            'city',
+            'district',
+            'country',
+            'status',
+            'created_at'
+        ]);
+}
+
+/**
+ * Get search suggestions based on partial input
+ */
+public static function getSearchSuggestions(string $term, int $limit = 10)
+{
+    return self::globalSearch($term)
+        ->active()
+        ->limit($limit)
+        ->get(['id', 'person_id', 'given_name', 'family_name'])
+        ->map(function ($person) {
+            return [
+                'id' => $person->id,
+                'person_id' => $person->person_id,
+                'name' => $person->full_name,
+                'label' => "{$person->full_name} ({$person->person_id})"
+            ];
+        });
+}
+
+public function relationships()
+{
+    return $this->hasMany(PersonRelationship::class, 'person_id');
+}
+
+public function relatedPersons()
+{
+    return $this->belongsToMany(Person::class, 'person_relationships', 'person_id', 'related_person_id')
+                ->withPivot('relationship_type', 'is_primary', 'is_emergency_contact', 'notes', 'status')
+                ->withTimestamps();
+}
+
+public function reverseRelationships()
+{
+    return $this->hasMany(PersonRelationship::class, 'related_person_id');
+}
 }

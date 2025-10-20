@@ -2,11 +2,11 @@
     <div class="p-8">
 
         {{-- Search and Filters --}}
-        <div class="bg-white rounded-lg shadow p-4 mb-4">
-            <div class="flex justify-between items-center mb-3">
-                <div class="flex items-center">
-                    <h2 class="text-base font-semibold">Search & Filters</h2>
-                    {{-- Loading indicator for filter operations --}}
+        {{-- <div class="bg-white rounded-lg shadow p-4 mb-4"> --}}
+        {{-- <div class="flex justify-between items-center mb-3"> --}}
+        {{-- <div class="flex items-center">
+                    <h2 class="text-base font-semibold">Search</h2>
+                    Loading indicator for filter operations
                     <div wire:loading wire:target="filters,dynamicFilters,updatedFilters,updatedDynamicFilters"
                         class="ml-3">
                         <svg class="animate-spin h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -18,23 +18,21 @@
                             </path>
                         </svg>
                     </div>
-                </div>
-                <button wire:click="toggleAdvancedFilters" type="button"
+                </div> --}}
+
+        {{-- <button wire:click="toggleAdvancedFilters" type="button"
                     class="text-sm text-blue-600 hover:text-blue-800 focus:outline-none">
                     {{ $showAdvancedFilters ? 'Hide Advanced Filters' : 'Show Advanced Filters' }}
-                </button>
-            </div>
+                </button> --}}
+        {{-- </div> --}}
 
-            {{-- Basic Filters --}}
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-                {{-- Search --}}
+        {{-- <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
                 <div>
                     <label class="block text-xs font-medium text-gray-700 mb-1">Search</label>
                     <div class="relative">
-                        <input type="text" wire:model.live.debounce.300ms="filters.search"
+                        <input type="text" wire:model.live.debounce.500ms.debounce.300ms="filters.search"
                             placeholder="Search by name, phone, or email..."
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-                        {{-- Search loading indicator --}}
                         <div wire:loading wire:target="filters.search" class="absolute right-3 top-2">
                             <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg"
                                 fill="none" viewBox="0 0 24 24">
@@ -48,11 +46,10 @@
                     </div>
                 </div>
 
-                {{-- Classification Filter --}}
                 <div>
                     <label class="block text-xs font-medium text-gray-700 mb-1">Classification</label>
                     <div class="relative">
-                        <select wire:model.live="filters.classification"
+                        <select wire:model.live.debounce.500ms="filters.classification"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                             <option value="">All Classifications</option>
                             @foreach ($availableRoles as $role)
@@ -72,12 +69,11 @@
                     </div>
                 </div>
 
-                {{-- Organization Filter --}}
                 @if ($isSuperAdmin)
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">Organization</label>
                         <div class="relative">
-                            <select wire:model.live="filters.organisation_id"
+                            <select wire:model.live.debounce.500ms="filters.organisation_id"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                                 <option value="">All Organizations</option>
                                 @foreach ($organizations as $org)
@@ -100,10 +96,8 @@
                 @endif
             </div>
 
-            {{-- Advanced Filters --}}
             @if ($showAdvancedFilters)
                 <div class="border-t pt-3 mt-3 relative">
-                    {{-- Loading overlay for advanced filters --}}
                     <div wire:loading wire:target="filters.gender,filters.age_range,filters.status,filters.date_range"
                         class="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded-md">
                         <div class="flex items-center space-x-2">
@@ -120,10 +114,9 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
-                        {{-- Gender Filter --}}
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Gender</label>
-                            <select wire:model.live="filters.gender"
+                            <select wire:model.live.debounce.500ms="filters.gender"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                                 <option value="">All Genders</option>
                                 @foreach ($genderOptions as $gender)
@@ -133,10 +126,9 @@
                             </select>
                         </div>
 
-                        {{-- Age Range Filter --}}
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Age Range</label>
-                            <select wire:model.live="filters.age_range"
+                            <select wire:model.live.debounce.500ms="filters.age_range"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                                 <option value="">All Ages</option>
                                 @foreach ($ageRanges as $range)
@@ -145,10 +137,9 @@
                             </select>
                         </div>
 
-                        {{-- Status Filter --}}
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Status</label>
-                            <select wire:model.live="filters.status"
+                            <select wire:model.live.debounce.500ms="filters.status"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                                 <option value="">All Statuses</option>
                                 @foreach ($statusOptions as $status)
@@ -157,29 +148,26 @@
                             </select>
                         </div>
 
-                        {{-- Date Range Start --}}
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Created From</label>
-                            <input type="date" wire:model.live="filters.date_range.start"
+                            <input type="date" wire:model.live.debounce.500ms="filters.date_range.start"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-                        {{-- Date Range End --}}
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Created To</label>
-                            <input type="date" wire:model.live="filters.date_range.end"
+                            <input type="date" wire:model.live.debounce.500ms="filters.date_range.end"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                         </div>
 
-                        {{-- Dynamic Filters based on Organisation Configuration --}}
                         @foreach ($filterConfigurations as $config)
                             <div>
                                 <label
                                     class="block text-xs font-medium text-gray-700 mb-1">{{ ucfirst(str_replace('_', ' ', $config->field_name)) }}</label>
                                 @if ($config->field_type === 'select')
-                                    <select wire:model.live="dynamicFilters.{{ $config->field_name }}"
+                                    <select wire:model.live.debounce.500ms="dynamicFilters.{{ $config->field_name }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                                         <option value="">All Options</option>
                                         @foreach ($config->options as $option)
@@ -187,14 +175,17 @@
                                         @endforeach
                                     </select>
                                 @elseif($config->field_type === 'date')
-                                    <input type="date" wire:model.live="dynamicFilters.{{ $config->field_name }}"
+                                    <input type="date"
+                                        wire:model.live.debounce.500ms="dynamicFilters.{{ $config->field_name }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                                 @elseif($config->field_type === 'number')
-                                    <input type="number" wire:model.live="dynamicFilters.{{ $config->field_name }}"
+                                    <input type="number"
+                                        wire:model.live.debounce.500ms="dynamicFilters.{{ $config->field_name }}"
                                         placeholder="Enter {{ str_replace('_', ' ', $config->field_name) }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                                 @else
-                                    <input type="text" wire:model.live="dynamicFilters.{{ $config->field_name }}"
+                                    <input type="text"
+                                        wire:model.live.debounce.500ms="dynamicFilters.{{ $config->field_name }}"
                                         placeholder="Enter {{ str_replace('_', ' ', $config->field_name) }}"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                                 @endif
@@ -202,7 +193,6 @@
                         @endforeach
                     </div>
 
-                    {{-- Dynamic filters loading indicator --}}
                     <div wire:loading wire:target="dynamicFilters" class="mt-2">
                         <div class="flex items-center text-blue-600 text-sm">
                             <svg class="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -219,8 +209,6 @@
                 </div>
             @endif
 
-            {{-- Filter Actions --}}
-            {{-- Filter Actions --}}
             <div class="flex justify-between items-center mt-3 pt-3 border-t">
                 <div class="flex items-center space-x-4">
                     <div class="text-sm text-gray-600">
@@ -243,7 +231,6 @@
                         </span>
                     </div>
 
-                    {{-- Active filter indicators --}}
                     @if ($activeFilters > 0)
                         <div class="flex flex-wrap gap-1" wire:loading.remove wire:target="resetFilters">
                             @if (!empty($filters['search']))
@@ -320,29 +307,16 @@
                     @endif
                 </div>
 
-                {{-- Reset Button with Loading State --}}
-                {{-- <button wire:click="resetFilters" type="button" wire:loading.attr="disabled"
-                    wire:target="resetFilters"
-                    class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-md hover:bg-gray-50 flex items-center focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                    <div wire:loading.remove wire:target="resetFilters" class="flex items-center">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
-                            </path>
-                        </svg>
-                        Reset All Filters
-                    </div>
-                    <div wire:loading wire:target="resetFilters" class="flex items-center">
-                        <svg class="animate-spin w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                            </path>
-                        </svg>
-                        Resetting...
-                    </div>
-                </button> --}}
+                <div class="hidden" id="resetFiltersLoader">
+                    <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                            stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                    </svg>
+                </div>
 
                 <button onclick="quickResetFilters()" type="button" id="resetFiltersBtn"
                     class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-md hover:bg-gray-50 flex items-center focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed">
@@ -353,14 +327,12 @@
                     </svg>
                     Reset All Filters
                 </button>
-            </div>
-        </div>
+            </div> --}}
+        {{-- </div> --}}
 
-        {{-- Results Count & Actions --}}
         <div class="flex justify-between items-center mb-4">
             <div class="flex items-center space-x-4">
                 <div class="flex items-center">
-                    {{-- Loading state for results --}}
                     <div wire:loading wire:target="filters,dynamicFilters,updatedFilters,updatedDynamicFilters"
                         class="flex items-center">
                         <div class="w-3 h-3 bg-blue-500 rounded-full mr-2 animate-pulse" title="Searching..."></div>
@@ -369,7 +341,6 @@
                         </p>
                     </div>
 
-                    {{-- Normal state for results --}}
                     <div wire:loading.remove wire:target="filters,dynamicFilters,updatedFilters,updatedDynamicFilters"
                         class="flex items-center">
                         @if ($persons->count() > 0)
@@ -385,7 +356,6 @@
                     </div>
                 </div>
 
-                {{-- Performance indicator --}}
                 <div wire:loading.remove wire:target="filters,dynamicFilters" class="text-xs text-gray-400">
                     <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
@@ -431,6 +401,15 @@
                 @endcan
 
                 {{-- Add New Person Button --}}
+                <a href="{{ route('person-search') }}" style="background-color:#01fea1"
+                    class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white hover:bg-[#01bafe]">
+                    <svg class="-ml-1 mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    <span class="text-white">Search Person</span>
+                </a>
                 <a href="{{ route('persons.create') }}" style="background-color:#01bafe"
                     class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white hover:bg-[#01bafe]">
                     <svg class="-ml-1 mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -477,6 +456,8 @@
                                     Affiliations</th>
                                 <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">
                                     Classifications</th>
+                                <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">
+                                    Location</th>
                                 <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">
                                     Actions</th>
                             </tr>
@@ -643,8 +624,7 @@
                                                     <div class="flex-1">
                                                         <span
                                                             class="font-medium">{{ $affiliation->organisation->display_name ?? $affiliation->organisation->legal_name }}</span>
-                                                        <span class="text-gray-500">-
-                                                            {{ $affiliation->role_type }}</span>
+
                                                         @if ($affiliation->role_title)
                                                             <div class="text-xs text-gray-400">
                                                                 {{ $affiliation->role_title }}</div>
@@ -669,7 +649,8 @@
                                     </td>
                                     {{-- Classifications --}}
                                     <td class="px-1.5 py-1 whitespace-nowrap">
-                                        @if ($person->classification)
+                                        {{ $affiliation->role_type }}
+                                        {{-- @if ($person->classification)
                                             <div class="flex flex-wrap gap-1">
                                                 @foreach ($person->classification as $class)
                                                     @php
@@ -694,6 +675,22 @@
                                                 <div class="w-2 h-2 bg-yellow-500 rounded-full mr-1"
                                                     title="No classification assigned"></div>
                                                 <span class="text-gray-400 italic text-xs">No classification</span>
+                                            </div>
+                                        @endif --}}
+                                    </td>
+                                    <td class="px-1.5 py-1 whitespace-nowrap">
+                                        @if ($person->country || $person->city)
+                                            <div class="flex flex-wrap gap-1">
+                                                <div>{{ $person->city }}</div>
+                                                @if ($person->district)
+                                                    <div class="text-gray-500">{{ $person->district }}</div>
+                                                @endif
+                                            </div>
+                                        @else
+                                            <div class="flex items-center">
+                                                <div class="w-2 h-2 bg-yellow-500 rounded-full mr-1"
+                                                    title="No classification assigned"></div>
+                                                <span class="text-gray-400 italic text-xs">No Location</span>
                                             </div>
                                         @endif
                                     </td>
@@ -779,7 +776,7 @@
                     </table>
                 </div>
                 {{-- Pagination --}}
-                @if($persons->hasPages())
+                @if ($persons->hasPages())
                     <div class="bg-gray-50 px-6 py-3 border-t border-gray-200" wire:key="pagination">
                         {{ $persons->links() }}
                     </div>
@@ -936,51 +933,126 @@
             });
 
             // Quick reset function for instant feedback
-            function quickResetFilters() {
-                // Show loading state immediately
-                const button = event.target.closest('button');
-                const originalContent = button.innerHTML;
-                button.disabled = true;
-                button.innerHTML = `
-            <svg class="animate-spin w-4 h-4 mr-1 inline" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Resetting...
-        `;
+            //     function quickResetFilters() {
+            //         // Show loading state immediately
+            //         const button = event.target.closest('button');
+            //         const originalContent = button.innerHTML;
+            //         button.disabled = true;
+            //         button.innerHTML = `
+    //     <svg class="animate-spin w-4 h-4 mr-1 inline" fill="none" viewBox="0 0 24 24">
+    //         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+    //         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    //     </svg>
+    //     Resetting...
+    // `;
 
-                // Clear all form inputs instantly for better UX
-                document.querySelectorAll('input[type="text"], input[type="date"], select').forEach(input => {
-                    if (input.hasAttribute('wire:model.live') || input.hasAttribute('wire:model')) {
-                        input.value = '';
+            function quickResetFilters() {
+                const resetBtn = document.getElementById('resetFiltersBtn');
+                const loader = document.getElementById('resetFiltersLoader');
+
+                // Disable the button and show loader
+                resetBtn.disabled = true;
+                loader.classList.remove('hidden');
+
+                // Call the Livewire method to reset filters
+                @this.resetFilters().then(() => {
+                    // Re-enable the button and hide loader after reset
+                    resetBtn.disabled = false;
+                    loader.classList.add('hidden');
+                });
+            }
+
+            // Clear all form inputs instantly for better UX
+            document.querySelectorAll('input[type="text"], input[type="date"], select').forEach(input => {
+                if (input.hasAttribute('wire:model.live.debounce.500ms') || input.hasAttribute('wire:model')) {
+                    input.value = '';
+                }
+            });
+
+            // Let Livewire handle the actual reset
+            @this.resetFilters().then(() => {
+                button.disabled = false;
+                button.innerHTML = originalContent;
+            });
+            }
+        </script>
+    @endpush
+
+    @push('scripts')
+        <script>
+            document.addEventListener('livewire:initialized', () => {
+                // Re-initialize Alpine components after Livewire updates
+                Livewire.hook('morph.updated', ({
+                    el,
+                    component
+                }) => {
+                    // Re-scan for Alpine components
+                    if (window.Alpine) {
+                        Alpine.initTree(el);
                     }
                 });
 
-                // Let Livewire handle the actual reset
-                @this.resetFilters().then(() => {
-                    button.disabled = false;
-                    button.innerHTML = originalContent;
+                // Handle dropdown state persistence
+                let openDropdowns = new Set();
+
+                Livewire.hook('morph.updating', ({
+                    el,
+                    toEl,
+                    childrenOnly,
+                    skip
+                }) => {
+                    // Save open dropdown states
+                    el.querySelectorAll('[x-data*="open"]').forEach((dropdown, index) => {
+                        const alpine = Alpine.$data(dropdown);
+                        if (alpine && alpine.open) {
+                            openDropdowns.add(index);
+                        }
+                    });
                 });
+
+                Livewire.hook('morph.updated', ({
+                    el,
+                    component
+                }) => {
+                    // Restore dropdown states
+                    setTimeout(() => {
+                        el.querySelectorAll('[x-data*="open"]').forEach((dropdown, index) => {
+                            if (openDropdowns.has(index)) {
+                                const alpine = Alpine.$data(dropdown);
+                                if (alpine) {
+                                    alpine.open = false; // Close them to prevent issues
+                                }
+                            }
+                        });
+                        openDropdowns.clear();
+                    }, 50);
+                });
+            });
+
+            // Alternative approach: Use vanilla JavaScript for dropdowns
+            function toggleDropdown(personId) {
+                const dropdown = document.querySelector(`[data-dropdown="${personId}"]`);
+                const isOpen = dropdown.style.display === 'block';
+
+                // Close all dropdowns first
+                document.querySelectorAll('[data-dropdown]').forEach(d => {
+                    d.style.display = 'none';
+                });
+
+                // Toggle the clicked one
+                if (!isOpen) {
+                    dropdown.style.display = 'block';
+                }
             }
+
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('[data-dropdown-trigger]')) {
+                    document.querySelectorAll('[data-dropdown]').forEach(d => {
+                        d.style.display = 'none';
+                    });
+                }
+            });
         </script>
-
-        {{-- <script>
-            // Handle Livewire pagination errors
-            document.addEventListener('livewire:exception', function (event) {
-                console.log('Livewire exception caught:', event.detail);
-                if (event.detail.message && event.detail.message.includes('Component not found')) {
-                    console.log('Component not found error - refreshing page...');
-                    window.location.reload();
-                }
-            });
-
-            // Handle component not found errors
-            window.addEventListener('error', function(event) {
-                if (event.message && event.message.includes('Component not found')) {
-                    console.log('Component not found in window error - refreshing page...');
-                    window.location.reload();
-                }
-            });
-        </script> --}}
     @endpush
 </div>

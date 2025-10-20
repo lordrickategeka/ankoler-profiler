@@ -91,7 +91,7 @@ class Sidebar extends Component
                     ['label' => 'All Persons', 'route' => 'persons', 'permission' => ['view-persons', 'can_view_all_organisational_persons'], 'icon' => 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z'],
                     ['label' => 'Add New Person', 'route' => 'persons.create', 'permission' => 'create-persons', 'icon' => 'M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z'],
                     ['label' => 'Import Persons', 'route' => 'persons.import', 'permission' => 'import-org-persons', 'icon' => 'M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10'],
-                    ['label' => 'Search Persons', 'route' => 'dashboard', 'permission' => 'view-persons', 'icon' => 'm21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'],
+                    ['label' => 'Search Persons', 'route' => 'person-search', 'permission' => 'view-persons', 'icon' => 'm21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'],
                     // ['label' => 'Verification Queue', 'route' => 'dashboard', 'permission' => 'verify-persons', 'badge' => $this->getPendingVerificationCount(), 'icon' => 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z']
                 ]
             ],
@@ -223,7 +223,7 @@ class Sidebar extends Component
     {
         return [
             'dashboard' => [
-                'title' => '🏠 Dashboard',
+                'title' => 'Dashboard',
                 'icon' => 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z',
                 'route' => 'dashboard',
                 'items' => [
@@ -232,7 +232,7 @@ class Sidebar extends Component
                 ]
             ],
             'organization' => [
-                'title' => '🏢 My Organization',
+                'title' => 'My Organization',
                 'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
                 'items' => [
                     ['label' => 'Organization Profile', 'route' => 'dashboard', 'permission' => 'view-own-organization'],
@@ -241,7 +241,7 @@ class Sidebar extends Component
                 ]
             ],
             'person_registry' => [
-                'title' => '👥 Person Mgt',
+                'title' => 'Person Mgt',
                 'icon' => 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
                 'items' => [
                     ['label' => 'All Persons', 'route' => 'persons', 'permission' => 'view-org-persons'],
@@ -254,7 +254,7 @@ class Sidebar extends Component
                 ]
             ],
             'affiliations' => [
-                'title' => '🔗 Affiliations',
+                'title' => 'Affiliations',
                 'icon' => 'M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1',
                 'items' => [
                     ['label' => 'All Affiliations', 'route' => 'dashboard', 'permission' => 'view-org-affiliations'],
@@ -263,7 +263,7 @@ class Sidebar extends Component
                 ]
             ],
             'communication' => [
-                'title' => '📨 Communication',
+                'title' => 'Communication',
                 'icon' => 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z',
                 'items' => [
                     ['label' => 'Send Message', 'route' => 'communication.send', 'permission' => 'send-communications', 'icon' => 'M12 19l9 2-9-18-9 18 9-2zm0 0v-8'],
@@ -273,7 +273,7 @@ class Sidebar extends Component
                 ]
             ],
             'reports' => [
-                'title' => '📊 Reports',
+                'title' => 'Reports',
                 'icon' => 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
                 'items' => [
                     ['label' => 'Organization Reports', 'route' => 'dashboard', 'permission' => 'view-org-reports'],
@@ -341,7 +341,7 @@ class Sidebar extends Component
                 'items' => [
                     ['label' => 'Add New Person', 'route' => 'dashboard', 'permission' => 'create-persons'],
                     ['label' => 'Edit Person', 'route' => 'dashboard', 'permission' => 'edit-persons'],
-                    ['label' => 'Search Persons', 'route' => 'dashboard', 'permission' => 'view-persons']
+                    ['label' => 'Search Persons', 'route' => 'person-search', 'permission' => 'view-persons']
                 ]
             ],
             'my_work' => [
@@ -423,7 +423,7 @@ class Sidebar extends Component
                 'icon' => 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
                 'items' => [
                     ['label' => 'View Persons', 'route' => 'dashboard', 'permission' => 'view-persons'],
-                    ['label' => 'Search Persons', 'route' => 'dashboard', 'permission' => 'view-persons']
+                    ['label' => 'Search Persons', 'route' => 'person-search', 'permission' => 'view-persons']
                 ]
             ],
             'reports' => [

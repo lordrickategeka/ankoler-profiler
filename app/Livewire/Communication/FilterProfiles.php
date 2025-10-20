@@ -378,61 +378,6 @@ class FilterProfiles extends Component
         $this->updatePreviewCount();
     }
 
-    // protected function updatePreviewCount()
-    // {
-    //     if (empty($this->filter_criteria)) {
-    //         $this->previewCount = 0;
-    //         return;
-    //     }
-
-    //     try {
-    //         $organization = OrganizationHelper::getCurrentOrganization();
-    //         $filterService = new PersonFilterService($organization);
-
-    //         // Filter out empty criteria
-    //         $cleanCriteria = array_filter($this->filter_criteria, function ($value) {
-    //             return !empty($value);
-    //         });
-
-    //         if (empty($cleanCriteria)) {
-    //             $this->previewCount = 0;
-    //             return;
-    //         }
-
-    //         $this->previewCount = $filterService->applyFilters($cleanCriteria)->getQuery()->count();
-    //     } catch (\Exception $e) {
-    //         $this->previewCount = 0;
-    //     }
-    // }
-
-    // protected function updatePreviewCount()
-    // {
-    //     if (empty($this->filter_criteria)) {
-    //         $this->previewCount = 0;
-    //         return;
-    //     }
-
-    //     try {
-    //         if ($this->considerAllOrganizations && Auth::user()->hasRole('Super Admin')) {
-    //             $filterService = new PersonFilterService(null); // Pass null for all orgs
-    //         } else {
-    //             $organization = Organisation::find($this->selectedOrganizationId) ?: OrganizationHelper::getCurrentOrganization();
-    //             $filterService = new PersonFilterService($organization);
-    //         }
-
-    //         $cleanCriteria = array_filter($this->filter_criteria, fn($value) => !empty($value));
-
-    //         if (empty($cleanCriteria)) {
-    //             $this->previewCount = 0;
-    //             return;
-    //         }
-
-    //         $this->previewCount = $filterService->applyFilters($cleanCriteria)->getQuery()->count();
-    //     } catch (\Exception $e) {
-    //         $this->previewCount = 0;
-    //     }
-    // }
-
     protected function updatePreviewCount()
 {
     if (empty($this->filter_criteria)) {

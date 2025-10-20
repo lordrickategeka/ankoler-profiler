@@ -11,10 +11,11 @@ class CommunicationFilterProfile extends Model
     use HasFactory;
 
     protected $fillable = [
+        'organisation_id',
+        'user_id',
+
         'name',
         'description',
-        'user_id',
-        'organisation_id',
         'filter_criteria',
         'is_active',
         'is_shared',
@@ -63,14 +64,6 @@ class CommunicationFilterProfile extends Model
         return $filterService->applyFilters($this->filter_criteria)->get();
     }
 
-    /**
-     * Increment usage count and update last used timestamp
-     */
-    public function markAsUsed(): void
-    {
-        $this->increment('usage_count');
-        $this->update(['last_used_at' => now()]);
-    }
 
     /**
      * Scope for active profiles
@@ -100,5 +93,57 @@ class CommunicationFilterProfile extends Model
                      ->where('is_shared', true);
               });
         });
+    }
+
+
+    public function scopeOwnedBy($query, $userId)
+    {
+        return $query->where('user_id', $userId)->where('is_active', true);
+    }
+
+    
+    public function getFilterSummaryAttribute()
+    {
+        if (empty($this->filter_criteria)) {
+            return 'No filters';
+        }
+
+        $count = count($this->filter_criteria);
+        return $count . ' filter' . ($count !== 1 ? 's' : '') . ' applied';
+    }
+
+    /**
+     * Check if the profile is owned by a specific user.
+     */
+    public function isOwnedBy($userId)
+    {
+        return $this->user_id === $userId;
+    }
+
+    /**
+     * Increment usage count and update last used timestamp.
+     */
+    public function markAsUsed()
+    {
+        $this->increment('usage_count');
+        $this->update(['last_used_at' => now()]);
+    }
+
+    /**
+     * Get human-readable filter criteria
+     */
+    public function getFormattedCriteriaAttribute()
+    {
+        $criteria = $this->filter_criteria;
+        $formatted = [];
+
+        foreach ($criteria as $key => $value) {
+            if (!empty($value)) {
+                $label = ucfirst(str_replace('_', ' ', $key));
+                $formatted[] = $label . ': ' . (is_array($value) ? implode(', ', $value) : $value);
+            }
+        }
+
+        return $formatted;
     }
 }

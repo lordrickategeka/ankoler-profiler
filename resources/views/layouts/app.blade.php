@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -56,10 +58,13 @@
             </header>
 
             <!-- Page Content -->
-            <div class="flex-1 h-[calc(100vh-8rem)] overflow-y-auto">
-                {{ $slot }}
-                {{-- @yield('content') --}}
-            </div>
+           <div class="flex-1 h-[calc(100vh-8rem)] overflow-y-auto">
+    @isset($slot)
+        {{ $slot }} {{-- For Blade component usage --}}
+    @else
+        @yield('content') {{-- For @extends layout usage --}}
+    @endisset
+</div>
         </main>
         @livewireScripts
 

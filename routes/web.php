@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PersonSearchController;
 use App\Livewire\Dashboard\DashboardComponent;
 use App\Livewire\Person\PersonList;
 use Illuminate\Support\Facades\Route;
@@ -56,6 +57,13 @@ Route::middleware([
     Route::get('/persons/export', App\Livewire\Person\ExportPersons::class)
         ->name('persons.export')
         ->middleware('can:export-org-persons');
+
+
+// Route::resource('persons', PersonSearchController::class);
+Route::get('persons/search', [PersonSearchController::class, 'index2'])->name('person-search');
+Route::get('persons/search/api', [PersonSearchController::class, 'search'])->name('persons.search.api');
+Route::get('persons/search/suggestions', [PersonSearchController::class, 'suggestions'])->name('persons.search.suggestions');
+Route::post('persons/search/export', [PersonSearchController::class, 'export'])->name('persons.search.export');
 
     // Admin routes - Role and Permission Management
     Route::prefix('admin')->name('admin.')->middleware('can:manage-roles')->group(function () {

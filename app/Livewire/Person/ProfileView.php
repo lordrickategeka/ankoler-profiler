@@ -32,10 +32,6 @@ class ProfileView extends Component
 
     public function render()
     {
-        return view('livewire.person.profile-view')
-        ->layout('layouts.app', [
-                'title' => 'profile - Alpha',
-                'pageTitle' => 'Profiler'
-            ]);
+        return view('livewire.person.profile-view');
     }
 }
