@@ -14,12 +14,26 @@ class RolePermissionSeeder extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Create permissions
-        $permissions = [
+    $permissions = [
+            // Unit management permissions
+        'edit-units',
+        'delete-units',
+        'move-units',
+            'approve-unit-membership',
+            'bulk-approve-unit-membership',
             // Dashboard permissions
             'view-dashboard',
             'view-analytics',
             'view-org-analytics',
             'view-risk-overview',
+
+            'assign-organization-unit',
+            'review-organization-units',
+
+            // communication
+            'send-communications',
+            'view-communications',
+            'manage-communications',
 
             // organisation permissions
             'view-organisations',
@@ -34,6 +48,8 @@ class RolePermissionSeeder extends Seeder
             'view-units',
             'view-own-units',
             'create-units',
+            'view-organisation-units',
+
 
             // Person permissions
             'view-persons',
@@ -49,6 +65,10 @@ class RolePermissionSeeder extends Seeder
             'merge-persons',
             'manage-duplicates',
             'verify-persons',
+            'view-persons-document',
+            'edit-persons-document',
+            'delete-persons-document',
+            'Support-persons',
 
             // Affiliation permissions
             'view-affiliations',
@@ -207,6 +227,22 @@ class RolePermissionSeeder extends Seeder
             'view-addresses',
             'view-reports',
             'export-reports',
+        ]);
+
+        // Person role and permissions
+        $personRole = Role::firstOrCreate(['name' => 'Person']);
+        $personRole->syncPermissions([
+            'view-persons',
+            'view-persons-document',
+            'edit-persons-document',
+            'delete-persons-document',
+            'Support-persons',
+            'view-org-persons',
+            'edit-persons',
+            'Support-persons',
+            'view-affiliations',
+            'view-organisation-units',
+            // Do NOT include: 'edit-units', 'delete-units', 'move-units'
         ]);
     }
 }

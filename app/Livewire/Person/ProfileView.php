@@ -4,34 +4,40 @@ namespace App\Livewire\Person;
 
 use Livewire\Component;
 use App\Models\Person;
+use Illuminate\Support\Facades\Auth;
 
 class ProfileView extends Component
 {
     public $person;
-    public $showModal = false;
 
-    protected $listeners = ['show-person-profile' => 'showProfile'];
-
-    public function showProfile($personId)
+    public function mount($person = null)
     {
-        $this->person = Person::with([
+        // If the route parameter is 'me' or null, use the current authenticated user
+        if ($person === null || $person === 'me') {
+            $user = Auth::user();
+            if (method_exists($user, 'person')) {
+                $personModel = $user->person;
+            } else {
+                $personModel = Person::where('user_id', $user->id)->first();
+            }
+            if (!$personModel) {
+                abort(404, 'Person record not found for current user.');
+            }
+        } else if ($person instanceof Person) {
+            $personModel = $person;
+        } else {
+            $personModel = Person::findOrFail($person);
+        }
+        $this->person = $personModel->load([
             'phones',
             'emailAddresses',
             'identifiers',
             'affiliations.organisation'
-        ])->find($personId);
-
-        $this->showModal = true;
-    }
-
-    public function closeModal()
-    {
-        $this->showModal = false;
-        $this->person = null;
+        ]);
     }
 
     public function render()
     {
-        return view('livewire.person.profile-view');
+        return view('livewire.person.person-profile-view');
     }
 }

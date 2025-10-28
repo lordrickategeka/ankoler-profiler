@@ -306,7 +306,7 @@ class CreatePerson extends Component
      */
     public function testLivewire()
     {
-        $this->showSuccessToast('🎉 Livewire is working! Current step: ' . $this->currentStep);
+        $this->showSuccessToast('Livewire is working! Current step: ' . $this->currentStep);
         Log::info('CreatePerson: testLivewire called', [
             'current_step' => $this->currentStep,
             'form_data' => $this->form
@@ -374,6 +374,8 @@ class CreatePerson extends Component
             $currentOrganization = user_current_organization();
             if ($currentOrganization) {
                 $this->selectedOrganisationId = $currentOrganization->id;
+                        // Assign 'Person' role
+                        $user->assignRole('Person');
                 $this->selectedOrganisationName = $currentOrganization->display_name ?? $currentOrganization->legal_name;
                 $this->isOrganizationLocked = true;
             }
@@ -799,7 +801,7 @@ class CreatePerson extends Component
     {
         // Validate the phone field
         $this->validateOnly('form.phone');
-        
+
         if (!empty($this->form['phone'])) {
             $this->checkDuplicates();
         }
@@ -812,7 +814,7 @@ class CreatePerson extends Component
     {
         // Validate the email field
         $this->validateOnly('form.email');
-        
+
         if (!empty($this->form['email'])) {
             $this->checkDuplicates();
         }
@@ -825,7 +827,7 @@ class CreatePerson extends Component
     {
         // Validate the national ID field
         $this->validateOnly('form.national_id');
-        
+
         if (!empty($this->form['national_id'])) {
             $this->checkDuplicates();
         }
@@ -1018,8 +1020,20 @@ class CreatePerson extends Component
         try {
             Log::info('CreatePerson: Starting person creation', ['form_data' => $this->form]);
 
-            // Create person
+
+            // Generate a temporary password
+            $temporaryPassword = substr(str_shuffle('abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789!@#$%'), 0, 10);
+
+            // Generate person_id using IdGenerator helper
+            $personId = \App\Helpers\IdGenerator::generatePersonId();
+            $person_global_identifier = \App\Helpers\IdGenerator::generateGlobalIdentifier();
+
+
+            // Create person (without password field)
             $person = Person::create([
+                'person_id' => $personId,
+                'global_identifier' => $person_global_identifier,
+                'national_id' => $this->form['national_id'] ?: null,
                 'given_name' => $this->form['given_name'],
                 'middle_name' => $this->form['middle_name'] ?: null,
                 'family_name' => $this->form['family_name'],
@@ -1029,17 +1043,38 @@ class CreatePerson extends Component
                 'city' => $this->form['city'] ?: null,
                 'district' => $this->form['district'] ?: null,
                 'country' => $this->form['country'],
-                'classification' => [$this->form['role_type']],
+                'classification' => json_encode([$this->form['role_type']]),
                 'created_by' => Auth::id(),
+                'password' => $temporaryPassword,
             ]);
 
             Log::info('CreatePerson: Person created successfully', ['person_id' => $person->id]);
+
+            // Create a User for this person
+            $user = \App\Models\User::create([
+                'name' => $person->full_name ?? ($person->given_name . ' ' . $person->family_name),
+                'email' => $this->form['email'],
+                'password' => bcrypt($temporaryPassword),
+                'person_id' => $person->id,
+                'organisation_id' => $this->affiliations[0]['organisation_id'] ?? null,
+            ]);
+
+            // Assign 'Person' role to the user
+            if ($user) {
+                $user->assignRole('Person');
+                Log::info('CreatePerson: Assigned Person role to user', ['user_id' => $user->id]);
+            }
+            Log::info('CreatePerson: User created for person', ['user_id' => $user->id, 'person_id' => $person->id]);
+
+            // Send notification to person about profiling, with temp password (email will go to the email address provided)
 
             $this->createContactInformation($person);
             Log::info('CreatePerson: Contact information created');
 
             $this->createMultipleAffiliations($person);
             Log::info('CreatePerson: All affiliations created');
+            \App\Services\NotificationService::notifyProfiled($person, $temporaryPassword);
+            Log::info('CreatePerson: Notification sent to person about profiling');
 
             // Get first organization name for success message
             $firstOrgName = 'Unknown Organization';
@@ -1162,6 +1197,7 @@ class CreatePerson extends Component
                 'type' => 'mobile',
                 'is_primary' => true,
                 'created_by' => Auth::id(),
+                // Do NOT set phone_id here; let the model auto-generate it
             ]);
         }
 
@@ -1203,6 +1239,7 @@ class CreatePerson extends Component
                     'type' => 'mobile',
                     'is_primary' => false, // Don't override existing primary
                     'created_by' => Auth::id(),
+                    // Do NOT set phone_id here; let the model auto-generate it
                 ]);
             }
         }

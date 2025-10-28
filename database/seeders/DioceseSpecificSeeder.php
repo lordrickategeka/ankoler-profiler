@@ -438,14 +438,17 @@ class DioceseSpecificSeeder extends Seeder
      */
     private function createPerson(array $attributes): Person
     {
-        return Person::create(array_merge([
+        // Ensure classification is always an array or null, but for DB insert, pass as JSON or array (Eloquent will cast if model is set up)
+        $data = array_merge([
             'person_id' => 'PRS-' . str_pad(Person::count() + 1, 6, '0', STR_PAD_LEFT),
             'global_identifier' => \Illuminate\Support\Str::uuid(),
-            'classification' => ['diocese_scenario'],
+            'classification' => json_encode(['diocese_scenario']),
             'country' => 'Uganda',
             'status' => 'active',
             'created_by' => '1'
-        ], $attributes));
+        ], $attributes);
+        // If the model casts 'classification' as array/json, you can also just pass the array, but to be safe, use json_encode for DB insert
+        return Person::create($data);
     }
 
     /**

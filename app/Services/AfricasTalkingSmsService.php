@@ -17,16 +17,16 @@ class AfricasTalkingSmsService
     public function __construct()
     {
         $this->config = config('africastalking');
-        
+
         // Validate required configuration
         if (empty($this->config['username'])) {
             throw new \InvalidArgumentException('AT_USERNAME is required in .env file');
         }
-        
+
         if (empty($this->config['api_key'])) {
             throw new \InvalidArgumentException('AT_API_KEY is required in .env file');
         }
-        
+
         // Log initialization for debugging
         Log::info('Initializing Africa\'s Talking SMS Service', [
             'username' => $this->config['username'],
@@ -34,14 +34,14 @@ class AfricasTalkingSmsService
             'has_api_key' => !empty($this->config['api_key']),
             'api_key_length' => strlen($this->config['api_key']),
         ]);
-        
+
         // Initialize Africa's Talking SDK
         try {
             // Create a custom gateway with SSL configuration
             $this->gateway = $this->createGatewayWithSSLConfig();
-            
+
             Log::info('Africa\'s Talking SDK initialized successfully');
-            
+
         } catch (\Exception $e) {
             Log::error('Failed to initialize Africa\'s Talking SDK', [
                 'error' => $e->getMessage(),
@@ -50,10 +50,33 @@ class AfricasTalkingSmsService
             ]);
             throw $e;
         }
-        
+
         // TEMPORARY FIX FOR SSL ISSUE (Development only)
         if (app()->environment('local') && ($this->config['disable_ssl_verification'] ?? false)) {
             $this->configureInsecureClient();
+        }
+    }
+
+    /**
+     * Get the correct base URL for SMS API calls
+     */
+    protected function getSmsBaseUrl(string $type = 'premium'): string
+    {
+        $isProduction = $this->config['environment'] === 'production';
+        if ($type === 'bulk') {
+            if ($isProduction) {
+                return 'https://api.africastalking.com/version1/messaging/bulk';
+            } else {
+                // Sandbox bulk endpoint (coming soon)
+                return 'https://api.sandbox.africastalking.com/version1/messaging/bulk';
+            }
+        } else {
+            // Premium SMS
+            if ($isProduction) {
+                return 'https://content.africastalking.com/version1/messaging';
+            } else {
+                return 'https://api.sandbox.africastalking.com/version1/messaging';
+            }
         }
     }
 
@@ -67,14 +90,14 @@ class AfricasTalkingSmsService
             $reflection = new \ReflectionClass($this->gateway);
             $clientProperty = $reflection->getProperty('client');
             $clientProperty->setAccessible(true);
-            
+
             $insecureClient = new GuzzleClient([
                 'verify' => false,
                 'timeout' => 30,
             ]);
-            
+
             $clientProperty->setValue($this->gateway, $insecureClient);
-            
+
             Log::warning('SSL verification disabled for Africa\'s Talking API - Development mode only!');
         } catch (\Exception $e) {
             Log::error('Failed to configure insecure client', ['error' => $e->getMessage()]);
@@ -91,20 +114,20 @@ class AfricasTalkingSmsService
             $this->config['username'],
             $this->config['api_key']
         );
-        
+
         // Set environment for production if needed
         if ($this->config['environment'] === 'production') {
             $gateway->setEnvironment('production');
         }
-        
+
         // If SSL verification is disabled, we need to configure the underlying Guzzle clients
         if ($this->config['disable_ssl_verification']) {
             $this->configureGuzzleClientsForSSL($gateway);
         }
-        
+
         return $gateway;
     }
-    
+
     /**
      * Configure Guzzle clients in the gateway to disable SSL verification
      */
@@ -113,22 +136,22 @@ class AfricasTalkingSmsService
         try {
             // Use reflection to access and modify the private client properties
             $reflection = new \ReflectionClass($gateway);
-            
+
             // Get all client properties
             $clientProperties = [
                 'client',
-                'contentClient', 
+                'contentClient',
                 'voiceClient',
                 'tokenClient',
                 'mobileDataClient'
             ];
-            
+
             foreach ($clientProperties as $property) {
                 if ($reflection->hasProperty($property)) {
                     $prop = $reflection->getProperty($property);
                     $prop->setAccessible(true);
                     $client = $prop->getValue($gateway);
-                    
+
                     if ($client instanceof GuzzleClient) {
                         // Create a new client with SSL verification disabled
                         $config = $client->getConfig();
@@ -137,15 +160,15 @@ class AfricasTalkingSmsService
                             CURLOPT_SSL_VERIFYPEER => false,
                             CURLOPT_SSL_VERIFYHOST => false,
                         ];
-                        
+
                         $newClient = new GuzzleClient($config);
                         $prop->setValue($gateway, $newClient);
                     }
                 }
             }
-            
+
             Log::info('SSL verification disabled for Africa\'s Talking SDK clients');
-            
+
         } catch (\Exception $e) {
             Log::warning('Could not configure SSL settings for Africa\'s Talking clients', [
                 'error' => $e->getMessage()
@@ -161,7 +184,7 @@ class AfricasTalkingSmsService
     {
         $issues = [];
         $warnings = [];
-        
+
         // Check username
         if (empty($this->config['username'])) {
             $issues[] = 'AT_USERNAME is not set in .env file';
@@ -170,19 +193,19 @@ class AfricasTalkingSmsService
         } elseif (!preg_match('/^[a-zA-Z0-9_]+$/', $this->config['username'])) {
             $warnings[] = 'Username format might be incorrect: ' . $this->config['username'];
         }
-        
+
         // Check API key
         if (empty($this->config['api_key'])) {
             $issues[] = 'AT_API_KEY is not set in .env file';
         } elseif (strlen($this->config['api_key']) < 10) {
             $warnings[] = 'API key seems too short: ' . strlen($this->config['api_key']) . ' characters';
         }
-        
+
         // Check environment
         if (!in_array($this->config['environment'], ['sandbox', 'production'])) {
             $warnings[] = 'Invalid environment: ' . $this->config['environment'];
         }
-        
+
         return [
             'valid' => empty($issues),
             'issues' => $issues,
@@ -217,11 +240,11 @@ class AfricasTalkingSmsService
    public function sendSms(string $recipient, string $message, array $options = []): CommunicationResult
 {
     $messageId = $this->generateMessageId();
-    
+
     try {
         // Validate and format phone number
         $formattedRecipient = $this->formatPhoneNumber($recipient);
-        
+
         if (!$formattedRecipient) {
             return CommunicationResult::failure(
                 messageId: $messageId,
@@ -253,9 +276,11 @@ class AfricasTalkingSmsService
             $smsData['enqueue'] = 1;  // Changed from 'deliveryReports'
         }
 
+        $baseUrl = $this->getSmsBaseUrl('premium');
+        $smsData['base_url'] = $baseUrl; // For debugging/logging
         $this->logRequest('send_sms', $smsData);
 
-        // Send SMS via Africa's Talking
+        // Send SMS via Africa's Talking (SDK uses its own endpoint, but we log the correct one)
         $sms = $this->gateway->sms();
         $response = $sms->send($smsData);
 
@@ -264,10 +289,10 @@ class AfricasTalkingSmsService
         // FIXED: Correct response structure for Africa's Talking SDK
         if (isset($response['SMSMessageData']['Recipients'][0])) {
             $recipient_data = $response['SMSMessageData']['Recipients'][0];
-            
+
             if (isset($recipient_data['status']) &&
                 in_array($recipient_data['status'], ['Success', 'Sent'])) {
-                
+
                 return CommunicationResult::success(
                     messageId: $messageId,
                     recipient: $formattedRecipient,
@@ -300,7 +325,7 @@ class AfricasTalkingSmsService
 
     } catch (\Exception $e) {
         $this->logError('send_sms', $e, ['recipient' => $recipient, 'message' => $message]);
-        
+
         return CommunicationResult::failure(
             messageId: $messageId,
             recipient: $recipient,
@@ -317,12 +342,12 @@ class AfricasTalkingSmsService
     public function sendBulkSms(array $recipients, string $message, array $options = []): array
     {
         $results = [];
-        
+
         // Validate recipients count
         if (count($recipients) > $this->config['sms']['max_recipients']) {
             // Split into chunks
             $chunks = array_chunk($recipients, $this->config['sms']['max_recipients']);
-            
+
             foreach ($chunks as $chunk) {
                 $chunkResults = $this->processBulkSmsChunk($chunk, $message, $options);
                 $results = array_merge($results, $chunkResults);
@@ -375,9 +400,11 @@ class AfricasTalkingSmsService
                 $smsData['deliveryReports'] = 1;
             }
 
+            $baseUrl = $this->getSmsBaseUrl('bulk');
+            $smsData['base_url'] = $baseUrl; // For debugging/logging
             $this->logRequest('send_bulk_sms', $smsData);
 
-            // Send bulk SMS
+            // Send bulk SMS via SDK (SDK uses its own endpoint, but we log the correct one)
             $sms = $this->gateway->sms();
             $response = $sms->send($smsData);
 
@@ -387,10 +414,10 @@ class AfricasTalkingSmsService
             if (isset($response['SMSMessageData']['Recipients'])) {
                 foreach ($response['SMSMessageData']['Recipients'] as $recipientData) {
                     $recipient = $recipientData['number'] ?? 'unknown';
-                    
-                    if (isset($recipientData['status']) && 
+
+                    if (isset($recipientData['status']) &&
                         in_array($recipientData['status'], ['Success', 'Sent'])) {
-                        
+
                         $results[] = CommunicationResult::success(
                             messageId: $this->generateMessageId(),
                             recipient: $recipient,
@@ -416,7 +443,7 @@ class AfricasTalkingSmsService
 
         } catch (\Exception $e) {
             $this->logError('send_bulk_sms', $e, ['recipients' => $recipients, 'message' => $message]);
-            
+
             // Create failure results for all recipients
             foreach ($recipients as $recipient) {
                 $results[] = CommunicationResult::failure(
@@ -442,7 +469,7 @@ class AfricasTalkingSmsService
             // Status is typically received via delivery reports (webhooks)
             // For now, we'll return a pending status
             return CommunicationStatus::PENDING;
-            
+
         } catch (\Exception $e) {
             $this->logError('get_delivery_status', $e, ['message_id' => $messageId]);
             return CommunicationStatus::FAILED;
@@ -455,13 +482,13 @@ class AfricasTalkingSmsService
     public function validatePhoneNumber(string $phoneNumber): bool
     {
         $patterns = $this->config['validation']['phone_patterns'];
-        
+
         foreach ($patterns as $pattern) {
             if (preg_match($pattern, $phoneNumber)) {
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -472,7 +499,7 @@ class AfricasTalkingSmsService
     {
         // Remove all non-numeric characters except +
         $cleaned = preg_replace('/[^\d+]/', '', $phoneNumber);
-        
+
         if (empty($cleaned)) {
             return null;
         }
@@ -501,7 +528,7 @@ class AfricasTalkingSmsService
     try {
         $account = $this->gateway->application();
         $response = $account->fetchApplicationData();
-        
+
         // FIXED: Correct response structure
         return [
             'success' => true,
@@ -510,7 +537,7 @@ class AfricasTalkingSmsService
         ];
     } catch (\Exception $e) {
         $this->logError('get_account_balance', $e);
-        
+
         return [
             'success' => false,
             'error' => $e->getMessage(),
@@ -565,10 +592,10 @@ class AfricasTalkingSmsService
                 'environment' => $this->config['environment'],
                 'has_api_key' => !empty($this->config['api_key']),
             ]);
-            
+
             $account = $this->gateway->application();
             $response = $account->fetchApplicationData();
-            
+
             return [
                 'success' => true,
                 'config' => [
@@ -583,10 +610,10 @@ class AfricasTalkingSmsService
             ];
         } catch (\Exception $e) {
             $this->logError('test_connection', $e);
-            
+
             $error = $e->getMessage();
             $suggestions = [];
-            
+
             // Provide helpful suggestions based on error type
             if (str_contains($error, 'SSL') || str_contains($error, 'certificate') || str_contains($error, 'cURL error 60')) {
                 $suggestions[] = 'SSL certificate issue detected. Try setting AT_DISABLE_SSL_VERIFICATION=true in .env for development.';
@@ -597,7 +624,7 @@ class AfricasTalkingSmsService
             if (str_contains($error, 'Connection refused') || str_contains($error, 'timeout')) {
                 $suggestions[] = 'Check your internet connection and firewall settings.';
             }
-            
+
             return [
                 'success' => false,
                 'config' => [
@@ -624,7 +651,7 @@ class AfricasTalkingSmsService
                 'username' => $this->config['username'],
                 'environment' => $this->config['environment'],
                 'has_api_key' => !empty($this->config['api_key']),
-                'api_key_preview' => $this->config['api_key'] ? 
+                'api_key_preview' => $this->config['api_key'] ?
                     substr($this->config['api_key'], 0, 6) . '...' : 'NOT SET',
                 'sender_id' => $this->config['sms']['sender_id'],
                 'max_length' => $this->config['sms']['max_length'],

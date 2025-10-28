@@ -6,6 +6,9 @@ use App\Livewire\Person\PersonList;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RelationshipController;
 use App\Http\Controllers\SMSWebhookController;
+use App\Http\Controllers\AfricasTalkingCallbackController;
+use App\Livewire\Person\Notifications as PersonNotificationsLivewire;
+
 
 Route::get('/', function () {
     return view('auth.login');
@@ -55,8 +58,32 @@ Route::middleware([
         ->name('persons.import')
         ->middleware('can:import-org-persons');
     Route::get('/persons/export', App\Livewire\Person\ExportPersons::class)
-        ->name('persons.export')
-        ->middleware('can:export-org-persons');
+        ->name('persons.export');
+
+    // Person profile view
+    Route::get('/persons/profile-current', App\Livewire\Person\ProfileView::class)
+        ->name('persons.profile-current');
+
+    // Organisation Units for current user
+    Route::get('/my-organisation-units', App\Livewire\Person\OrganisationUnitsList::class)
+        ->name('person.organisation-units');
+
+
+    Route::get('/person/notifications', PersonNotificationsLivewire::class)->name('person.notifications');
+
+    // Organization Units - User listing and application
+    Route::get('/organization-units', App\Livewire\Organizations\ListOrganizationUnits::class)
+        ->name('organization-units.index')
+        ->middleware('can:view-organisation-units');
+
+    Route::get('/organization-units/create', App\Livewire\Organizations\CreateOrganizationUnit::class)
+        ->name('organization-units.create')
+        ->middleware('can:create-units');
+
+    // Organization Units - Admin review of applications
+    Route::get('/organization-units/applications', App\Livewire\Organizations\ReviewUnitApplications::class)
+        ->name('organization-units.applications')
+        ->middleware('can:review-organization-units');
 
 
 // Route::resource('persons', PersonSearchController::class);
@@ -81,12 +108,9 @@ Route::post('persons/search/export', [PersonSearchController::class, 'export'])-
     });
 
     // Organization Units routes
-    Route::get('/organization-units', App\Livewire\Organizations\OrganisationUnitsComponent::class)
-        ->name('organization-units.index')
-        ->middleware('can:view-units');
-    Route::get('/organization-units/create', App\Livewire\Organizations\CreateOrganizationUnit::class)
-        ->name('organization-units.create')
-        ->middleware('can:create-units');
+    // Route::get('/organization-units', App\Livewire\Organizations\OrganisationUnitsComponent::class)
+    //     ->name('organization-units.index')
+    //     ->middleware('can:view-units');
 
     // Communication routes
     Route::prefix('communication')->name('communication.')->group(function () {
@@ -144,3 +168,6 @@ Route::middleware(['auth:sanctum'])->prefix('api/relationships')->name('api.rela
 
 Route::post('/webhooks/africastalking/delivery-reports', [SMSWebhookController::class, 'handleDeliveryReport'])
     ->name('sms.delivery.webhook');
+
+// Africa's Talking callback endpoint
+Route::post('/africastalking/callback', [AfricasTalkingCallbackController::class, 'handle'])->name('africastalking.callback');

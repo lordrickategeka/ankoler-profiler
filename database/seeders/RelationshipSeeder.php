@@ -1,5 +1,4 @@
 <?php
-
 namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -311,43 +310,39 @@ class RelationshipSeeder extends Seeder
             $affiliations = $person->affiliations->where('status', 'active');
 
             if ($affiliations->count() >= 2) {
-                $affiliationArray = $affiliations->toArray();
+                $affiliationModels = $affiliations->values();
 
-                for ($i = 0; $i < count($affiliationArray) - 1; $i++) {
-                    for ($j = $i + 1; $j < count($affiliationArray); $j++) {
-                        $primary = $affiliationArray[$i];
-                        $secondary = $affiliationArray[$j];
+                for ($i = 0; $i < $affiliationModels->count() - 1; $i++) {
+                    for ($j = $i + 1; $j < $affiliationModels->count(); $j++) {
+                        $primary = $affiliationModels->get($i);
+                        $secondary = $affiliationModels->get($j);
 
-                        // Check if cross-org relationship already exists
-                        $exists = CrossOrgRelationship::where('person_id', $person->id)
-                            ->where('primary_affiliation_id', $primary['id'])
-                            ->where('secondary_affiliation_id', $secondary['id'])
-                            ->exists();
+                        // Use updateOrCreate to avoid duplicate unique constraint errors
+                        $strength = $this->calculateRelationshipStrength($primary, $secondary);
+                        $impactScore = $this->calculateImpactScore($primary, $secondary);
 
-                        if (!$exists) {
-                            $strength = $this->calculateRelationshipStrength($primary, $secondary);
-                            $impactScore = $this->calculateImpactScore($primary, $secondary);
-
-                            CrossOrgRelationship::createCrossOrgRelationship(
-                                $person->id,
-                                $primary['id'],
-                                $secondary['id'],
-                                [
-                                    'relationship_strength' => $strength,
-                                    'discovery_method' => 'automatic',
-                                    'impact_score' => $impactScore,
-                                    'verified' => rand(0, 3) == 0, // 25% chance of being verified
-                                    'verified_at' => rand(0, 3) == 0 ? now()->subDays(rand(1, 20)) : null,
-                                    'verified_by' => rand(0, 3) == 0 ? 1 : null,
-                                    'metadata' => [
-                                        'auto_discovery' => true,
-                                        'time_gap_days' => $this->calculateTimeGap($primary, $secondary),
-                                        'discovery_date' => now()->subDays(rand(1, 90))->toDateString()
-                                    ]
-                                ]
-                            );
-                            $created++;
-                        }
+                        CrossOrgRelationship::updateOrCreate(
+                            [
+                                'person_id' => $person->id,
+                                'primary_affiliation_id' => $primary->id,
+                                'secondary_affiliation_id' => $secondary->id,
+                            ],
+                            [
+                                'relationship_strength' => $strength,
+                                'discovery_method' => 'automatic',
+                                'impact_score' => $impactScore,
+                                'verified' => rand(0, 3) == 0, // 25% chance of being verified
+                                'verified_at' => rand(0, 3) == 0 ? now()->subDays(rand(1, 20)) : null,
+                                'verified_by' => rand(0, 3) == 0 ? 1 : null,
+                                'metadata' => [
+                                    'auto_discovery' => true,
+                                    'time_gap_days' => $this->calculateTimeGap($primary, $secondary),
+                                    'discovery_date' => now()->subDays(rand(1, 90))->toDateString()
+                                ],
+                                'status' => 'active',
+                            ]
+                        );
+                        $created++;
                     }
                 }
             }
@@ -414,11 +409,13 @@ class RelationshipSeeder extends Seeder
             $affiliation2 = $existingAffiliation2;
         }
 
-        // Create cross-org relationship
-        CrossOrgRelationship::createCrossOrgRelationship(
-            $affiliation1->person_id,
-            $affiliation1->id,
-            $affiliation2->id,
+        // Use updateOrCreate to avoid duplicate unique constraint errors
+        CrossOrgRelationship::updateOrCreate(
+            [
+                'person_id' => $affiliation1->person_id,
+                'primary_affiliation_id' => $affiliation1->id,
+                'secondary_affiliation_id' => $affiliation2->id,
+            ],
             [
                 'relationship_strength' => 'strong',
                 'discovery_method' => 'automatic',
@@ -427,7 +424,8 @@ class RelationshipSeeder extends Seeder
                 'metadata' => [
                     'scenario_type' => "{$role1}_at_{$orgType1}_{$role2}_at_{$orgType2}",
                     'high_impact_scenario' => true
-                ]
+                ],
+                'status' => 'active',
             ]
         );
 
@@ -479,7 +477,6 @@ class RelationshipSeeder extends Seeder
 
         foreach ($samplePersons as $personData) {
             Person::create(array_merge($personData, [
-                'person_id' => 'PRS-' . str_pad(Person::max('id') + 1, 6, '0', STR_PAD_LEFT),
                 'global_identifier' => Str::uuid(),
                 'status' => 'active',
                 'country' => 'Uganda',
@@ -524,18 +521,18 @@ class RelationshipSeeder extends Seeder
         return 'dependent';
     }
 
-    private function calculateRelationshipStrength(array $primary, array $secondary): string
+    private function calculateRelationshipStrength(PersonAffiliation $primary, PersonAffiliation $secondary): string
     {
         $score = 0;
 
         // Role importance
         $importantRoles = ['ADMIN', 'MANAGER', 'DOCTOR', 'TEACHER'];
-        if (in_array($primary['role_type'], $importantRoles)) $score += 2;
-        if (in_array($secondary['role_type'], $importantRoles)) $score += 2;
+        if (in_array($primary->role_type, $importantRoles)) $score += 2;
+        if (in_array($secondary->role_type, $importantRoles)) $score += 2;
 
         // Time proximity
-        if (isset($primary['start_date']) && isset($secondary['start_date'])) {
-            $daysDiff = abs(strtotime($primary['start_date']) - strtotime($secondary['start_date'])) / (60 * 60 * 24);
+        if (!empty($primary->start_date) && !empty($secondary->start_date)) {
+            $daysDiff = abs(strtotime($primary->start_date) - strtotime($secondary->start_date)) / (60 * 60 * 24);
             if ($daysDiff <= 30) $score += 3;
             elseif ($daysDiff <= 90) $score += 2;
             elseif ($daysDiff <= 365) $score += 1;
@@ -555,13 +552,13 @@ class RelationshipSeeder extends Seeder
 
         // High-impact combinations
         $highImpactCombos = [
-            ['STAFF', 'PATIENT'], 0.3,
-            ['TEACHER', 'STUDENT'], 0.3,
-            ['ADMIN', 'MEMBER'], 0.25,
-            ['DOCTOR', 'PATIENT'], 0.35
+            [['STAFF', 'PATIENT'], 0.3],
+            [['TEACHER', 'STUDENT'], 0.3],
+            [['ADMIN', 'MEMBER'], 0.25],
+            [['DOCTOR', 'PATIENT'], 0.35]
         ];
 
-       foreach ($highImpactCombos as $entry) {
+        foreach ($highImpactCombos as $entry) {
             $combo = $entry[0];
             $boost = $entry[1];
 
@@ -575,12 +572,12 @@ class RelationshipSeeder extends Seeder
         return min(1.0, $score);
     }
 
-    private function calculateTimeGap(array $primary, array $secondary): int
+
+    private function calculateTimeGap(PersonAffiliation $primary, PersonAffiliation $secondary): int
     {
-        if (!isset($primary['start_date']) || !isset($secondary['start_date'])) {
+        if (empty($primary->start_date) || empty($secondary->start_date)) {
             return 0;
         }
-
-        return abs(strtotime($primary['start_date']) - strtotime($secondary['start_date'])) / (60 * 60 * 24);
+        return abs(strtotime($primary->start_date) - strtotime($secondary->start_date)) / (60 * 60 * 24);
     }
 }

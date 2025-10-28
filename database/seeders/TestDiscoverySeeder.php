@@ -67,28 +67,24 @@ class TestDiscoverySeeder extends Seeder
                 'family_name' => 'Ssebunya',
                 'gender' => 'male',
                 'date_of_birth' => now()->subYears(45),
-                'role' => 'father'
             ],
             [
                 'given_name' => 'Christine',
                 'family_name' => 'Ssebunya',
                 'gender' => 'female',
                 'date_of_birth' => now()->subYears(42),
-                'role' => 'mother'
             ],
             [
                 'given_name' => 'David',
                 'family_name' => 'Ssebunya',
                 'gender' => 'male',
                 'date_of_birth' => now()->subYears(17),
-                'role' => 'son'
             ],
             [
                 'given_name' => 'Ruth',
                 'family_name' => 'Ssebunya',
                 'gender' => 'female',
                 'date_of_birth' => now()->subYears(14),
-                'role' => 'daughter'
             ]
         ];
 
@@ -96,8 +92,7 @@ class TestDiscoverySeeder extends Seeder
             $this->createTestPerson(array_merge($memberData, [
                 'address' => $sharedAddress,
                 'city' => $sharedCity,
-                'district' => $sharedDistrict,
-                'test_type' => 'address_discovery'
+                'district' => $sharedDistrict
             ]));
         }
 
@@ -109,8 +104,7 @@ class TestDiscoverySeeder extends Seeder
             'date_of_birth' => now()->subYears(25),
             'address' => $sharedAddress,
             'city' => $sharedCity,
-            'district' => $sharedDistrict,
-            'test_type' => 'address_discovery_unrelated'
+            'district' => $sharedDistrict
         ]);
     }
 
@@ -129,16 +123,14 @@ class TestDiscoverySeeder extends Seeder
             'given_name' => 'Andrew',
             'family_name' => 'Kiwanuka',
             'gender' => 'male',
-            'date_of_birth' => now()->subYears(35),
-            'test_type' => 'contact_discovery'
+            'date_of_birth' => now()->subYears(35)
         ]);
 
         $person2 = $this->createTestPerson([
             'given_name' => 'Esther',
             'family_name' => 'Namusisi',
             'gender' => 'female',
-            'date_of_birth' => now()->subYears(32),
-            'test_type' => 'contact_discovery'
+            'date_of_birth' => now()->subYears(32)
         ]);
 
         // Add shared phone number
@@ -194,8 +186,7 @@ class TestDiscoverySeeder extends Seeder
         foreach ($familyMembers as $memberData) {
             $this->createTestPerson(array_merge($memberData, [
                 'family_name' => $familyName,
-                'district' => 'Kasese',
-                'test_type' => 'name_pattern_discovery'
+                'district' => 'Kasese'
             ]));
         }
     }
@@ -218,8 +209,7 @@ class TestDiscoverySeeder extends Seeder
             'given_name' => 'Susan',
             'family_name' => 'Namuli',
             'gender' => 'female',
-            'date_of_birth' => now()->subYears(38),
-            'test_type' => 'temporal_discovery_parent'
+            'date_of_birth' => now()->subYears(38)
         ]);
 
         // Create potential child
@@ -227,8 +217,7 @@ class TestDiscoverySeeder extends Seeder
             'given_name' => 'James',
             'family_name' => 'Namuli',
             'gender' => 'male',
-            'date_of_birth' => now()->subYears(16),
-            'test_type' => 'temporal_discovery_child'
+            'date_of_birth' => now()->subYears(16)
         ]);
 
         // Create affiliations with dates close together (suggesting parent enrolled child)
@@ -277,8 +266,7 @@ class TestDiscoverySeeder extends Seeder
             'given_name' => 'Dr. Patricia',
             'family_name' => 'Namukasa',
             'gender' => 'female',
-            'date_of_birth' => now()->subYears(40),
-            'test_type' => 'cross_org_discovery'
+            'date_of_birth' => now()->subYears(40)
         ]);
 
         // Create multiple affiliations
@@ -306,14 +294,15 @@ class TestDiscoverySeeder extends Seeder
      */
     private function createTestPerson(array $attributes): Person
     {
-        return Person::create(array_merge([
+        $data = array_merge([
             'person_id' => 'TEST-' . str_pad(rand(1000, 9999), 6, '0', STR_PAD_LEFT),
             'global_identifier' => Str::uuid(),
-            'classification' => ['test_discovery'],
+            'classification' => json_encode(['test_discovery']),
             'country' => 'Uganda',
             'status' => 'active',
             'created_by' => '1'
-        ], $attributes));
+        ], $attributes);
+        return Person::create($data);
     }
 
     /**

@@ -1,4 +1,15 @@
-<div class="space-y-6">
+<div class="space-y-6" x-data="{ showDrawer: false, selectedMessage: null }">
+    @if (session()->has('success'))
+        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)"
+            class="fixed top-4 right-4 z-50">
+            <div class="toast toast-top toast-end">
+                <div class="alert alert-success">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"></path></svg>
+                    <span>{{ session('success') }}</span>
+                </div>
+            </div>
+        </div>
+    @endif
     {{-- Statistics Cards --}}
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
@@ -66,7 +77,7 @@
         </div>
 
         <div class="p-4">
-            <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
+            <div class="flex flex-wrap gap-4 items-end">
                 <div class="form-control">
                     <input type="text" wire:model.live.debounce.300ms="search"
                            class="input input-bordered input-sm"
@@ -175,10 +186,9 @@
                             </td>
                             <td>
                                 <div class="flex gap-1">
-                                    <button class="btn btn-ghost btn-xs"
-                                            onclick="viewMessage{{ $message->id }}.showModal()">
+                                    <label for="drawer-message-{{ $message->id }}" class="btn btn-ghost btn-xs drawer-button">
                                         View
-                                    </button>
+                                    </label>
                                     @if($message->bulk_message_id)
                                         <button class="btn btn-ghost btn-xs text-blue-600"
                                                 onclick="viewBulkStats{{ $message->id }}.showModal()">
@@ -211,4 +221,31 @@
             </div>
         @endif
     </div>
+    <!-- DaisyUI Drawer for message details -->
+    @foreach($messages as $message)
+        <div class="drawer drawer-end z-50">
+            <input id="drawer-message-{{ $message->id }}" type="checkbox" class="drawer-toggle" />
+            <div class="drawer-side">
+                <label for="drawer-message-{{ $message->id }}" aria-label="close sidebar" class="drawer-overlay"></label>
+                <div class="menu p-6 w-96 min-h-full bg-base-100 text-base-content relative">
+                    <button class="absolute top-4 right-4 btn btn-sm btn-ghost" for="drawer-message-{{ $message->id }}">&times;</button>
+                    <h2 class="text-xl font-bold mb-2">Message Details</h2>
+                    <div class="mb-2"><span class="font-semibold">Channel:</span> {{ $message->channel }}</div>
+                    <div class="mb-2"><span class="font-semibold">Recipient:</span> {{ $message->recipient_identifier }}</div>
+                    <div class="mb-2"><span class="font-semibold">Subject:</span> {{ $message->subject }}</div>
+                    <div class="mb-2"><span class="font-semibold">Content:</span> {{ $message->content }}</div>
+                    <div class="mb-2"><span class="font-semibold">Status:</span> {{ $message->status }}</div>
+                    <div class="mb-2"><span class="font-semibold">Sent By:</span> {{ $message->sentByUser?->name ?? 'System' }}</div>
+                    <div class="mb-2"><span class="font-semibold">Created At:</span> {{ $message->created_at->format('M d, Y H:i A') }}</div>
+                    <div class="mb-2"><span class="font-semibold">Bulk Message ID:</span> {{ $message->bulk_message_id }}</div>
+                    <div class="divider"></div>
+                    <div class="flex gap-2 mt-2">
+                        <button class="btn btn-outline btn-sm" wire:click="resendMessage({{ $message->id }})">Resend</button>
+                        <button class="btn btn-outline btn-sm" wire:click="editMessage({{ $message->id }})">Edit</button>
+                        <button class="btn btn-outline btn-sm btn-error" wire:click="deleteMessage({{ $message->id }})">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
 </div>

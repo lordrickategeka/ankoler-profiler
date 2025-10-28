@@ -39,9 +39,8 @@ class EmailAddress extends Model
 
         static::creating(function ($email) {
             if (empty($email->email_id)) {
-                $email->email_id = self::generateEmailId();
+                $email->email_id = \App\Helpers\IdGenerator::generateEmailId();
             }
-            
             // Normalize email to lowercase
             $email->email = strtolower($email->email);
         });
@@ -68,25 +67,7 @@ class EmailAddress extends Model
         });
     }
 
-    /**
-     * Generate unique email ID
-     */
-    public static function generateEmailId(): string
-    {
-        $prefix = 'EML-';
-        $lastEmail = self::where('email_id', 'like', $prefix . '%')
-            ->orderBy('email_id', 'desc')
-            ->first();
-
-        if ($lastEmail) {
-            $lastNumber = (int) substr($lastEmail->email_id, strlen($prefix));
-            $newNumber = $lastNumber + 1;
-        } else {
-            $newNumber = 1;
-        }
-
-        return $prefix . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
-    }
+    // ...existing code...
 
     /**
      * Relationships

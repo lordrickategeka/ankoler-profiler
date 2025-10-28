@@ -71,7 +71,7 @@ class RelationshipDiscoveryService
     /**
      * Discover relationships based on shared addresses
      */
-    private function discoverByAddress(): int
+    public function discoverByAddress(): int
     {
         $discovered = 0;
 
@@ -103,7 +103,7 @@ class RelationshipDiscoveryService
     /**
      * Analyze a group of people sharing the same address
      */
-    private function analyzeAddressGroup(Collection $persons): int
+    public function analyzeAddressGroup(Collection $persons): int
     {
         $discovered = 0;
 
@@ -145,7 +145,7 @@ class RelationshipDiscoveryService
     /**
      * Discover relationships by shared contact information
      */
-    private function discoverByContactInfo(): int
+    public function discoverByContactInfo(): int
     {
         $discovered = 0;
 
@@ -176,7 +176,7 @@ class RelationshipDiscoveryService
 
         foreach ($emailGroups as $email) {
             $persons = Person::query()
-                ->whereHas('emails', function ($query) use ($email) {
+                ->whereHas('emailAddresses', function ($query) use ($email) {
                     $query->where('email', $email);
                 })
                 ->where('status', 'active')
@@ -191,7 +191,7 @@ class RelationshipDiscoveryService
     /**
      * Analyze people sharing contact information
      */
-    private function analyzeContactGroup(Collection $persons, string $contactType, string $contactValue): int
+    public function analyzeContactGroup(Collection $persons, string $contactType, string $contactValue): int
     {
         $discovered = 0;
 
@@ -233,7 +233,7 @@ class RelationshipDiscoveryService
     /**
      * Discover relationships by name patterns
      */
-    private function discoverByNamePatterns(): int
+    public function discoverByNamePatterns(): int
     {
         $discovered = 0;
 
@@ -261,7 +261,7 @@ class RelationshipDiscoveryService
     /**
      * Analyze people with the same family name
      */
-    private function analyzeFamilyNameGroup(Collection $persons): int
+    public function analyzeFamilyNameGroup(Collection $persons): int
     {
         $discovered = 0;
 
@@ -302,7 +302,7 @@ class RelationshipDiscoveryService
     /**
      * Discover relationships by temporal patterns (enrollment dates, etc.)
      */
-    private function discoverByTemporalPatterns(): int
+    public function discoverByTemporalPatterns(): int
     {
         $discovered = 0;
 
@@ -387,7 +387,7 @@ class RelationshipDiscoveryService
     /**
      * Analyze cross-organizational connections for a person
      */
-    private function analyzeCrossOrgConnections(int $personId, Collection $affiliations): int
+    public function analyzeCrossOrgConnections(int $personId, Collection $affiliations): int
     {
         $discovered = 0;
 
@@ -433,7 +433,7 @@ class RelationshipDiscoveryService
     /**
      * Determine relationship type between two persons
      */
-    private function determineRelationshipType(Person $person1, Person $person2): ?string
+    public function determineRelationshipType(Person $person1, Person $person2): ?string
     {
         $age1 = $person1->date_of_birth ? now()->diffInYears($person1->date_of_birth) : null;
         $age2 = $person2->date_of_birth ? now()->diffInYears($person2->date_of_birth) : null;
@@ -463,7 +463,7 @@ class RelationshipDiscoveryService
     /**
      * Calculate confidence score for relationship
      */
-    private function calculateConfidence(Person $person1, Person $person2, string $discoveryMethod): float
+    public function calculateConfidence(Person $person1, Person $person2, string $discoveryMethod): float
     {
         $confidence = 0.5; // Base confidence
 
@@ -501,7 +501,7 @@ class RelationshipDiscoveryService
     /**
      * Calculate relationship strength for cross-org connections
      */
-    private function calculateRelationshipStrength(PersonAffiliation $primary, PersonAffiliation $secondary): string
+    public function calculateRelationshipStrength(PersonAffiliation $primary, PersonAffiliation $secondary): string
     {
         $score = 0;
 
@@ -544,7 +544,7 @@ class RelationshipDiscoveryService
     /**
      * Calculate impact score for cross-org relationship
      */
-    private function calculateCrossOrgImpactScore(PersonAffiliation $primary, PersonAffiliation $secondary): float
+    public function calculateCrossOrgImpactScore(PersonAffiliation $primary, PersonAffiliation $secondary): float
     {
         $score = 0.5; // Base score
 
@@ -573,7 +573,7 @@ class RelationshipDiscoveryService
     /**
      * Check if relationship already exists between two persons
      */
-    private function relationshipExists(int $personId1, int $personId2): bool
+    public function relationshipExists(int $personId1, int $personId2): bool
     {
         return PersonRelationship::query()
             ->where(function ($query) use ($personId1, $personId2) {

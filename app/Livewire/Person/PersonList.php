@@ -33,6 +33,10 @@ class PersonList extends Component
     public $showDeleteModal = false;
     public $personToDeleteId = null;
 
+        // Edit person properties
+        public $editPersonId = null;
+        public $editPersonData = [];
+
     protected $queryString = [
         'filters' => ['except' => []],
         'showAdvancedFilters' => ['except' => false]
@@ -80,7 +84,7 @@ class PersonList extends Component
         // Clear specific cache patterns instead of Cache::flush()
         $user = Auth::user();
         $currentOrganization = user_current_organization();
-        
+
         $patterns = [
             'person_list_' . md5(serialize([
                 $this->filters,
@@ -196,11 +200,11 @@ class PersonList extends Component
 
                 $this->showDeleteModal = false;
                 $this->personToDeleteId = null;
-                
+
                 session()->flash('message', "Person '{$personName}' has been successfully deleted.");
                 $this->clearPersonListCache();
                 $this->resetPage();
-                
+
             } catch (\Exception $e) {
                 DB::rollBack();
                 throw $e;
@@ -217,6 +221,36 @@ class PersonList extends Component
         $this->showDeleteModal = false;
         $this->personToDeleteId = null;
     }
+
+        /**
+         * Load a person's data for editing
+         */
+        public function editPerson($id)
+        {
+            $person = Person::findOrFail($id);
+            $this->editPersonId = $person->id;
+            $this->editPersonData = $person->toArray();
+        }
+
+        /**
+         * Update the person's data
+         */
+        public function updatePerson()
+        {
+            if (!$this->editPersonId) {
+                return;
+            }
+            $person = Person::findOrFail($this->editPersonId);
+            $person->fill($this->editPersonData);
+            $person->save();
+            // Optionally reset edit state
+            $this->editPersonId = null;
+            $this->editPersonData = [];
+            session()->flash('message', 'Person updated successfully.');
+            // Optionally refresh list or emit event
+            $this->clearPersonListCache();
+            $this->resetPage();
+        }
 
     protected function loadDynamicFilters()
     {
@@ -239,7 +273,7 @@ class PersonList extends Component
         $currentOrganization = user_current_organization();
 
         $canViewAllPersons = $user && method_exists($user, 'hasRole') && $user->hasRole('Super Admin');
-        $canViewOrgPersons = $user && method_exists($user, 'hasRole') && 
+        $canViewOrgPersons = $user && method_exists($user, 'hasRole') &&
                             $user->hasRole(['Organisation Admin', 'Department Manager', 'Data Entry Clerk']);
 
         if (!$canViewAllPersons && !$canViewOrgPersons) {
@@ -312,21 +346,21 @@ class PersonList extends Component
     private function getAdditionalData($currentOrganization, $canViewAllPersons)
     {
         $cacheKey = 'person_list_additional_' . ($currentOrganization?->id ?? 'all');
-        
+
         return Cache::remember($cacheKey, 1800, function() use ($currentOrganization, $canViewAllPersons) {
             return [
                 'availableRoles' => $this->getAvailableRolesForOrganization($currentOrganization),
                 'genderOptions' => ['male', 'female', 'other', 'prefer_not_to_say'],
                 'statusOptions' => ['active', 'inactive', 'suspended'],
                 'ageRanges' => ['18-25', '26-35', '36-45', '46-55', '56-65', '65+'],
-                'organizations' => $canViewAllPersons ? 
+                'organizations' => $canViewAllPersons ?
                     \App\Models\Organisation::select('id', 'legal_name', 'display_name')
                         ->where('is_active', true)
                         ->orderBy('legal_name')
-                        ->get() : 
+                        ->get() :
                     ($currentOrganization ? collect([$currentOrganization]) : collect()),
-                'filterConfigurations' => $currentOrganization ? 
-                    FilterConfiguration::activeForOrganisation($currentOrganization->id)->get() : 
+                'filterConfigurations' => $currentOrganization ?
+                    FilterConfiguration::activeForOrganisation($currentOrganization->id)->get() :
                     collect()
             ];
         });

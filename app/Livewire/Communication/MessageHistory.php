@@ -12,12 +12,34 @@ class MessageHistory extends Component
 {
     use WithPagination;
 
+
+
+    use WithPagination;
+
     public string $search = '';
     public string $channel_filter = '';
     public string $status_filter = '';
     public string $date_from = '';
     public string $date_to = '';
     public int $per_page = 20;
+    public $editingMessage = null;
+
+
+    public function deleteMessage($id)
+    {
+        $message = CommunicationMessage::where('organisation_id', Auth::user()->organisation_id)
+            ->findOrFail($id);
+        $message->delete();
+        session()->flash('success', 'Message deleted successfully.');
+        $this->resetPage();
+    }
+
+    public function editMessage($id)
+    {
+        $this->editingMessage = CommunicationMessage::where('organisation_id', Auth::user()->organisation_id)
+            ->findOrFail($id);
+        // You can now use $editingMessage in your Blade view to show an edit form/modal/drawer
+    }
 
     protected $queryString = [
         'search' => ['except' => ''],

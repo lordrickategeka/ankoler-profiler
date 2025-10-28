@@ -10,6 +10,7 @@ use App\Models\PersonAffiliation;
 use App\Models\Phone;
 use App\Models\EmailAddress;
 use App\Models\PersonIdentifier;
+use Illuminate\Support\Str;
 
 class PersonTestDataSeeder extends Seeder
 {
@@ -62,16 +63,18 @@ class PersonTestDataSeeder extends Seeder
         ]);
 
         // Create test person 1: Jane Doe (will be used for deduplication testing)
-        $jane = Person::create([
+        $jane = Person::updateOrCreate([
+            'person_id' => Person::generatePersonId(),
+            'global_identifier' => (string) Str::uuid(),
             'given_name' => 'Jane',
-            'family_name' => 'Doe',
+            'family_name' => 'Mbabazi',
             'date_of_birth' => '1995-03-20',
             'gender' => 'female',
             'address' => 'Kampala, Uganda',
             'city' => 'Kampala',
             'district' => 'Kampala',
             'country' => 'Uganda',
-            'classification' => ['STAFF'],
+            'classification' => json_encode(['STAFF']),
             'status' => 'active'
         ]);
 
@@ -92,13 +95,17 @@ class PersonTestDataSeeder extends Seeder
             'status' => 'active'
         ]);
 
-        PersonIdentifier::create([
-            'person_id' => $jane->id,
-            'type' => 'national_id',
-            'identifier' => 'CM950320123456XYZ',
-            'issuing_authority' => 'NIRA',
-            'status' => 'active'
-        ]);
+        PersonIdentifier::updateOrCreate(
+            [
+                'type' => 'national_id',
+                'identifier' => 'CM950320123456XYZ',
+            ],
+            [
+                'person_id' => $jane->id,
+                'issuing_authority' => 'NIRA',
+                'status' => 'active'
+            ]
+        );
 
         // Create affiliation for Jane at hospital
         PersonAffiliation::create([
@@ -113,6 +120,8 @@ class PersonTestDataSeeder extends Seeder
 
         // Create test person 2: John Smith
         $john = Person::create([
+            'person_id' => Person::generatePersonId(),
+            'global_identifier' => (string) Str::uuid(),
             'given_name' => 'John',
             'family_name' => 'Smith',
             'date_of_birth' => '1988-07-10',
@@ -121,7 +130,7 @@ class PersonTestDataSeeder extends Seeder
             'city' => 'Entebbe',
             'district' => 'Wakiso',
             'country' => 'Uganda',
-            'classification' => ['MEMBER'],
+            'classification' => json_encode(['MEMBER']),
             'status' => 'active'
         ]);
 
@@ -141,13 +150,17 @@ class PersonTestDataSeeder extends Seeder
             'status' => 'active'
         ]);
 
-        PersonIdentifier::create([
-            'person_id' => $john->id,
-            'type' => 'national_id',
-            'identifier' => 'CM880710987654ABC',
-            'issuing_authority' => 'NIRA',
-            'status' => 'active'
-        ]);
+        PersonIdentifier::updateOrCreate(
+            [
+                'type' => 'national_id',
+                'identifier' => 'CM880710987654ABC',
+            ],
+            [
+                'person_id' => $john->id,
+                'issuing_authority' => 'NIRA',
+                'status' => 'active'
+            ]
+        );
 
         // Create affiliation for John at SACCO
         PersonAffiliation::create([
@@ -162,6 +175,8 @@ class PersonTestDataSeeder extends Seeder
 
         // Create test person 3: Mary Johnson (similar to Jane for fuzzy matching test)
         $mary = Person::create([
+            'person_id' => Person::generatePersonId(),
+            'global_identifier' => (string) Str::uuid(),
             'given_name' => 'Marie',
             'family_name' => 'Doe',
             'date_of_birth' => '1995-03-20', // Same DOB as Jane
@@ -170,7 +185,7 @@ class PersonTestDataSeeder extends Seeder
             'city' => 'Jinja',
             'district' => 'Jinja',
             'country' => 'Uganda',
-            'classification' => ['PATIENT'],
+            'classification' => json_encode(['PATIENT']),
             'status' => 'active'
         ]);
 

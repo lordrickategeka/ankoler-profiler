@@ -8,7 +8,6 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
@@ -41,10 +40,10 @@
                         @else
                             <div class="text-xs text-base-content/60 uppercase tracking-wider font-medium mb-2">Ankole
                                 Person Profiler</div>
-                            <h1 class="text-3xl font-bold text-base-content mb-2">Welcome to Person Registry</h1>
+                            <h1 class="text-2xl font-bold text-base-content mb-2">Welcome to Person Registry</h1>
                             <p class="text-base-content/70 text-sm max-w-2xl">
-                                Comprehensive person identity management system with role-based access, organizational
-                                affiliations, and compliance tracking
+                                Comprehensive person identity management system with role-based access,</br> 
+                                organizational affiliations, and compliance tracking
                             </p>
                         @endif
                     </div>

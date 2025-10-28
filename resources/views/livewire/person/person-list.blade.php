@@ -492,8 +492,7 @@
                                                             $completeness += 25;
                                                         }
                                                         if (
-                                                            $person->classification &&
-                                                            count($person->classification) > 0
+                                                            !empty($person->classification)
                                                         ) {
                                                             $completeness += 25;
                                                         }
@@ -542,70 +541,41 @@
                                                 <div class="text-sm text-gray-500">ID: {{ $person->person_id }}</div>
                                                 @if ($person->date_of_birth)
                                                     <div class="text-xs text-gray-400">Born:
-                                                        {{ $person->date_of_birth->format('M j, Y') }}</div>
+                                                        @php
+                                                            $dob = $person->date_of_birth;
+                                                            if (is_string($dob)) {
+                                                                try {
+                                                                    $dob = \Carbon\Carbon::parse($dob);
+                                                                } catch (Exception $e) {
+                                                                    $dob = null;
+                                                                }
+                                                            }
+                                                        @endphp
+                                                        {{ $dob ? $dob->format('M j, Y') : 'N/A' }}
+                                                    </div>
                                                 @endif
                                             </div>
                                         </div>
                                     </td>
                                     {{-- Contact Info --}}
                                     <td class="px-1.5 py-1 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">
-                                            @if ($person->phones->first())
-                                                <div class="flex items-center">
-                                                    <div class="w-2 h-2 bg-green-500 rounded-full mr-1"
-                                                        title="Phone available"></div>
-                                                    <svg class="w-4 h-4 mr-1 text-gray-400" fill="currentColor"
-                                                        viewBox="0 0 20 20">
-                                                        <path
-                                                            d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z">
-                                                        </path>
-                                                    </svg>
-                                                    {{ $person->phones->first()->number }}
-                                                </div>
-                                            @else
-                                                <div class="flex items-center text-gray-400">
-                                                    <div class="w-2 h-2 bg-red-500 rounded-full mr-1"
-                                                        title="No phone"></div>
-                                                    <svg class="w-4 h-4 mr-1" fill="currentColor"
-                                                        viewBox="0 0 20 20">
-                                                        <path
-                                                            d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z">
-                                                        </path>
-                                                    </svg>
-                                                    No phone
-                                                </div>
-                                            @endif
-                                            @if ($person->emailAddresses->first())
-                                                <div class="flex items-center mt-1">
-                                                    <div class="w-2 h-2 bg-green-500 rounded-full mr-1"
-                                                        title="Email available"></div>
-                                                    <svg class="w-4 h-4 mr-1 text-gray-400" fill="currentColor"
-                                                        viewBox="0 0 20 20">
-                                                        <path
-                                                            d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z">
-                                                        </path>
-                                                        <path
-                                                            d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z">
-                                                        </path>
-                                                    </svg>
-                                                    {{ Str::limit($person->emailAddresses->first()->email, 20) }}
-                                                </div>
-                                            @else
-                                                <div class="flex items-center mt-1 text-gray-400">
-                                                    <div class="w-2 h-2 bg-red-500 rounded-full mr-1"
-                                                        title="No email"></div>
-                                                    <svg class="w-4 h-4 mr-1" fill="currentColor"
-                                                        viewBox="0 0 20 20">
-                                                        <path
-                                                            d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z">
-                                                        </path>
-                                                        <path
-                                                            d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z">
-                                                        </path>
-                                                    </svg>
-                                                    No email
-                                                </div>
-                                            @endif
+                                        <div class="flex flex-col gap-1">
+                                            <div>
+                                                <span class="font-semibold text-gray-600 text-xs">Phone:</span>
+                                                @if ($person->phones->count() > 0)
+                                                    <span class="text-xs text-gray-700">{{ $person->phones->pluck('number')->join(', ') }}</span>
+                                                @else
+                                                    <span class="text-xs text-gray-400 italic">No phone</span>
+                                                @endif
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold text-gray-600 text-xs">Email:</span>
+                                                @if ($person->emailAddresses->count() > 0)
+                                                    <span class="text-xs text-gray-700">{{ $person->emailAddresses->pluck('email')->join(', ') }}</span>
+                                                @else
+                                                    <span class="text-xs text-gray-400 italic">No email</span>
+                                                @endif
+                                            </div>
                                         </div>
                                     </td>
                                     {{-- Affiliations --}}
@@ -732,14 +702,13 @@
                                                         </svg>
                                                         View Profile
                                                     </button>
-                                                    <a href="#"
+                                                    <a href="{{ route('persons.create', ['edit' => $person->id]) }}"
                                                         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
-                                                        <svg class="w-4 h-4 mr-2" fill="none"
+                                                        <svg class="w-4 h-4 mr-2 text-yellow-600" fill="none"
                                                             stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                                 stroke-width="2"
-                                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                                            </path>
+                                                                d="M15.232 5.232l3.536 3.536M9 13h3l8-8a2.828 2.828 0 10-4-4l-8 8v3z" />
                                                         </svg>
                                                         Edit
                                                     </a>
@@ -752,11 +721,11 @@
                                                         </svg>
                                                         Add Affiliation
                                                     </button>
-                                                    @can('can_delete_person')
+                                                    @can('delete-persons')
                                                         <button wire:click="confirmDelete({{ $person->id }})"
                                                             @click="open = false" type="button"
                                                             class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center">
-                                                            <svg class="w-4 h-4 mr-2" fill="none"
+                                                            <svg class="w-4 h-4 mr-2 text-red-600" fill="none"
                                                                 stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                                     stroke-width="2"

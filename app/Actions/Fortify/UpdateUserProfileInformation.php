@@ -23,8 +23,18 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             'photo' => ['nullable', 'mimes:jpg,jpeg,png', 'max:1024'],
         ])->validateWithBag('updateProfileInformation');
 
+
         if (isset($input['photo'])) {
             $user->updateProfilePhoto($input['photo']);
+        }
+
+        // Also update the linked Person model if it exists
+        if ($user->person) {
+            $user->person->forceFill([
+                'given_name' => $input['name'],
+                // Optionally split name into given/middle/family if needed
+                // 'email' => $input['email'], // Email is handled via related EmailAddress model if needed
+            ])->save();
         }
 
         if ($input['email'] !== $user->email &&

@@ -654,7 +654,19 @@
                                     <div class="text-sm text-gray-500">
                                         {{ $person->gender ? ucfirst($person->gender) : '' }}
                                         @if ($person->date_of_birth)
-                                            • {{ $person->date_of_birth->age }} years
+                                            @php
+                                                $dob = $person->date_of_birth;
+                                                if (is_string($dob)) {
+                                                    try {
+                                                        $dob = \Carbon\Carbon::parse($dob);
+                                                    } catch (Exception $e) {
+                                                        $dob = null;
+                                                    }
+                                                }
+                                            @endphp
+                                            @if ($dob)
+                                                • {{ $dob->age }} years
+                                            @endif
                                         @endif
                                     </div>
                                     <div class="text-sm text-gray-500">
@@ -718,7 +730,7 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span
-                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                         @if ($person->status === 'active') bg-green-100 text-green-800
                                         @elseif($person->status === 'inactive') bg-gray-100 text-gray-800
                                         @else bg-red-100 text-red-800 @endif">
@@ -727,9 +739,9 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-2">
-                                        {{-- <a href="{{ route('persons.show', $person) }}" 
+                                        {{-- <a href="{{ route('persons.show', $person) }}"
                                            class="text-blue-600 hover:text-blue-900">View</a>
-                                        <a href="{{ route('persons.edit', $person) }}" 
+                                        <a href="{{ route('persons.edit', $person) }}"
                                            class="text-indigo-600 hover:text-indigo-900">Edit</a> --}}
                                     </div>
                                 </td>
@@ -770,12 +782,12 @@
                     <div>
                         <h4 class="text-sm font-semibold text-gray-900">View Related Connections</h4>
                         <p class="text-xs text-gray-600">
-                            Discover relationships for the {{ $persons->total() }} filtered 
+                            Discover relationships for the {{ $persons->total() }} filtered
                             {{ Str::plural('person', $persons->total()) }}
                         </p>
                     </div>
                 </div>
-                
+
                 <button wire:click="toggleRelationships"
                         class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm">
                     <i class="fas fa-{{ $showRelationships ? 'eye-slash' : 'eye' }} mr-2"></i>
@@ -784,7 +796,7 @@
             </div>
         </div>
     @endif
-    
+
     {{-- Relationship Grid Component --}}
     @if($showRelationships)
         <livewire:relationship-grid :personIds="$persons->pluck('id')->toArray()" :key="'rel-'.now()->timestamp" />

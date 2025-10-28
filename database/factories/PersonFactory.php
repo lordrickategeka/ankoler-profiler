@@ -21,25 +21,27 @@ class PersonFactory extends Factory
     public function definition(): array
     {
         $gender = $this->faker->randomElement(['male', 'female', 'other']);
-        $firstNames = $gender === 'female' 
+        $firstNames = $gender === 'female'
             ? ['Alice', 'Grace', 'Mary', 'Sarah', 'Jane', 'Rose', 'Faith', 'Hope', 'Joy', 'Peace', 'Mercy', 'Charity', 'Agnes', 'Betty', 'Catherine']
             : ['John', 'Paul', 'Peter', 'David', 'James', 'Michael', 'Robert', 'Stephen', 'Francis', 'Emmanuel', 'Joshua', 'Samuel', 'Daniel', 'Mark', 'Luke'];
 
         $middleNames = ['Grace', 'Mary', 'Paul', 'Peter', 'James', 'Rose', 'Faith', 'Hope', 'Emmanuel', 'Joseph'];
-        
-        $lastNames = ['Mukasa', 'Namubiru', 'Ssekandi', 'Katende', 'Mugisha', 'Byarugaba', 'Tumusiime', 'Asiimwe', 'Ainebyoona', 'Mbabazi', 
+
+        $lastNames = ['Mukasa', 'Namubiru', 'Ssekandi', 'Katende', 'Mugisha', 'Byarugaba', 'Tumusiime', 'Asiimwe', 'Ainebyoona', 'Mbabazi',
                      'Kirabo', 'Nalwanga', 'Tukamushaba', 'Babirye', 'Nakato', 'Wasswa', 'Kato', 'Musoke', 'Lubega', 'Kasozi'];
 
         $districts = ['Kampala', 'Wakiso', 'Mukono', 'Jinja', 'Mbarara', 'Gulu', 'Lira', 'Arua', 'Masaka', 'Kasese', 'Kabale', 'Soroti', 'Kitgum', 'Hoima', 'Mbale'];
         $cities = ['Kampala', 'Entebbe', 'Jinja', 'Mbarara', 'Gulu', 'Lira', 'Arua', 'Masaka', 'Kasese', 'Kabale', 'Soroti', 'Kitgum', 'Hoima', 'Mbale', 'Tororo'];
 
         return [
+            'person_id' => \App\Models\Person::generatePersonId(),
+            'global_identifier' => $this->faker->uuid(),
             'given_name' => $this->faker->randomElement($firstNames),
             'middle_name' => $this->faker->optional(0.7)->randomElement($middleNames),
             'family_name' => $this->faker->randomElement($lastNames),
             'date_of_birth' => $this->faker->dateTimeBetween('-65 years', '-18 years')->format('Y-m-d'),
             'gender' => $gender,
-            'classification' => [],
+            'classification' => json_encode([]),
             'address' => $this->faker->streetAddress(),
             'city' => $this->faker->randomElement($cities),
             'district' => $this->faker->randomElement($districts),
@@ -57,7 +59,7 @@ class PersonFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'classification' => ['medical'],
+                'classification' => json_encode(['medical']),
             ];
         });
     }
@@ -70,17 +72,15 @@ class PersonFactory extends Factory
         return $this->state(function (array $attributes) {
             // Mix of students and staff
             $isStudent = $this->faker->boolean(70); // 70% students, 30% staff
-            
             if ($isStudent) {
                 return [
                     'date_of_birth' => $this->faker->dateTimeBetween('-25 years', '-5 years')->format('Y-m-d'),
-                    'classification' => ['student'],
+                    'classification' => json_encode(['student']),
                 ];
             }
-            
             return [
                 'date_of_birth' => $this->faker->dateTimeBetween('-60 years', '-25 years')->format('Y-m-d'),
-                'classification' => ['education'],
+                'classification' => json_encode(['education']),
             ];
         });
     }
@@ -93,7 +93,7 @@ class PersonFactory extends Factory
         return $this->state(function (array $attributes) {
             return [
                 'date_of_birth' => $this->faker->dateTimeBetween('-65 years', '-18 years')->format('Y-m-d'),
-                'classification' => ['financial'],
+                'classification' => json_encode(['financial']),
             ];
         });
     }
@@ -105,7 +105,7 @@ class PersonFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'classification' => ['religious'],
+                'classification' => json_encode(['religious']),
             ];
         });
     }
@@ -118,7 +118,7 @@ class PersonFactory extends Factory
         return $this->state(function (array $attributes) {
             return [
                 'date_of_birth' => $this->faker->dateTimeBetween('-60 years', '-20 years')->format('Y-m-d'),
-                'classification' => ['corporate'],
+                'classification' => json_encode(['corporate']),
             ];
         });
     }

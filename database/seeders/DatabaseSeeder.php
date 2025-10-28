@@ -50,7 +50,7 @@ class DatabaseSeeder extends Seeder
                 // PersonAffiliationSeeder::class,
 
                 // Relationship system (run after persons and affiliations exist)
-                RelationshipSeeder::class,
+                // RelationshipSeeder::class,
 
                 // Communication system
                 // CommunicationSeeder::class,
@@ -59,7 +59,7 @@ class DatabaseSeeder extends Seeder
                 PersonTestDataSeeder::class,
                 PersonViewPermissionSeeder::class,
                 RoleTypeSeeder::class,
-                FilterConfiguration::class,
+                FilterConfigurationSeeder::class,
                 // DomainRecordsSeeder::class,
 
                 RelationshipSeeder::class,
@@ -68,6 +68,7 @@ class DatabaseSeeder extends Seeder
 
                 CommunicationPermissionSeeder::class,
                 // CommunicationTemplateSeeder::class,
+                OrganizationUnitsSeeder::class,
             ]);
 
             // Re-enable foreign key checks

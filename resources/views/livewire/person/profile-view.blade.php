@@ -1,5 +1,3 @@
-<!-- DaisyUI Modal Trigger (optional, can be placed elsewhere) -->
-<!-- <button class="btn" onclick="profile_modal.showModal()">View Profile</button> -->
 <div>
     @if ($showModal && $person)
         <dialog id="profile_modal" class="modal" open>
@@ -31,7 +29,18 @@
                             <div class="space-y-2 text-sm">
                                 <p><strong>Full Name:</strong> {{ $person->full_name }}</p>
                                 <p><strong>Date of Birth:</strong>
-                                    {{ $person->date_of_birth?->format('F j, Y') ?: 'Not specified' }}</p>
+                                    @php
+                                        $dob = $person->date_of_birth;
+                                        if (is_string($dob)) {
+                                            try {
+                                                $dob = \Carbon\Carbon::parse($dob);
+                                            } catch (Exception $e) {
+                                                $dob = null;
+                                            }
+                                        }
+                                    @endphp
+                                    {{ $dob ? $dob->format('F j, Y') : 'Not specified' }}
+                                </p>
                                 <p><strong>Gender:</strong>
                                     {{ $person->gender ? ucfirst($person->gender) : 'Not specified' }}</p>
                                 <p><strong>Status:</strong>
@@ -41,9 +50,11 @@
                                 @if ($person->classification)
                                     <p><strong>Classifications:</strong></p>
                                     <div class="flex flex-wrap gap-1 mt-1">
-                                        @foreach ($person->classification as $class)
-                                            <span
-                                                class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{{ $class }}</span>
+                                        @php
+                                            $classifications = is_array($person->classification) ? $person->classification : (is_string($person->classification) ? array_filter(explode(',', $person->classification)) : []);
+                                        @endphp
+                                        @foreach ($classifications as $class)
+                                            <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{{ $class }}</span>
                                         @endforeach
                                     </div>
                                 @endif

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -44,12 +43,12 @@ class PersonAffiliation extends Model
                 $maxAttempts = 5;
                 for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
                     $affiliation->affiliation_id = self::generateAffiliationId();
-                    
+
                     // Double-check that this ID doesn't exist before proceeding
                     if (!self::where('affiliation_id', $affiliation->affiliation_id)->exists()) {
                         break;
                     }
-                    
+
                     if ($attempt === $maxAttempts) {
                         throw new \Exception('Could not generate unique affiliation ID after ' . $maxAttempts . ' attempts');
                     }
@@ -59,13 +58,30 @@ class PersonAffiliation extends Model
     }
 
     /**
+     * Get the person for this affiliation.
+     */
+    public function person()
+    {
+        return $this->belongsTo(\App\Models\Person::class, 'person_id');
+    }
+
+    /**
+     * Get the organization unit for this affiliation.
+     */
+    public function organizationUnit()
+    {
+        return $this->belongsTo(\App\Models\OrganizationUnit::class, 'domain_record_id');
+    }
+
+
+    /**
      * Generate unique affiliation ID
      */
     public static function generateAffiliationId(): string
     {
         $prefix = 'AFF-';
         $maxAttempts = 10;
-        
+
         for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
             // Get the highest numeric part by extracting numbers and finding max
             $highestId = self::where('affiliation_id', 'like', $prefix . '%')
@@ -79,18 +95,18 @@ class PersonAffiliation extends Model
 
             $newNumber = ($highestId ?? 0) + 1;
             $newId = $prefix . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
-            
+
             // Check if this ID already exists (race condition protection)
             if (!self::where('affiliation_id', $newId)->exists()) {
                 return $newId;
             }
-            
+
             // If ID exists, wait a bit and try again
             if ($attempt < $maxAttempts) {
                 usleep(rand(10000, 50000)); // Wait 10-50ms
             }
         }
-        
+
         // Fallback: generate a unique ID with timestamp
         return $prefix . time() . '-' . rand(1000, 9999);
     }
@@ -98,10 +114,10 @@ class PersonAffiliation extends Model
     /**
      * Relationships
      */
-    public function person(): BelongsTo
-    {
-        return $this->belongsTo(Person::class);
-    }
+    // public function person(): BelongsTo
+    // {
+    //     return $this->belongsTo(Person::class);
+    // }
 
     public function organisation(): BelongsTo
     {

@@ -37,7 +37,7 @@ class Phone extends Model
 
         static::creating(function ($phone) {
             if (empty($phone->phone_id)) {
-                $phone->phone_id = self::generatePhoneId();
+                $phone->phone_id = \App\Helpers\IdGenerator::generatePhoneId();
             }
         });
 
@@ -58,25 +58,7 @@ class Phone extends Model
         });
     }
 
-    /**
-     * Generate unique phone ID
-     */
-    public static function generatePhoneId(): string
-    {
-        $prefix = 'PHN-';
-        $lastPhone = self::where('phone_id', 'like', $prefix . '%')
-            ->orderBy('phone_id', 'desc')
-            ->first();
-
-        if ($lastPhone) {
-            $lastNumber = (int) substr($lastPhone->phone_id, strlen($prefix));
-            $newNumber = $lastNumber + 1;
-        } else {
-            $newNumber = 1;
-        }
-
-        return $prefix . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
-    }
+    // ...existing code...
 
     /**
      * Relationships

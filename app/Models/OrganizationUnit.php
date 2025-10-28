@@ -19,4 +19,20 @@ class OrganizationUnit extends Model
         'parent_unit_id',
         'is_active',
     ];
+
+    /**
+     * Parent unit relationship
+     */
+    public function parent()
+    {
+        return $this->belongsTo(self::class, 'parent_unit_id');
+    }
+
+    /**
+     * Children units relationship
+     */
+    public function children()
+    {
+        return $this->hasMany(self::class, 'parent_unit_id');
+    }
 }

@@ -51,9 +51,9 @@ class RoleTypeManager extends Component
         }
 
         if ($this->activeFilter === 'active') {
-            $query->where('active', true);
+            $query->where('is_active', true);
         } elseif ($this->activeFilter === 'inactive') {
-            $query->where('active', false);
+            $query->where('is_active', false);
         }
 
         $roleTypes = $query->orderBy('name')->paginate(15);

@@ -21,7 +21,7 @@ class PersonSearch extends Component
     public $searchBy = 'global';
     public $status = 'active';
     public $showAdvanced = false;
-    
+
     // Advanced filters
     public $classification = '';
     public $gender = '';
@@ -32,19 +32,19 @@ class PersonSearch extends Component
     public $country = '';
     public $ageFrom = '';
     public $ageTo = '';
-    
+
     // Pagination
     public $perPage = 6;
-    
+
     // Selection
     public $selectAll = false;
     public $selectedPersons = [];
     public $viewMode = 'grid';
-    
+
     // Drawer states
     public $showCreateFilterDrawer = false;
     public $showViewFiltersDrawer = false;
-    
+
     // Filter profile properties
     public $filterProfileName = '';
     public $filterProfileDescription = '';
@@ -53,7 +53,7 @@ class PersonSearch extends Component
     public $availableProfiles = [];
     public $profileSearch = '';
     public $showSaveFilterModal = false;
-    
+
     // Data
     public $organisations = [];
     public $classifications = [];
@@ -120,7 +120,7 @@ class PersonSearch extends Component
     public function loadAvailableProfiles()
     {
         $organization = OrganizationHelper::getCurrentOrganization();
-        
+
         if (!$organization) {
             $this->availableProfiles = [];
             return;
@@ -165,22 +165,22 @@ class PersonSearch extends Component
 
     public function getHasActiveFiltersProperty()
     {
-        return !empty($this->search) || 
-               !empty($this->classification) || 
-               !empty($this->gender) || 
-               !empty($this->organisationId) || 
-               $this->status !== 'active' || 
-               !empty($this->city) || 
-               !empty($this->district) || 
-               !empty($this->country) || 
-               !empty($this->ageFrom) || 
+        return !empty($this->search) ||
+               !empty($this->classification) ||
+               !empty($this->gender) ||
+               !empty($this->organisationId) ||
+               $this->status !== 'active' ||
+               !empty($this->city) ||
+               !empty($this->district) ||
+               !empty($this->country) ||
+               !empty($this->ageFrom) ||
                !empty($this->ageTo);
     }
 
     public function getCurrentFiltersArray()
     {
         $filters = [];
-        
+
         if (!empty($this->search)) $filters['search'] = $this->search;
         if (!empty($this->searchBy) && $this->searchBy !== 'global') $filters['search_by'] = $this->searchBy;
         if (!empty($this->classification)) $filters['classification'] = $this->classification;
@@ -197,7 +197,7 @@ class PersonSearch extends Component
         if (!empty($this->country)) $filters['country'] = $this->country;
         if (!empty($this->ageFrom)) $filters['age_from'] = $this->ageFrom;
         if (!empty($this->ageTo)) $filters['age_to'] = $this->ageTo;
-        
+
         return $filters;
     }
 
@@ -283,7 +283,7 @@ class PersonSearch extends Component
         ]);
 
         $organization = OrganizationHelper::getCurrentOrganization();
-        
+
         if (!$organization) {
             session()->flash('error', 'No organization selected. Cannot save filter profile.');
             return;
@@ -315,7 +315,7 @@ class PersonSearch extends Component
     public function loadFilterProfile($profileId)
     {
         $organization = OrganizationHelper::getCurrentOrganization();
-        
+
         $profile = CommunicationFilterProfile::accessibleBy(Auth::id(), $organization->id)
             ->find($profileId);
 
@@ -327,7 +327,7 @@ class PersonSearch extends Component
         try {
             // Clear existing filters first
             $this->clearFilters();
-            
+
             // Apply filters from profile
             $criteria = $profile->filter_criteria;
 
@@ -371,7 +371,7 @@ class PersonSearch extends Component
     public function deleteFilterProfile($profileId)
     {
         $organization = OrganizationHelper::getCurrentOrganization();
-        
+
         $profile = CommunicationFilterProfile::where('id', $profileId)
             ->where('organisation_id', $organization->id)
             ->where('user_id', Auth::id())
@@ -406,7 +406,7 @@ class PersonSearch extends Component
         ]);
 
         $organization = OrganizationHelper::getCurrentOrganization();
-        
+
         if (!$organization) {
             session()->flash('error', 'No organization selected. Cannot save filter profile.');
             return;
@@ -425,12 +425,12 @@ class PersonSearch extends Component
             ]);
 
             $this->closeCreateFilterDrawer();
-            
+
             return redirect()->route('communication.send')->with([
                 'success' => 'Filter profile saved successfully! You can now use it to send communications.',
                 'preselect_filter_profile' => $profile->id
             ]);
-            
+
         } catch (\Exception $e) {
             session()->flash('error', 'Failed to save filter profile. Please try again.');
         }
@@ -482,7 +482,7 @@ class PersonSearch extends Component
     {
         $this->reset([
             'search',
-            'classification', 
+            'classification',
             'gender',
             'organisationId',
             'roleType',
@@ -492,12 +492,12 @@ class PersonSearch extends Component
             'ageFrom',
             'ageTo'
         ]);
-        
+
         $this->status = 'active';
         $this->searchBy = 'global';
         $this->loadedProfileId = null;
         $this->resetPage();
-        
+
         $this->dispatch('filtersCleared');
         session()->flash('success', 'All filters cleared successfully.');
     }
@@ -542,40 +542,40 @@ class PersonSearch extends Component
         if (!empty($this->search)) {
             switch ($this->searchBy) {
                 case 'name':
-                    $query->where(function($q) {
-                        $q->where('first_name', 'like', "%{$this->search}%")
-                          ->orWhere('last_name', 'like', "%{$this->search}%")
-                          ->orWhere('middle_name', 'like', "%{$this->search}%");
-                    });
+                                        $query->where(function($q) {
+                                                $q->where('given_name', 'like', "%{$this->search}%")
+                                                    ->orWhere('family_name', 'like', "%{$this->search}%")
+                                                    ->orWhere('middle_name', 'like', "%{$this->search}%");
+                                        });
                     break;
-                
+
                 case 'person_id':
                     $query->where('person_id', 'like', "%{$this->search}%");
                     break;
-                
+
                 case 'phone':
                     $query->whereHas('phones', function ($q) {
                         $q->where('number', 'like', "%{$this->search}%");
                     });
                     break;
-                
+
                 case 'email':
                     $query->whereHas('emailAddresses', function ($q) {
                         $q->where('email', 'like', "%{$this->search}%");
                     });
                     break;
-                
+
                 case 'identifier':
                     $query->whereHas('identifiers', function ($q) {
                         $q->where('identifier', 'like', "%{$this->search}%");
                     });
                     break;
-                
+
                 case 'global':
                 default:
                     $query->where(function ($q) {
-                        $q->where('first_name', 'like', "%{$this->search}%")
-                          ->orWhere('last_name', 'like', "%{$this->search}%")
+                        $q->where('given_name', 'like', "%{$this->search}%")
+                          ->orWhere('family_name', 'like', "%{$this->search}%")
                           ->orWhere('middle_name', 'like', "%{$this->search}%")
                           ->orWhere('person_id', 'like', "%{$this->search}%")
                           ->orWhereHas('phones', function ($phoneQuery) {
@@ -625,7 +625,7 @@ class PersonSearch extends Component
             $query->whereHas('affiliations', function ($q) {
                 $q->where('organisation_id', $this->organisationId)
                   ->where('status', 'active');
-                
+
                 if (!empty($this->roleType)) {
                     $q->where('role_type', $this->roleType);
                 }
@@ -639,7 +639,7 @@ class PersonSearch extends Component
                     $dateFrom = now()->subYears($this->ageFrom)->format('Y-m-d');
                     $q->where('date_of_birth', '<=', $dateFrom);
                 }
-                
+
                 if (!empty($this->ageTo)) {
                     $dateTo = now()->subYears($this->ageTo)->format('Y-m-d');
                     $q->where('date_of_birth', '>=', $dateTo);
@@ -697,10 +697,10 @@ class PersonSearch extends Component
                 ->get();
 
             session()->flash('success', count($this->selectedPersons) . ' persons exported successfully.');
-            
+
             $this->selectedPersons = [];
             $this->selectAll = false;
-            
+
         } catch (\Exception $e) {
             session()->flash('error', 'Export failed: ' . $e->getMessage());
         }
@@ -709,27 +709,27 @@ class PersonSearch extends Component
     public function getSearchSummaryProperty()
     {
         $activeFilters = [];
-        
+
         if (!empty($this->search)) {
             $activeFilters[] = "Search: \"{$this->search}\"";
         }
-        
+
         if (!empty($this->status)) {
             $activeFilters[] = "Status: " . ucfirst($this->status);
         }
-        
+
         if (!empty($this->gender)) {
             $activeFilters[] = "Gender: " . ucfirst($this->gender);
         }
-        
+
         if (!empty($this->classification)) {
             $activeFilters[] = "Classification: " . ucfirst($this->classification);
         }
-        
+
         if (!empty($this->city)) {
             $activeFilters[] = "City: {$this->city}";
         }
-        
+
         return implode(' • ', $activeFilters);
     }
 
@@ -743,7 +743,7 @@ class PersonSearch extends Component
 public function toggleRelationships()
 {
     $this->showRelationships = !$this->showRelationships;
-    
+
     if ($this->showRelationships) {
         $personIds = $this->getPersonsQuery()->pluck('id')->toArray();
         $this->dispatch('loadRelationships', personIds: $personIds);
@@ -758,9 +758,9 @@ public function getRelationshipCountProperty()
     if (empty($this->persons) || $this->persons->isEmpty()) {
         return 0;
     }
-    
+
     $personIds = $this->persons->pluck('id')->toArray();
-    
+
     return DB::table('person_relations')
         ->whereIn('person_id', $personIds)
         ->distinct('related_person_id')

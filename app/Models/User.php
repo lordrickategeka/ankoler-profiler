@@ -90,7 +90,7 @@ class User extends Authenticatable
     {
         // Super Admin can access ALL organizations
         if ($this->hasRole('Super Admin')) {
-            return Organisation::where('active', true)
+            return Organisation::where('is_active', true)
                                ->orderBy('display_name')
                                ->get();
         }
@@ -105,7 +105,7 @@ class User extends Authenticatable
             $query->where('person_id', $this->person_id)
                   ->where('status', 'ACTIVE');
         })
-        ->where('active', true)
+    ->where('is_active', true)
         ->orderBy('display_name')
         ->get();
     }

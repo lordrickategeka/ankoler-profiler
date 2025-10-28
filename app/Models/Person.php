@@ -8,10 +8,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Str;
+use Illuminate\Notifications\Notifiable;
 
 class Person extends Model
 {
-    use HasFactory;
+    /**
+     * User relationship (links person to user record)
+     */
+    public function user()
+    {
+        return $this->hasOne(User::class, 'person_id');
+    }
+    use HasFactory, Notifiable;
     protected $table = 'persons';
     protected $fillable = [
         'person_id',
@@ -31,23 +39,15 @@ class Person extends Model
         'updated_by',
     ];
 
-    protected $casts = [
-        'classification' => 'array',
-        'date_of_birth' => 'date',
-    ];
-
-    protected static function boot()
+    /**
+     * Route notifications for the mail channel.
+     *
+     * @return string|null
+     */
+    public function routeNotificationForMail()
     {
-        parent::boot();
-
-        static::creating(function ($person) {
-            if (empty($person->person_id)) {
-                $person->person_id = self::generatePersonId();
-            }
-            if (empty($person->global_identifier)) {
-                $person->global_identifier = Str::uuid();
-            }
-        });
+        $primary = $this->primaryEmail();
+        return $primary ? $primary->email : null;
     }
 
     /**
@@ -80,7 +80,7 @@ class Person extends Model
             $this->middle_name,
             $this->family_name
         ]);
-        
+
         return implode(' ', $parts);
     }
 
@@ -243,7 +243,7 @@ class Person extends Model
     public function addClassification(string $classification): void
     {
         $classifications = $this->classification ?? [];
-        
+
         if (!in_array($classification, $classifications)) {
             $classifications[] = $classification;
             $this->classification = $classifications;
@@ -268,7 +268,7 @@ class Person extends Model
     public function scopeSearchByName($query, string $name)
     {
         $searchTerms = explode(' ', trim($name));
-        
+
         return $query->where(function ($q) use ($searchTerms) {
             foreach ($searchTerms as $term) {
                 $q->where(function ($subQ) use ($term) {
@@ -349,7 +349,7 @@ class Person extends Model
                 $dateFrom = now()->subYears($criteria['age_from'])->format('Y-m-d');
                 $q->where('date_of_birth', '<=', $dateFrom);
             }
-            
+
             if (!empty($criteria['age_to'])) {
                 $dateTo = now()->subYears($criteria['age_to'])->format('Y-m-d');
                 $q->where('date_of_birth', '>=', $dateTo);
@@ -371,7 +371,7 @@ class Person extends Model
         $query->whereHas('affiliations', function ($q) use ($criteria) {
             $q->where('organisation_id', $criteria['organisation_id'])
               ->where('status', 'active');
-            
+
             if (!empty($criteria['role_type'])) {
                 $q->where('role_type', $criteria['role_type']);
             }
@@ -388,7 +388,7 @@ public function scopeSearchByIdentifier($query, string $identifier, string $type
 {
     return $query->whereHas('identifiers', function ($q) use ($identifier, $type) {
         $q->where('identifier_value', 'like', "%{$identifier}%");
-        
+
         if ($type) {
             $q->where('type', $type);
         }
@@ -423,7 +423,7 @@ public function scopeByOrganisation($query, int $organisationId, string $roleTyp
     return $query->whereHas('affiliations', function ($q) use ($organisationId, $roleType) {
         $q->where('organisation_id', $organisationId)
           ->where('status', 'active');
-        
+
         if ($roleType) {
             $q->where('role_type', $roleType);
         }
@@ -448,7 +448,7 @@ public function scopeByAgeRange($query, int $ageFrom = null, int $ageTo = null)
             $dateFrom = now()->subYears($ageFrom)->format('Y-m-d');
             $q->where('date_of_birth', '<=', $dateFrom);
         }
-        
+
         if ($ageTo !== null) {
             $dateTo = now()->subYears($ageTo)->format('Y-m-d');
             $q->where('date_of_birth', '>=', $dateTo);
@@ -498,7 +498,7 @@ public function getFormattedAddressAttribute(): string
         $this->district,
         $this->country
     ]);
-    
+
     return implode(', ', $parts);
 }
 
@@ -542,7 +542,7 @@ public static function searchForExport(array $criteria)
         ])
         ->select([
             'id',
-            'person_id', 
+            'person_id',
             'given_name',
             'middle_name',
             'family_name',
