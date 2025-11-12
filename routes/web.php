@@ -2,12 +2,20 @@
 
 use App\Http\Controllers\PersonSearchController;
 use App\Livewire\Dashboard\DashboardComponent;
-use App\Livewire\Person\PersonList;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RelationshipController;
 use App\Http\Controllers\SMSWebhookController;
 use App\Http\Controllers\AfricasTalkingCallbackController;
+use App\Http\Controllers\AllPersonsListController;
 use App\Livewire\Person\Notifications as PersonNotificationsLivewire;
+
+use App\Exports\OrganisationTemplateExport;
+use Maatwebsite\Excel\Facades\Excel;
+// Organization template export
+Route::get('/organizations/template', function () {
+    $export = new OrganisationTemplateExport();
+    return Excel::download($export, 'organisation_import_template.xlsx');
+})->name('organizations.template')->middleware(['auth:sanctum', config('jetstream.auth_session')]);
 
 
 Route::get('/', function () {
@@ -33,8 +41,7 @@ Route::get('/test-at', function () {
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
-    'verified',
-    ])->group(function () {
+])->group(function () {
 
     Route::get('/dashboard', DashboardComponent::class)->name('dashboard');
 
@@ -52,13 +59,24 @@ Route::middleware([
         ->middleware('can:view-organisations');
 
     // Person routes
-    Route::get('/persons', PersonList::class)->name('persons');
+    // Route::get('/persons/all', App\Livewire\Person\PersonList::class)->name('persons.all');
+    // Route::get('/persons/all', App\Livewire\PersonsListComponent::class)->name('persons.all');
+
+    Route::get('/persons/all', [AllPersonsListController::class,'index'])->name('persons.all');
+
     Route::get('/persons/create', App\Livewire\Person\CreatePerson::class)->name('persons.create');
     Route::get('/persons/import', App\Livewire\Person\ImportPersons::class)
         ->name('persons.import')
         ->middleware('can:import-org-persons');
     Route::get('/persons/export', App\Livewire\Person\ExportPersons::class)
         ->name('persons.export');
+
+
+    // Person Products page
+    Route::get('/persons/products', App\Livewire\PersonProducts::class)
+        ->name('person-products');
+
+
 
     // Person profile view
     Route::get('/persons/profile-current', App\Livewire\Person\ProfileView::class)
@@ -86,11 +104,11 @@ Route::middleware([
         ->middleware('can:review-organization-units');
 
 
-// Route::resource('persons', PersonSearchController::class);
-Route::get('persons/search', [PersonSearchController::class, 'index2'])->name('person-search');
-Route::get('persons/search/api', [PersonSearchController::class, 'search'])->name('persons.search.api');
-Route::get('persons/search/suggestions', [PersonSearchController::class, 'suggestions'])->name('persons.search.suggestions');
-Route::post('persons/search/export', [PersonSearchController::class, 'export'])->name('persons.search.export');
+    // Route::resource('persons', PersonSearchController::class);
+    Route::get('persons/search', [PersonSearchController::class, 'index2'])->name('person-search');
+    Route::get('persons/search/api', [PersonSearchController::class, 'search'])->name('persons.search.api');
+    Route::get('persons/search/suggestions', [PersonSearchController::class, 'suggestions'])->name('persons.search.suggestions');
+    Route::post('persons/search/export', [PersonSearchController::class, 'export'])->name('persons.search.export');
 
     // Admin routes - Role and Permission Management
     Route::prefix('admin')->name('admin.')->middleware('can:manage-roles')->group(function () {
@@ -133,7 +151,6 @@ Route::post('persons/search/export', [PersonSearchController::class, 'export'])-
             ->name('settings')
             ->middleware('can:manage-communications');
     });
-
 });
 
 Route::middleware(['auth'])->prefix('relationships')->name('relationships.')->group(function () {

@@ -7,7 +7,7 @@ use Livewire\Component;
 
 class ReviewUnitApplications extends Component
 {
-    public $applications;
+    // Removed unnecessary $applications property
     public $selectedApplication = null;
     public $selectedIds = [];
 
@@ -47,8 +47,7 @@ class ReviewUnitApplications extends Component
                 'updated_at' => now(),
             ]);
         }
-        $this->mount();
-        $this->selectedApplication = null;
+    $this->selectedApplication = null;
     }
 
     public function reject($id)
@@ -64,8 +63,7 @@ class ReviewUnitApplications extends Component
                 'updated_at' => now(),
             ]);
         }
-        $this->mount();
-        $this->selectedApplication = null;
+    $this->selectedApplication = null;
     }
 
     public function bulkApprove()
@@ -96,8 +94,7 @@ class ReviewUnitApplications extends Component
                 'updated_at' => now(),
             ]);
         }
-        $this->mount();
-        $this->selectedIds = [];
+    $this->selectedIds = [];
     }
 
     public function bulkReject()
@@ -116,8 +113,7 @@ class ReviewUnitApplications extends Component
                 'updated_at' => now(),
             ]);
         }
-        $this->mount();
-        $this->selectedIds = [];
+    $this->selectedIds = [];
     }
 
     public function render()

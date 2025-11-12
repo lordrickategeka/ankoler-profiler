@@ -16,9 +16,9 @@ class RolePermissionSeeder extends Seeder
         // Create permissions
     $permissions = [
             // Unit management permissions
-        'edit-units',
-        'delete-units',
-        'move-units',
+            'edit-units',
+            'delete-units',
+            'move-units',
             'approve-unit-membership',
             'bulk-approve-unit-membership',
             // Dashboard permissions

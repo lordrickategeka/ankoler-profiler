@@ -408,7 +408,7 @@
 
                 <div class="card-actions justify-end mt-4">
                     <button wire:click="resetImport" class="btn btn-primary">Import Another File</button>
-                    <a href="{{ route('persons') }}" class="btn btn-success">View All Persons</a>
+                    <a href="{{ route('persons.all') }}" class="btn btn-success">View All Persons</a>
                 </div>
             </div>
         </div>

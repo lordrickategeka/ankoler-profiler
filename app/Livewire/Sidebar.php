@@ -54,40 +54,47 @@ class Sidebar extends Component
     }
 
     public function getPersonMenu()
-{
-    $user = auth()->user();
-    $unreadCount = $user ? $user->unreadNotifications->count() : 0;
-    return [
-        'person-actions' => [
-            'title' => 'My Dashboard',
-            'icon' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
-            'items' => [
-                [
-                    'label' => 'My Profile',
+    {
+        $user = auth()->user();
+        $unreadCount = $user ? $user->unreadNotifications->count() : 0;
+        return [
+            'person-actions' => [
+                'title' => 'My Dashboard',
+                'icon' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+                'items' => [
+                    [
+                        'label' => 'My Profile',
+                        'icon' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+                        'route' => 'persons.profile-current',
+                        'permission' => 'view-persons'
+                    ],
+                    
+                    [
+                    'label' => 'My Products',
                     'icon' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
-                    'route' => 'dashboard',
+                    'route' => 'person-products',
                     'permission' => 'view-persons'
-                ],
-                [
+                    ],
+                    [
                     'label' => 'My Organizations',
                     'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 4h1m4 0h1M9 16h1',
                     'route' => 'dashboard',
                     'permission' => 'view-org-persons'
-                ],
-                [
+                    ],
+                    [
                     'label' => 'Privacy Settings',
                     'icon' => 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z',
                     'route' => 'dashboard',
                     'permission' => 'edit-persons'
-                ],
-                [
+                    ],
+                    [
                     'label' => 'Notifications',
                     'icon' => 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9',
                     'route' => 'person.notifications',
                     'permission' => 'view-persons',
                     'badge' => $unreadCount
-                ],
-                [
+                    ],
+                    [
                     'label' => 'My Documents',
                     'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
                     'route' => 'dashboard',
@@ -99,17 +106,17 @@ class Sidebar extends Component
                     'route' => 'dashboard',
                     'permission' => 'view-persons'
                 ],
-                    ['label' => 'Profile View', 'route' => 'persons.profile-current', 'permission' => 'view-persons', 'icon' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0z'],
                 [
                     'label' => 'Help & Support',
                     'icon' => 'M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
                     'route' => 'dashboard',
                     'permission' => 'Support-persons'
-                ]
+                ],
             ]
         ]
-    ];
-}
+
+        ];
+    }
 
     private function getSuperAdminMenu()
     {
@@ -148,9 +155,10 @@ class Sidebar extends Component
                 'title' => 'Person Registry',
                 'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
                 'items' => [
-                    ['label' => 'All Persons', 'route' => 'persons', 'permission' => ['view-persons', 'can_view_all_organisational_persons'], 'icon' => 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z'],
+                    ['label' => 'All Persons', 'route' => 'persons.all', 'permission' => ['view-persons', 'can_view_all_organisational_persons'], 'icon' => 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z'],
                     ['label' => 'Add New Person', 'route' => 'persons.create', 'permission' => 'create-persons', 'icon' => 'M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z'],
                     ['label' => 'Import Persons', 'route' => 'persons.import', 'permission' => 'import-org-persons', 'icon' => 'M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10'],
+                    ['label' => 'Export Persons', 'route' => 'persons.export', 'permission' => 'export-org-persons', 'icon' => 'M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10'],
                     ['label' => 'Search Persons', 'route' => 'person-search', 'permission' => 'view-persons', 'icon' => 'm21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'],
                     // ['label' => 'Verification Queue', 'route' => 'dashboard', 'permission' => 'verify-persons', 'badge' => $this->getPendingVerificationCount(), 'icon' => 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z']
                 ]
@@ -162,9 +170,19 @@ class Sidebar extends Component
                     ['label' => 'Send Message', 'route' => 'communication.send', 'permission' => 'send-communications', 'icon' => 'M12 19l9 2-9-18-9 18 9-2zm0 0v-8'],
                     ['label' => 'Filter Profiles', 'route' => 'communication.filter-profiles', 'permission' => 'send-communications', 'icon' => 'M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z'],
                     ['label' => 'Message History', 'route' => 'communication.history', 'permission' => 'view-communications', 'icon' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'],
-                    ['label' => 'Bulk Messaging', 'route' => 'communication.send', 'permission' => 'send-bulk-communications', 'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z'],
-                    ['label' => 'Analytics', 'route' => 'communication.index', 'permission' => 'view-communication-analytics', 'icon' => 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'],
+                    // ['label' => 'Bulk Messaging', 'route' => 'communication.send', 'permission' => 'send-bulk-communications', 'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z'],
+                    // ['label' => 'Analytics', 'route' => 'communication.index', 'permission' => 'view-communication-analytics', 'icon' => 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'],
                     ['label' => 'Settings', 'route' => 'communication.settings', 'permission' => 'manage-communications', 'icon' => 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z']
+                ]
+            ],
+            'community' => [
+                'title' => 'Community',
+                'icon' => 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z',
+                'items' => [
+                    ['label' => 'Shop', 'route' => 'person-products', 'permission' => 'manage-roles', 'icon' => 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.042-.133-2.052-.382-3.016z'],
+                    ['label' => 'Products', 'route' => 'person-products', 'permission' => 'view-persons', 'icon' => 'M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z'],
+
+
                 ]
             ],
             'admin' => [
@@ -177,6 +195,7 @@ class Sidebar extends Component
                     ['label' => 'Users', 'route' => 'admin.users.index', 'permission' => 'manage-roles', 'icon' => 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z']
                 ]
             ],
+
             // 'affiliations' => [
             //     'title' => 'Affiliations & Roles',
             //     'icon' => 'M8 9l4-4 4 4m0 6l-4 4-4-4m-5-5h2.586a1 1 0 01.707.293L8 12l1.707 1.707A1 1 0 0010.414 14H13m-3-3v3m0-3V8',
@@ -304,13 +323,12 @@ class Sidebar extends Component
                 'title' => 'Person Mgt',
                 'icon' => 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
                 'items' => [
-                    ['label' => 'All Persons', 'route' => 'persons', 'permission' => 'view-org-persons'],
+                    ['label' => 'All Persons', 'route' => 'persons.all', 'permission' => 'view-org-persons'],
                     ['label' => 'Add New Person', 'route' => 'persons.create', 'permission' => 'create-org-persons'],
                     ['label' => 'Import Persons', 'route' => 'persons.import', 'permission' => 'import-org-persons'],
-
+                    ['label' => 'Products', 'route' => 'person-products', 'permission' => 'view-org-persons', 'icon' => 'M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z'],
                     ['label' => 'Export Persons', 'route' => 'dashboard', 'permission' => 'export-org-persons'],
                     ['label' => 'Filter Profiles', 'route' => 'communication.filter-profiles', 'permission' => 'send-communications', 'icon' => 'M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z'],
-
                 ]
             ],
             'affiliations' => [
@@ -482,7 +500,7 @@ class Sidebar extends Component
                 'title' => 'Person Mgt',
                 'icon' => 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
                 'items' => [
-                    ['label' => 'View Persons', 'route' => 'dashboard', 'permission' => 'view-persons'],
+                    ['label' => 'View Persons', 'route' => 'persons.all', 'permission' => 'view-persons'],
                     ['label' => 'Search Persons', 'route' => 'person-search', 'permission' => 'view-persons']
                 ]
             ],

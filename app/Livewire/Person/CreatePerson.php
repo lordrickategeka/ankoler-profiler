@@ -1104,7 +1104,7 @@ class CreatePerson extends Component
             session()->flash('success', "✅ {$person->full_name} successfully registered with {$affiliationText} at {$firstOrgName}" . ($affiliationCount > 1 ? ' and others' : '') . "!");
 
             // Redirect to person list page
-            return $this->redirect('/persons', navigate: true);
+            return $this->redirect('/persons/all', navigate: true);
 
         } catch (\Exception $e) {
             Log::error('CreatePerson: Error in createNewPerson', [
@@ -1181,7 +1181,7 @@ class CreatePerson extends Component
 
         $this->resetForm();
 
-        return redirect()->route('person.index');
+        return redirect()->route('persons.all');
     }
 
     /**

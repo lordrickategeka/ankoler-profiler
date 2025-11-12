@@ -23,10 +23,11 @@ class ProfileView extends Component
             if (!$personModel) {
                 abort(404, 'Person record not found for current user.');
             }
-        } else if ($person instanceof Person) {
-            $personModel = $person;
         } else {
-            $personModel = Person::findOrFail($person);
+            $personModel = Person::find($person);
+            if (!$personModel) {
+                abort(404, 'Person record not found for id: ' . $person);
+            }
         }
         $this->person = $personModel->load([
             'phones',

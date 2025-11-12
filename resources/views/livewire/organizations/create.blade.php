@@ -54,11 +54,42 @@
                     </svg>
                     Back to Organizations
                 </a>
+                <a href="{{ route('organizations.template') }}" class="btn btn-outline btn-primary" target="_blank">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Export Template
+                </a>
             </div>
         </div>
     </x-slot>
 
     <div class="py-4">
+        {{-- Import Organizations --}}
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 mb-6">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-1">Import Organizations</h3>
+                    <p class="text-gray-600 text-sm">Upload an Excel or CSV file to import organizations in bulk. <a href="{{ route('organizations.template') }}" class="link link-primary underline ml-1" target="_blank">Download template</a></p>
+                </div>
+                <form wire:submit.prevent="importOrganizations" class="flex flex-col md:flex-row md:items-center gap-2">
+                    <input type="file" wire:model="importFile" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" class="file-input file-input-bordered file-input-sm" />
+                    @error('importFile')
+                        <span class="text-red-600 text-xs">{{ $message }}</span>
+                    @enderror
+                    <button type="submit" class="btn btn-primary btn-sm" wire:loading.attr="disabled" wire:target="importFile,importOrganizations">
+                        <span wire:loading.remove wire:target="importOrganizations">Import</span>
+                        <span wire:loading wire:target="importOrganizations" class="flex items-center gap-2">
+                            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Importing...
+                        </span>
+                    </button>
+                </form>
+            </div>
+        </div>
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             {{-- Tab Navigation --}}
             <div class="mb-6">

@@ -304,6 +304,8 @@ class PersonsImport implements ToCollection, WithHeadingRow, WithValidation, Wit
     private function createPerson(array $row): Person
     {
         return Person::create([
+            'person_id' => \App\Helpers\IdGenerator::generatePersonId(),
+            'global_identifier' => \App\Helpers\IdGenerator::generateGlobalIdentifier('GID'),
             'given_name' => $row['given_name'],
             'middle_name' => $row['middle_name'] ?? null,
             'family_name' => $row['family_name'],
@@ -313,7 +315,7 @@ class PersonsImport implements ToCollection, WithHeadingRow, WithValidation, Wit
             'city' => $row['city'] ?? null,
             'district' => $row['district'] ?? null,
             'country' => $row['country'] ?? 'Uganda',
-            'classification' => [$row['role_type'] ?? $this->defaultRoleType],
+            'classification' => json_encode([$row['role_type'] ?? $this->defaultRoleType]),
             'created_by' => $this->createdBy,
         ]);
     }

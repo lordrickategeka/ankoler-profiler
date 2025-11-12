@@ -76,7 +76,6 @@
                                         <option value="active">Active</option>
                                         <option value="inactive">Inactive</option>
                                         <option value="verified">Verified</option>
-                                        <option value="trial">Trial</option>
                                     </select>
                                 </div>
 
@@ -242,9 +241,7 @@
                                                 @if ($organization->is_verified)
                                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Verified</span>
                                                 @endif
-                                                @if ($organization->is_trial)
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Trial</span>
-                                                @endif
+                                               
                                             </div>
                                         @else
                                             <span class="text-gray-400 italic">None</span>

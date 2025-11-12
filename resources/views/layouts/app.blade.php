@@ -10,7 +10,7 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -27,7 +27,7 @@
         {{-- Main Content --}}
         <main class="flex-1 flex flex-col overflow-hidden">
             {{-- Header --}}
-            <header class="bg-base-100 border-b border-base-300 px-8 py-6">
+            <header class="bg-base-100 border-b border-base-300 px-8 py-3" style="background: #eeeff2">
                 <div class="flex items-center justify-between">
                     <div>
                         @if(isset($pageCategory))
@@ -45,10 +45,10 @@
                         @if(isset($pageSubtitle))
                             <p class="text-base-content/70 text-sm max-w-2xl">{{ $pageSubtitle }}</p>
                         @else
-                            {{-- <p class="text-base-content/70 text-sm max-w-2xl">
+                            <p class="text-base-content/70 text-sm max-w-2xl">
                                 Comprehensive person identity management system with role-based access, organizational
                                 affiliations.
-                            </p> --}}
+                            </p>
                         @endif
                     </div>
                     <div class="flex items-center gap-3" id='topbar-menu'>

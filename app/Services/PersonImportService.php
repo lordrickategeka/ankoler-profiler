@@ -16,136 +16,6 @@ class PersonImportService
         $this->deduplicationService = new PersonDeduplicationService();
     }
 
-    /**
-     * Get role-specific template headers based on organization category
-     */
-    // public function getRoleSpecificTemplateHeaders(string $organizationCategory): array
-    // {
-    //     // Base headers that match the Person model structure
-    //     $baseHeaders = [
-    //         // Personal Information (Person table)
-    //         'Given Name' => 'First Name (Required)',
-    //         'Middle Name' => 'Middle Name (Optional)',
-    //         'Family Name' => 'Last Name (Required)',
-    //         'Date of Birth' => 'Date of Birth (YYYY-MM-DD)',
-    //         'Gender' => 'Gender (male/female/other/prefer_not_to_say)',
-
-    //         // Address Information (Person table)
-    //         'Address' => 'Full Address',
-    //         'City' => 'City',
-    //         'District' => 'District/State',
-    //         'Country' => 'Country (Default: Uganda)',
-
-    //         // Contact Information (Related tables)
-    //         'Primary Phone' => 'Primary Phone Number',
-    //         'Primary Email' => 'Primary Email Address',
-
-    //         // Identity Information (PersonIdentifier table)
-    //         'National ID' => 'National ID Number',
-    //         'Passport Number' => 'Passport Number (Optional)',
-    //         'Driver\'s License' => 'Driver\'s License (Optional)',
-    //         'Professional License' => 'Professional License (Optional)',
-
-    //         // Affiliation Information (PersonAffiliation table)
-    //         'Role Type' => $this->getRoleTypeDescription($organizationCategory),
-    //         'Role Title' => 'Job Title/Position (Optional)',
-    //         'Site/Location' => 'Site/Location (Optional)',
-    //         'Start Date' => 'Start Date (YYYY-MM-DD)',
-    //     ];
-
-    //     // Role-specific headers based on organization category
-    //     $roleSpecificHeaders = [];
-
-    //     switch (strtolower($organizationCategory)) {
-    //         case 'hospital':
-    //             $roleSpecificHeaders = [
-    //                 // Patient-specific fields (Domain Records)
-    //                 'Patient Number' => 'Patient Number (for patients)',
-    //                 'Medical Record Number' => 'Medical Record Number (for patients)',
-    //                 'Allergies' => 'Known Allergies (for patients)',
-    //                 'Chronic Conditions' => 'Chronic Conditions (for patients)',
-    //                 'Emergency Contact' => 'Emergency Contact Name (for patients)',
-    //                 'Emergency Phone' => 'Emergency Contact Phone (for patients)',
-
-    //                 // Staff-specific fields (Domain Records)
-    //                 'Employee Number' => 'Employee Number (for staff)',
-    //                 'Department' => 'Department (for staff)',
-    //                 'Specialization' => 'Medical Specialization (for doctors)',
-    //                 'License Number' => 'Medical License Number (for medical staff)',
-    //             ];
-    //             break;
-
-    //         case 'school':
-    //             $roleSpecificHeaders = [
-    //                 // Student-specific fields (Domain Records)
-    //                 'Student Number' => 'Student Number (for students)',
-    //                 'Enrollment Date' => 'Enrollment Date (YYYY-MM-DD) (for students)',
-    //                 'Current Class' => 'Current Class/Grade (for students)',
-    //                 'Guardian Name' => 'Guardian Name (for students)',
-    //                 'Guardian Phone' => 'Guardian Phone (for students)',
-    //                 'Guardian Email' => 'Guardian Email (for students)',
-
-    //                 // Staff-specific fields (Domain Records)
-    //                 'Employee Number' => 'Employee Number (for staff)',
-    //                 'Department' => 'Department (for staff)',
-    //                 'Teaching Subjects' => 'Teaching Subjects (for teachers)',
-    //                 'Qualifications' => 'Educational Qualifications (for staff)',
-    //             ];
-    //             break;
-
-    //         case 'sacco':
-    //             $roleSpecificHeaders = [
-    //                 // Member-specific fields (Domain Records)
-    //                 'membership_number' => 'Membership Number',
-    //                 'join_date' => 'Join Date (YYYY-MM-DD)',
-    //                 'share_capital' => 'Initial Share Capital (Amount)',
-    //                 'savings_account_ref' => 'Savings Account Reference',
-    //                 'next_of_kin_name' => 'Next of Kin Name',
-    //                 'next_of_kin_phone' => 'Next of Kin Phone',
-    //                 'occupation' => 'Occupation',
-    //                 'monthly_income' => 'Monthly Income (Amount)',
-
-    //                 // Staff-specific fields (Domain Records)
-    //                 'employee_number' => 'Employee Number (for staff)',
-    //                 'salary' => 'Salary (for staff)',
-    //             ];
-    //             break;
-
-    //         case 'parish':
-    //             $roleSpecificHeaders = [
-    //                 // Member-specific fields (Domain Records)
-    //                 'member_number' => 'Member Number',
-    //                 'baptism_date' => 'Baptism Date (YYYY-MM-DD)',
-    //                 'confirmation_date' => 'Confirmation Date (YYYY-MM-DD)',
-    //                 'church_group' => 'Church Group/Ministry',
-    //                 'marital_status' => 'Marital Status',
-    //                 'spouse_name' => 'Spouse Name (if married)',
-    //                 'children_count' => 'Number of Children',
-
-    //                 // Clergy-specific fields (Domain Records)
-    //                 'ordination_date' => 'Ordination Date (YYYY-MM-DD) (for clergy)',
-    //             ];
-    //             break;
-
-    //         case 'corporate':
-    //         case 'government':
-    //         case 'ngo':
-    //         default:
-    //             $roleSpecificHeaders = [
-    //                 // Employee-specific fields (Domain Records)
-    //                 'employee_number' => 'Employee Number',
-    //                 'department' => 'Department',
-    //                 'hire_date' => 'Hire Date (YYYY-MM-DD)',
-    //                 'salary' => 'Salary (Amount)',
-    //                 'supervisor_name' => 'Supervisor Name',
-    //                 'work_location' => 'Work Location',
-    //             ];
-    //             break;
-    //     }
-
-    //     return array_merge($baseHeaders, $roleSpecificHeaders);
-    // }
-
     public function getRoleSpecificTemplateHeaders(string $organizationCategory): array
     {
         // Base headers using database field names
@@ -807,6 +677,11 @@ class PersonImportService
     private function validateRow(array $row, int $rowNumber): array
     {
         $errors = [];
+
+        // Trim all values in the row
+        $row = array_map(function($value) {
+            return is_string($value) ? trim($value) : $value;
+        }, $row);
 
         // Required fields
         if (empty($row['given_name'])) {

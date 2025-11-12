@@ -241,11 +241,12 @@ class ImportPersons extends Component
             // Flash success message
             $successCount = $this->importResults['summary']['success'] ?? 0;
             $failedCount = $this->importResults['summary']['failed'] ?? 0;
-            
+
             if ($failedCount > 0) {
                 session()->flash('message', "Import completed: {$successCount} successful, {$failedCount} failed. Check details below.");
             } else {
                 session()->flash('message', "Successfully imported {$successCount} persons!");
+                return redirect()->route('persons.all');
             }
 
         } catch (ValidationException $e) {
@@ -263,7 +264,7 @@ class ImportPersons extends Component
     {
         $failures = $e->failures();
         $errorMessages = [];
-        
+
         foreach ($failures as $failure) {
             $row = $failure->row();
             $attribute = $failure->attribute();
@@ -274,18 +275,18 @@ class ImportPersons extends Component
         // Show first few errors in the main error, rest in session
         $mainErrors = array_slice($errorMessages, 0, 3);
         $remainingCount = count($errorMessages) - 3;
-        
+
         $message = 'Validation errors found:' . PHP_EOL . implode(PHP_EOL, $mainErrors);
         if ($remainingCount > 0) {
             $message .= PHP_EOL . "... and {$remainingCount} more errors. Check the detailed results below.";
         }
-        
+
         $this->addError('import', $message);
-        
+
         // Store all validation errors for display
         $this->validationErrors = $errorMessages;
         $this->showResults = true; // Show results section to display validation errors
-        
+
         Log::error('ImportPersons: Validation errors - ' . implode(' | ', $errorMessages));
     }
 
@@ -309,7 +310,7 @@ class ImportPersons extends Component
             }
 
             $service = new PersonImportService();
-            
+
             $templatePath = $service->generateExcelTemplateFile(
                 $this->currentOrganisation->category,
                 $this->currentOrganisation->display_name ?? $this->currentOrganisation->legal_name
@@ -334,7 +335,7 @@ class ImportPersons extends Component
             'previewData',
             'showPreview'
         ]);
-        
+
         // Clear any error bags
         $this->resetErrorBag();
     }

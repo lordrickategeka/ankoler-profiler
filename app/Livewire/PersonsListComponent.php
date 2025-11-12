@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Person;
+namespace App\Livewire;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
-class PersonList extends Component
+
+class PersonsListComponent extends Component
 {
     use WithPagination;
 
@@ -90,7 +91,7 @@ class PersonList extends Component
                 $this->filters,
                 $this->dynamicFilters,
                 $currentOrganization?->id ?? 'all',
-                ($user && method_exists($user, 'hasRole') && $user->hasRole('Super Admin')) ? 'all' : 'org'
+                $user && method_exists($user, 'hasRole') && $user->hasRole('Super Admin') ? 'all' : 'org'
             ])),
             'person_list_additional_' . ($currentOrganization?->id ?? 'all')
         ];
@@ -274,11 +275,9 @@ class PersonList extends Component
 
         $canViewAllPersons = $user && method_exists($user, 'hasRole') && $user->hasRole('Super Admin');
         $canViewOrgPersons = $user && method_exists($user, 'hasRole') &&
-            (is_array(['Organisation Admin', 'Department Manager', 'Data Entry Clerk'])
-                ? $user->hasRole(['Organisation Admin', 'Department Manager', 'Data Entry Clerk'])
-                : false);
+                            $user->hasRole(['Organisation Admin', 'Department Manager', 'Data Entry Clerk']);
 
-        if (!($user && method_exists($user, 'hasRole')) || (!$canViewAllPersons && !$canViewOrgPersons)) {
+        if (!$canViewAllPersons && !$canViewOrgPersons) {
             return $this->renderEmptyState();
         }
 
@@ -334,12 +333,15 @@ class PersonList extends Component
         // Get additional data
         $additionalData = $this->getAdditionalData($currentOrganization, $canViewAllPersons);
 
-        return view('livewire.person.person-list', array_merge([
+        return view('livewire.persons-list-component', array_merge([
             'persons' => $persons,
             'isSuperAdmin' => $canViewAllPersons,
             'currentOrganization' => $currentOrganization,
             'personToDelete' => $this->personToDeleteId ? Person::find($this->personToDeleteId) : null
-        ], $additionalData));
+        ], $additionalData))->layout('layouts.app', [
+            'title' => 'Person - Alpha',
+            'pageTitle' => 'Person Mgt'
+        ]);
     }
 
     private function getAdditionalData($currentOrganization, $canViewAllPersons)
@@ -367,7 +369,7 @@ class PersonList extends Component
 
     private function renderEmptyState()
     {
-        return view('livewire.person.person-list', [
+        return view('livewire.persons-list-component', [
             'persons' => collect(),
             'availableRoles' => [],
             'genderOptions' => [],
@@ -395,4 +397,5 @@ class PersonList extends Component
             default => ['STAFF', 'MEMBER', 'VOLUNTEER', 'CONSULTANT', 'VENDOR']
         };
     }
+    
 }

@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Jetstream\Jetstream;
 
+use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
+use App\Http\Responses\LoginResponse;
+
 class JetstreamServiceProvider extends ServiceProvider
 {
     /**
@@ -27,6 +30,9 @@ class JetstreamServiceProvider extends ServiceProvider
         Jetstream::deleteUsersUsing(DeleteUser::class);
 
         Vite::prefetch(concurrency: 3);
+
+        // Bind custom LoginResponse to override post-login redirect
+        $this->app->singleton(LoginResponseContract::class, LoginResponse::class);
     }
 
     /**

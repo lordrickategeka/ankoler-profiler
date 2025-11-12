@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Organizations;
 
+
 use App\Models\Organisation;
 use App\Models\OrganisationSite;
 use App\Mail\AdminWelcomeEmail;
@@ -13,9 +14,16 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
+
 class Create extends Component
 {
     use WithFileUploads;
+
+    // Import functionality
+    public $importFile;
+    protected $importRules = [
+        'importFile' => 'required|file|mimes:csv,txt,xlsx,xls',
+    ];
 
     // Step Management
     public $currentStep = 1;
@@ -87,6 +95,48 @@ class Create extends Component
     public $default_language = 'en';
 
 
+    public function importOrganizations()
+    {
+        $this->validate($this->importRules);
+
+        try {
+            Log::info('Starting organization import', [
+                'file' => $this->importFile ? $this->importFile->getClientOriginalName() : null,
+                'size' => $this->importFile ? $this->importFile->getSize() : null,
+                'mime' => $this->importFile ? $this->importFile->getMimeType() : null,
+            ]);
+            $import = new \App\Imports\OrganisationsImport();
+            \Maatwebsite\Excel\Facades\Excel::import($import, $this->importFile);
+            $summary = $import->results['summary'];
+            $details = $import->results['details'];
+            $success = $summary['success'] ?? 0;
+            $failed = $summary['failed'] ?? 0;
+            $total = $summary['total'] ?? 0;
+
+            Log::info('Organization import completed', [
+                'success' => $success,
+                'failed' => $failed,
+                'total' => $total,
+                'details' => $details,
+            ]);
+
+            if ($failed > 0) {
+                $errorDetails = collect($details)->where('status', 'failed')->map(function($row) {
+                    return 'Row ' . $row['row'] . ': ' . $row['message'];
+                })->implode(' | ');
+                session()->flash('error', "Imported $success of $total organizations. $failed failed. Errors: $errorDetails");
+            } else {
+                session()->flash('success', "Imported $success of $total organizations. $failed failed.");
+                redirect('organizations');
+            }
+        } catch (\Exception $e) {
+            Log::error('Organization import failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            session()->flash('error', 'Import failed: ' . $e->getMessage());
+        }
+    }
 
     protected $rules = [
         // Step 1
@@ -605,10 +655,11 @@ class Create extends Component
 
         $person = \App\Models\Person::create([
             'id' => Str::uuid(),
+            'person_id' => \App\Helpers\IdGenerator::generatePersonId(),
             'global_identifier' => 'PER-' . strtoupper(Str::random(8)),
             'given_name' => $givenName,
             'family_name' => $familyName,
-            'classification' => ['STAFF'],
+            'classification' => json_encode(['STAFF']),
         ]);
 
         // Create email address record

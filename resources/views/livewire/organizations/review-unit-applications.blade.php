@@ -19,28 +19,30 @@
             <tbody>
                 @if(isset($applications) && count($applications))
                     @foreach($applications as $app)
-                    <tr>
-                        <td><input type="checkbox" wire:model="selectedIds" value="{{ $app->id }}"></td>
-                        <td>{{ $app->person->full_name ?? 'N/A' }}</td>
-                        <td>{{ $app->organizationUnit->name ?? 'N/A' }}</td>
-                        <td>
-                            @if($app->status === 'inactive')
-                                <span class="badge badge-warning">Pending</span>
-                            @elseif($app->status === 'active')
-                                <span class="badge badge-success">Active</span>
-                            @elseif($app->status === 'terminated')
-                                <span class="badge badge-error">Terminated</span>
-                            @elseif($app->status === 'suspended')
-                                <span class="badge badge-info">Suspended</span>
-                            @else
-                                <span class="badge">{{ ucfirst($app->status) }}</span>
-                            @endif
-                        </td>
-                        <td>
-                            <button class="btn btn-success btn-xs" wire:click="approve({{ $app->id }})">Approve</button>
-                            <button class="btn btn-error btn-xs" wire:click="reject({{ $app->id }})">Reject</button>
-                        </td>
-                    </tr>
+                        @php
+                            $person = \App\Models\Person::find($app->person_id);
+                            $unit = \App\Models\OrganizationUnit::find($app->unit_id);
+                        @endphp
+                        <tr>
+                            <td><input type="checkbox" wire:model="selectedIds" value="{{ $app->id }}"></td>
+                            <td>{{ $person?->full_name ?? 'N/A' }}</td>
+                            <td>{{ $unit?->name ?? 'N/A' }}</td>
+                            <td>
+                                @if($app->status === 'pending')
+                                    <span class="badge badge-warning">Pending</span>
+                                @elseif($app->status === 'approved')
+                                    <span class="badge badge-success">Approved</span>
+                                @elseif($app->status === 'rejected')
+                                    <span class="badge badge-error">Rejected</span>
+                                @else
+                                    <span class="badge">{{ ucfirst($app->status) }}</span>
+                                @endif
+                            </td>
+                            <td>
+                                <button class="btn btn-success btn-xs" wire:click="approve({{ $app->id }})">Approve</button>
+                                <button class="btn btn-error btn-xs" wire:click="reject({{ $app->id }})">Reject</button>
+                            </td>
+                        </tr>
                     @endforeach
                 @else
                     <tr>
@@ -52,10 +54,14 @@
         </form>
     </div>
     @if($selectedApplication)
+        @php
+            $person = \App\Models\Person::find($selectedApplication->person_id ?? null);
+            $unit = \App\Models\OrganizationUnit::find($selectedApplication->unit_id ?? null);
+        @endphp
         <div class="mt-6 p-4 border rounded bg-gray-50">
             <h3 class="font-bold mb-2">Application Details</h3>
-            <div><strong>Applicant:</strong> {{ $selectedApplication->person->full_name ?? 'N/A' }}</div>
-            <div><strong>Unit:</strong> {{ $selectedApplication->organizationUnit->name ?? 'N/A' }}</div>
+            <div><strong>Applicant:</strong> {{ $person?->full_name ?? 'N/A' }}</div>
+            <div><strong>Unit:</strong> {{ $unit?->name ?? 'N/A' }}</div>
             <div><strong>Status:</strong> {{ ucfirst($selectedApplication->status) }}</div>
             <div class="mt-2">
                 <button class="btn btn-success btn-sm" wire:click="approve({{ $selectedApplication->id }})">Approve</button>

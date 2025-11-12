@@ -1,4 +1,4 @@
-<div class="p-8" style="background-color: #FAF7F5;">
+<div class="p-8" style="background-color: #eeeff2;">
     @role('Person')
     {{-- Person Dashboard: Quick Actions --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8 max-w-7xl mx-auto">
@@ -114,24 +114,7 @@
     @hasanyrole('Super Admin')
     {{-- Quick Actions Grid --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8 max-w-7xl mx-auto">
-        <!-- Person Registry Card -->
-        <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-200 border border-base-300">
-            <div class="card-body items-center text-center p-4">
-                <div class="w-12 h-12 bg-gradient-to-br from-accent/20 to-accent/10 rounded-xl flex items-center justify-center mb-3">
-                    <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                </div>
-                <h3 class="card-title text-base font-bold mb-1">Person Registry</h3>
-                <p class="text-base-content/70 text-xs mb-3">Manage person identities, profiles, and master records.</p>
-                <a href="{{ route('persons.create') }}" class="btn btn-outline btn-accent btn-sm gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Add Person
-                </a>
-            </div>
-        </div>
+
 
         <!-- Organizations Card -->
         <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-200 border border-base-300">
@@ -148,6 +131,25 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5" />
                     </svg>
                     View Organizations
+                </a>
+            </div>
+        </div>
+
+        <!-- Person Registry Card -->
+        <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-200 border border-base-300">
+            <div class="card-body items-center text-center p-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-accent/20 to-accent/10 rounded-xl flex items-center justify-center mb-3">
+                    <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                </div>
+                <h3 class="card-title text-base font-bold mb-1">Person Registry</h3>
+                <p class="text-base-content/70 text-xs mb-3">Manage person identities, profiles, and master records.</p>
+                <a href="{{ route('persons.create') }}" class="btn btn-outline btn-accent btn-sm gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Add Person
                 </a>
             </div>
         </div>

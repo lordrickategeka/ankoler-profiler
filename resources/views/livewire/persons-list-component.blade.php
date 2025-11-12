@@ -1,4 +1,6 @@
-<div class="h-[calc(100vh-8rem)] overflow-y-auto" wire:key="person-list-component">
+<div>
+    {{-- Because she competes with no one, no one can compete with her. --}}
+    <div class="h-[calc(100vh-8rem)] overflow-y-auto" wire:key="person-list-component">
     <div class="p-8">
 
         <div class="flex justify-between items-center mb-4">
@@ -265,13 +267,11 @@
                                                     <div class="flex-1">
                                                         <span
                                                             class="font-medium">{{ $affiliation->organisation->display_name ?? $affiliation->organisation->legal_name }}</span>
+
                                                         @if ($affiliation->role_title)
                                                             <div class="text-xs text-gray-400">
                                                                 {{ $affiliation->role_title }}</div>
                                                         @endif
-                                                    </div>
-                                                    <div class="px-1.5 py-1 whitespace-nowrap">
-                                                        {{ $affiliation->role_type }}
                                                     </div>
                                                 </div>
                                             @empty
@@ -279,7 +279,6 @@
                                                     <div class="w-2 h-2 bg-gray-400 rounded-full mr-1"
                                                         title="No active affiliations"></div>
                                                     <span class="text-gray-400 italic">No active affiliations</span>
-                                                    <div class="px-1.5 py-1 whitespace-nowrap text-xs text-gray-400 italic">No role type</div>
                                                 </div>
                                             @endforelse
 
@@ -291,6 +290,36 @@
                                             @endif
                                         </div>
                                     </td>
+                                    {{-- Classifications --}}
+                                    <td class="px-1.5 py-1 whitespace-nowrap">
+                                        {{ $affiliation->role_type }}
+                                        {{-- @if ($person->classification)
+                                            <div class="flex flex-wrap gap-1">
+                                                @foreach ($person->classification as $class)
+                                                    @php
+                                                        $badgeColor = match (strtoupper($class)) {
+                                                            'STAFF' => 'bg-blue-100 text-blue-800',
+                                                            'STUDENT' => 'bg-green-100 text-green-800',
+                                                            'PARENT' => 'bg-purple-100 text-purple-800',
+                                                            'VISITOR' => 'bg-orange-100 text-orange-800',
+                                                            'ALUMNI' => 'bg-gray-100 text-gray-800',
+                                                            default => 'bg-indigo-100 text-indigo-800',
+                                                        };
+                                                    @endphp
+                                                    <span
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $badgeColor }}">
+                                                        <div class="w-1.5 h-1.5 bg-current rounded-full mr-1"></div>
+                                                        {{ $class }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <div class="flex items-center">
+                                                <div class="w-2 h-2 bg-yellow-500 rounded-full mr-1"
+                                                    title="No classification assigned"></div>
+                                                <span class="text-gray-400 italic text-xs">No classification</span>
+                                            </div>
+                                        @endif --}}
                                     </td>
                                     <td class="px-1.5 py-1 whitespace-nowrap">
                                         @if ($person->country || $person->city)
@@ -441,7 +470,7 @@
     </div>
 
     {{-- Include Profile View Modal --}}
-    {{-- @livewire('person.profile-view') --}}
+    @livewire('person.profile-view')
 
     {{-- Delete Confirmation Modal --}}
     @if ($showDeleteModal)
@@ -574,7 +603,7 @@
                 button.disabled = false;
                 button.innerHTML = originalContent;
             });
-
+            
         </script>
     @endpush
 
@@ -655,4 +684,6 @@
             });
         </script>
     @endpush
+</div>
+
 </div>

@@ -21,14 +21,14 @@ return new class extends Migration
             $table->enum('organization_type', ['super', 'branch', 'HOLDING', 'SUBSIDIARY', 'STANDALONE'])->default('branch');
             $table->boolean('is_super')->default(false);
             $table->foreignId('parent_organization_id')->nullable()->constrained('organisations')->onDelete('set null');
-            $table->string('registration_number')->unique();
+            $table->string('registration_number')->nullable();
             $table->string('tax_identification_number')->unique()->nullable();
             $table->string('country_of_registration', 3)->default('UGA'); // ISO country codes
-            $table->date('date_established');
+            $table->date('date_established')->nullable();
             $table->text('logo_path')->nullable();
             $table->text('website_url')->nullable();
-            $table->string('contact_email')->unique();
-            $table->string('contact_phone');
+            $table->string('contact_email')->nullable();
+            $table->string('contact_phone')->nullable();
             $table->text('description')->nullable();
             $table->boolean('is_active')->default(true);
 

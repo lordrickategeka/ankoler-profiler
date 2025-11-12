@@ -1,0 +1,2 @@
+category,legal_name,display_name,code,organization_type,registration_number,contact_email,contact_phone,date_established,address_line_1,city,country,primary_contact_name,primary_contact_email,primary_contact_phone
+school,Sample School,Sample School,SS001,STANDALONE,REG1234,school@example.com,256700000001,2020-01-01,123 Main St,Kampala,UGA,John Doe,john.doe@example.com,256700000002

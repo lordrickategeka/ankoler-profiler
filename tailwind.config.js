@@ -25,8 +25,8 @@ export default {
         themes: [
             {
                 profiler: {
-                    "primary": "#fdba74",      // Using accent color as primary
-                    "secondary": "#fb923c",
+                    "primary": "#982B55",      // Brand primary color
+                    "secondary": "#982B55",    // Brand secondary color
                     "accent": "#f97316",       // Main accent color
                     "neutral": "#374151",
                     "base-100": "#ffffff",
