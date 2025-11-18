@@ -98,7 +98,10 @@ class PersonSearch extends Component
         $this->classifications = Person::whereNotNull('classification')
             ->get()
             ->pluck('classification')
-            ->flatten()
+            ->flatMap(function ($item) {
+                $decoded = json_decode($item, true);
+                return is_array($decoded) ? $decoded : [$item];
+            })
             ->unique()
             ->sort()
             ->values();
@@ -665,7 +668,10 @@ class PersonSearch extends Component
         return Person::whereNotNull('classification')
             ->get()
             ->pluck('classification')
-            ->flatten()
+            ->flatMap(function ($item) {
+                $decoded = json_decode($item, true);
+                return is_array($decoded) ? $decoded : [$item];
+            })
             ->unique()
             ->sort()
             ->values();
