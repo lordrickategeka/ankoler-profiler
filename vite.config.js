@@ -12,6 +12,7 @@ export default defineConfig({
                 // 'resources/js/react/app.jsx' // React entry file
             ],
             refresh: true,
+            base: '/ankoleprofile.demo/',
         }),
         react(),
     ],
