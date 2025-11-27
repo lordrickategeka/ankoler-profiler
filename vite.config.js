@@ -14,6 +14,6 @@ export default defineConfig({
             refresh: true,
             base: '/ankoleprofile.demo/',
         }),
-        react(),
+        // react(),
     ],
 });
