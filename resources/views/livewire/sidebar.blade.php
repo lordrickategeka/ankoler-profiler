@@ -3,7 +3,7 @@
     <div class="p-6 border-b border-base-300">
         <div class="flex items-center gap-3">
             <div class="rounded-xl flex items-center justify-center bg-white">
-                <img src="/images/ankole-diocese-logo.png" alt="Ankole Diocese Logo" class="w-32 h-32 object-contain" />
+                <img src="{{ asset('images/ankole-diocese-logo.png') }}" alt="Ankole Diocese Logo" class="w-32 h-32 object-contain" />
             </div>
             {{-- <span class="text-xl font-bold text-base-content">Profiler</span> --}}
         </div>
