@@ -6,8 +6,22 @@ use App\Models\Organisation;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-class Index extends Component
-{
+class Index extends Component {
+    public $editStep = 1;
+
+    public function nextEditStep()
+    {
+        if ($this->editStep < 3) {
+            $this->editStep++;
+        }
+    }
+
+    public function prevEditStep()
+    {
+        if ($this->editStep > 1) {
+            $this->editStep--;
+        }
+    }
     use WithPagination;
 
     public $search = '';
@@ -105,6 +119,31 @@ class Index extends Component
             'ngo' => 'NGO/Non-Profit',
             'other' => 'Other'
         ];
+    }
+
+    public $confirmingDeleteId = null;
+    public $editingOrganizationId = null;
+    public $editingOrganizationData = [
+        'legal_name' => '',
+        'category' => '',
+        'is_active' => false,
+        // Add other fields as needed
+    ];
+
+
+    public function confirmDelete($id)
+    {
+        $this->confirmingDeleteId = $id;
+    }
+
+
+    public function deleteOrganization()
+    {
+        $organization = Organisation::findOrFail($this->confirmingDeleteId);
+        $organization->delete();
+
+        session()->flash('message', 'Organization deleted successfully.');
+        $this->confirmingDeleteId = null;
     }
 
     public function render()

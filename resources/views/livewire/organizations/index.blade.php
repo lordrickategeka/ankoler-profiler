@@ -5,7 +5,7 @@
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                     {{ __('Organizations') }}
                 </h2>
-                <p class="text-gray-600 text-sm mt-1">Manage organizational hierarchy and structures</p>
+                <p class="text-gray-600 text-sm mt-1">Manage organizational hierarchy and structures oop</p>
             </div>
 
             @can('create-organizations')
@@ -106,8 +106,11 @@
                     <table class="min-w-full divide-y divide-gray-200 text-[11px]">
                         <thead class="bg-gray-50 text-[10px]">
                             <tr>
-                                <th class="px-1.5 py-0.5 text-left font-medium text-gray-500 uppercase tracking-wider w-16">#</th>
-                                <th class="px-1.5 py-0.5 text-left font-medium text-gray-500 uppercase tracking-wider w-80">
+                                <th
+                                    class="px-1.5 py-0.5 text-left font-medium text-gray-500 uppercase tracking-wider w-16">
+                                    #</th>
+                                <th
+                                    class="px-1.5 py-0.5 text-left font-medium text-gray-500 uppercase tracking-wider w-80">
                                     <button wire:click="sortBy('legal_name')"
                                         class="flex items-center gap-1 font-medium text-gray-500 hover:text-gray-700 uppercase text-[10px]">
                                         ORGANIZATION
@@ -120,7 +123,8 @@
                                         @endif
                                     </button>
                                 </th>
-                                <th class="px-1.5 py-0.5 text-left font-medium text-gray-500 uppercase tracking-wider w-32">
+                                <th
+                                    class="px-1.5 py-0.5 text-left font-medium text-gray-500 uppercase tracking-wider w-32">
                                     <button wire:click="sortBy('category')"
                                         class="flex items-center gap-1 font-medium text-gray-500 hover:text-gray-700 uppercase text-[10px]">
                                         CATEGORY
@@ -133,9 +137,14 @@
                                         @endif
                                     </button>
                                 </th>
-                                <th class="px-1.5 py-0.5 text-left font-small text-gray-500 uppercase tracking-wider w-40">LOCATION</th>
-                                <th class="px-1.5 py-0.5 text-left font-small text-gray-500 uppercase tracking-wider w-64">CONTACT</th>
-                                <th class="px-1.5 py-0.5 text-left font-small text-gray-500 uppercase tracking-wider w-32">
+                                <th
+                                    class="px-1.5 py-0.5 text-left font-small text-gray-500 uppercase tracking-wider w-40">
+                                    LOCATION</th>
+                                <th
+                                    class="px-1.5 py-0.5 text-left font-small text-gray-500 uppercase tracking-wider w-64">
+                                    CONTACT</th>
+                                <th
+                                    class="px-1.5 py-0.5 text-left font-small text-gray-500 uppercase tracking-wider w-32">
                                     <button wire:click="sortBy('is_active')"
                                         class="flex items-center gap-1 font-small text-gray-500 hover:text-gray-700 uppercase text-[10px]">
                                         STATUS
@@ -148,7 +157,8 @@
                                         @endif
                                     </button>
                                 </th>
-                                <th class="px-1.5 py-0.5 text-left font-medium text-gray-500 uppercase tracking-wider w-24">
+                                <th
+                                    class="px-1.5 py-0.5 text-left font-medium text-gray-500 uppercase tracking-wider w-24">
                                     <button wire:click="sortBy('created_at')"
                                         class="flex items-center gap-1 font-medium text-gray-500 hover:text-gray-700 uppercase text-[10px]">
                                         CREATED
@@ -161,17 +171,21 @@
                                         @endif
                                     </button>
                                 </th>
-                                <th class="px-1.5 py-0.5 text-left font-medium text-gray-500 uppercase tracking-wider w-20">ACTIONS</th>
+                                <th
+                                    class="px-1.5 py-0.5 text-left font-medium text-gray-500 uppercase tracking-wider w-20">
+                                    ACTIONS</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200 text-[11px]">
                             @forelse($organizations as $organization)
                                 <tr class="hover:bg-gray-50">
-                                    <td class="px-1.5 py-1 whitespace-nowrap">{{ $organizations->firstItem() + $loop->index }}</td>
+                                    <td class="px-1.5 py-1 whitespace-nowrap">
+                                        {{ $organizations->firstItem() + $loop->index }}</td>
                                     <td class="px-1.5 py-1">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0 h-10 w-10">
-                                                <div class="h-10 w-10 rounded-full bg-accent/10 flex items-center justify-center">
+                                                <div
+                                                    class="h-10 w-10 rounded-full bg-accent/10 flex items-center justify-center">
                                                     <span class="text-accent font-medium text-sm">
                                                         {{ substr($organization->name, 0, 2) }}
                                                     </span>
@@ -185,16 +199,19 @@
                                                     </a>
                                                 </div>
                                                 @if ($organization->display_name && $organization->display_name !== $organization->legal_name)
-                                                    <div class="text-sm text-gray-500 truncate">{{ $organization->display_name }}</div>
+                                                    <div class="text-sm text-gray-500 truncate">
+                                                        {{ $organization->display_name }}</div>
                                                 @endif
                                                 @if ($organization->code)
-                                                    <div class="text-xs text-gray-400">Code: {{ $organization->code }}</div>
+                                                    <div class="text-xs text-gray-400">Code: {{ $organization->code }}
+                                                    </div>
                                                 @endif
                                             </div>
                                         </div>
                                     </td>
                                     <td class="px-1.5 py-1 whitespace-nowrap">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                             {{ $organization->category_display }}
                                         </span>
                                     </td>
@@ -209,21 +226,30 @@
                                     <td class="px-1.5 py-1">
                                         <div class="text-sm text-gray-900">
                                             @if ($organization->primary_contact_name)
-                                                <div class="font-medium truncate">{{ $organization->primary_contact_name }}</div>
+                                                <div class="font-medium truncate">
+                                                    {{ $organization->primary_contact_name }}</div>
                                             @endif
                                             @if ($organization->contact_email)
                                                 <div class="flex items-center">
-                                                    <svg class="w-4 h-4 mr-1 text-gray-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
-                                                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                                                    <svg class="w-4 h-4 mr-1 text-gray-400 flex-shrink-0"
+                                                        fill="currentColor" viewBox="0 0 20 20">
+                                                        <path
+                                                            d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z">
+                                                        </path>
+                                                        <path
+                                                            d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z">
+                                                        </path>
                                                     </svg>
                                                     <span class="truncate">{{ $organization->contact_email }}</span>
                                                 </div>
                                             @endif
                                             @if ($organization->contact_phone)
                                                 <div class="flex items-center mt-1">
-                                                    <svg class="w-4 h-4 mr-1 text-gray-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
+                                                    <svg class="w-4 h-4 mr-1 text-gray-400 flex-shrink-0"
+                                                        fill="currentColor" viewBox="0 0 20 20">
+                                                        <path
+                                                            d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z">
+                                                        </path>
                                                     </svg>
                                                     <span class="truncate">{{ $organization->contact_phone }}</span>
                                                 </div>
@@ -234,14 +260,17 @@
                                         @if ($organization->is_active || $organization->is_verified || $organization->is_trial)
                                             <div class="flex flex-wrap gap-1">
                                                 @if ($organization->is_active)
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
+                                                    <span
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
                                                 @else
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Inactive</span>
+                                                    <span
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Inactive</span>
                                                 @endif
                                                 @if ($organization->is_verified)
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Verified</span>
+                                                    <span
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Verified</span>
                                                 @endif
-                                               
+
                                             </div>
                                         @else
                                             <span class="text-gray-400 italic">None</span>
@@ -254,28 +283,58 @@
                                     </td>
                                     <td class="px-1.5 py-1 whitespace-nowrap text-right font-medium">
                                         <div x-data="{ open: false }" class="relative flex justify-end">
-                                            <button @click="open = !open" class="p-1 rounded-full hover:bg-gray-200 focus:outline-none">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                    <circle cx="10" cy="4" r="1.5"/>
-                                                    <circle cx="10" cy="10" r="1.5"/>
-                                                    <circle cx="10" cy="16" r="1.5"/>
+                                            <button @click="open = !open"
+                                                class="p-1 rounded-full hover:bg-gray-200 focus:outline-none">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                                    viewBox="0 0 20 20" fill="currentColor">
+                                                    <circle cx="10" cy="4" r="1.5" />
+                                                    <circle cx="10" cy="10" r="1.5" />
+                                                    <circle cx="10" cy="16" r="1.5" />
                                                 </svg>
                                             </button>
-                                            <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded shadow-lg z-10">
+                                            <div x-show="open" @click.away="open = false"
+                                                class="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded shadow-lg z-10">
                                                 <ul class="py-1">
                                                     <li>
-                                                        <a href="{{ route('organizations.show', $organization->id) }}" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 block">View</a>
+                                                        <a href="{{ route('organizations.show', $organization->id) }}"
+                                                            class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 block">View</a>
                                                     </li>
                                                     <li>
-                                                        <button class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Edit</button>
+                                                        <button
+                                                            class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Edit</button>
                                                     </li>
+                                                    @can('manage-sites')
                                                     <li>
-                                                        <button class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Manage Sites</button>
+                                                        <button
+                                                            class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Manage
+                                                            Sites</button>
                                                     </li>
+                                                    @endcan
                                                     <li>
-                                                        <button class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Delete</button>
+                                                        <button
+                                                            class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-red-600"
+                                                            wire:click="confirmDelete({{ $organization->id }})">
+                                                            Delete
+                                                        </button>
                                                     </li>
                                                 </ul>
+                                                @if ($confirmingDeleteId)
+                                                    <div
+                                                        class="fixed inset-0 flex items-center justify-center z-50 bg-transparent">
+                                                        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+                                                            <h2 class="text-lg font-semibold mb-4">Delete Organization
+                                                            </h2>
+                                                            <p class="mb-4">Are you sure you want to delete this
+                                                                organization? This action cannot be undone.</p>
+                                                            <div class="flex justify-end gap-2">
+                                                                <button wire:click="$set('confirmingDeleteId', null)"
+                                                                    class="btn btn-ghost">Cancel</button>
+                                                                <button wire:click="deleteOrganization"
+                                                                    class="btn btn-error">Delete</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
                                             </div>
                                         </div>
                                     </td>

@@ -3,6 +3,8 @@
 namespace App\Imports;
 
 use App\Models\Organisation;
+use App\Models\CustomField;
+use App\Models\CustomFieldValue;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -96,27 +98,46 @@ class OrganisationsImport implements ToCollection, WithHeadingRow, WithValidatio
 
     private function processRow(array $row, int $rowNumber): array
     {
-        $orgData = [
-            'category' => $row['category'],
-            'legal_name' => $row['legal_name'],
-            'display_name' => $row['display_name'] ?? $row['legal_name'],
-            'code' => $row['code'],
-            'organization_type' => $row['organization_type'],
-            'registration_number' => $row['registration_number'],
-            'contact_email' => $row['contact_email'],
-            'contact_phone' => $row['contact_phone'],
-            'date_established' => $row['date_established'],
-            'address_line_1' => $row['address_line_1'],
-            'city' => $row['city'],
-            'country' => $row['country'],
-            'primary_contact_name' => $row['primary_contact_name'],
-            'primary_contact_email' => $row['primary_contact_email'],
-            'primary_contact_phone' => $row['primary_contact_phone'],
+        // List of standard org fields
+        $orgFields = [
+            'category', 'legal_name', 'display_name', 'code', 'organization_type',
+            'registration_number', 'contact_email', 'contact_phone', 'date_established',
+            'address_line_1', 'city', 'country', 'primary_contact_name',
+            'primary_contact_email', 'primary_contact_phone',
         ];
-        Organisation::create($orgData);
+
+        $orgData = [];
+        foreach ($orgFields as $field) {
+            if (array_key_exists($field, $row)) {
+                $orgData[$field] = $row[$field];
+            }
+        }
+
+        $organisation = Organisation::create($orgData);
+
+        // Handle custom fields
+        foreach ($row as $key => $value) {
+            if (!in_array($key, $orgFields) && $value !== null && $value !== '') {
+                // Find or create the custom field definition
+                $customField = CustomField::firstOrCreate(
+                    ['name' => $key],
+                    [
+                        'label' => ucwords(str_replace('_', ' ', $key)),
+                        'type' => 'string', // Default type, adjust as needed
+                    ]
+                );
+                // Save the value for this org and field
+                CustomFieldValue::create([
+                    'organisation_id' => $organisation->id,
+                    'custom_field_id' => $customField->id,
+                    'value' => $value,
+                ]);
+            }
+        }
+
         return [
             'status' => 'success',
-            'message' => 'Created organization'
+            'message' => 'Created organization with custom fields'
         ];
     }
 

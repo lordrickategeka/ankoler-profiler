@@ -45,7 +45,7 @@ class SmsChannel implements CommunicationChannelInterface
     public function sendBulk(array $recipients, string $message, array $options = []): Collection
     {
         $results = $this->smsService->sendBulkSms($recipients, $message, $options);
-        
+
         return collect($results);
     }
 
@@ -60,7 +60,7 @@ class SmsChannel implements CommunicationChannelInterface
             try {
                 // Get phone number for the person
                 $phoneNumber = $this->getPersonPhoneNumber($person);
-                
+
                 if (!$phoneNumber) {
                     $results->push(CommunicationResult::failure(
                         messageId: 'SMS_NO_PHONE_' . time(),
@@ -125,7 +125,7 @@ class SmsChannel implements CommunicationChannelInterface
 
             // Optional: Test connectivity by checking account balance
             $balanceResult = $this->smsService->getAccountBalance();
-            
+
             return $balanceResult['success'] ?? false;
         } catch (\Exception $e) {
             Log::warning('SMS channel availability check failed', [
@@ -255,7 +255,7 @@ class SmsChannel implements CommunicationChannelInterface
     {
         // Get person variables
         $variables = $this->getPersonVariables($person);
-        
+
         // Merge with any additional options
         $variables = array_merge($variables, $options);
 

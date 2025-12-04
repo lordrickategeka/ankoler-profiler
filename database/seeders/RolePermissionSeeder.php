@@ -141,6 +141,10 @@ class RolePermissionSeeder extends Seeder
             'view-tasks',
             'view-own-entries',
             'view-quality-issues',
+
+            'manage-sites',
+            'import-organisations',
+            'export-organisations'
         ];
 
         foreach ($permissions as $permission) {

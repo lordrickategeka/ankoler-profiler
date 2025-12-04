@@ -8,14 +8,53 @@ use App\Http\Controllers\SMSWebhookController;
 use App\Http\Controllers\AfricasTalkingCallbackController;
 use App\Http\Controllers\AllPersonsListController;
 use App\Livewire\Person\Notifications as PersonNotificationsLivewire;
+use App\Models\CustomField;
+
 
 use App\Exports\OrganisationTemplateExport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Livewire\Organizations\ImportOrganisations;
+
+// Custom organization template export (POST)
+Route::post('/organizations/export-template', function (\Illuminate\Http\Request $request) {
+    $fields = $request->input('fields', []);
+    $headers = array_map('trim', $fields);
+
+    // Save custom fields to custom_fields table
+    foreach ($fields as $field) {
+        CustomField::updateOrCreate([
+            'model_type' => 'organisation_template',
+            'model_id' => 0,
+            'field_name' => $field,
+        ], [
+            'field_label' => ucfirst(str_replace('_', ' ', $field)),
+            'field_type' => 'string',
+            'field_options' => null,
+            'is_required' => false,
+            'validation_rules' => null,
+            'group' => null,
+            'order' => null,
+            'description' => null,
+        ]);
+    }
+
+    $export = new OrganisationTemplateExport([], $headers);
+    return Excel::download($export, 'custom_organisation_template.xlsx');
+})->name('organizations.export-template')->middleware(['auth:sanctum', config('jetstream.auth_session')]);
 // Organization template export
 Route::get('/organizations/template', function () {
     $export = new OrganisationTemplateExport();
     return Excel::download($export, 'organisation_import_template.xlsx');
 })->name('organizations.template')->middleware(['auth:sanctum', config('jetstream.auth_session')]);
+
+// Organization Import route
+Route::get('/organizations/import', ImportOrganisations::class)
+    ->name('organizations.import')
+    ->middleware(['auth:sanctum', config('jetstream.auth_session')]);
+
+// Public self-registration route
+Route::get('/person/self-register', App\Livewire\Person\PersonSelfRegistrationComponent::class)
+    ->name('person.self-register');
 
 
 Route::get('/', function () {

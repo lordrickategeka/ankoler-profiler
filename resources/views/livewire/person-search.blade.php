@@ -695,7 +695,7 @@
                                                 </div>
                                                 <div class="flex-1">
                                                     <span
-                                                        class="font-medium">{{ $affiliation->organisation->display_name ?? $affiliation->organisation->legal_name }}</span>
+                                                        class="font-medium">{{ $affiliation->organisation->display_name ?? $affiliation->organisation->legal_name ?? 'Not Provided' }}</span>
                                                     <span class="text-gray-500">-
                                                         {{ $affiliation->role_type }}</span>
                                                     @if ($affiliation->role_title)

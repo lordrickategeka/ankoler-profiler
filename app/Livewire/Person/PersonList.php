@@ -36,6 +36,9 @@ class PersonList extends Component
         // Edit person properties
         public $editPersonId = null;
         public $editPersonData = [];
+        // View person properties
+        public $viewPersonId = null;
+        public $viewPersonData = null;
 
     protected $queryString = [
         'filters' => ['except' => []],
@@ -231,6 +234,22 @@ class PersonList extends Component
             $this->editPersonId = $person->id;
             $this->editPersonData = $person->toArray();
         }
+
+            /**
+             * Load a person's data for viewing
+             */
+            public function viewPerson($id)
+            {
+                $person = Person::find($id);
+                if ($person) {
+                    $this->viewPersonId = $person->id;
+                    $this->viewPersonData = $person;
+                } else {
+                    $this->viewPersonId = null;
+                    $this->viewPersonData = null;
+                    session()->flash('error', 'Person not found.');
+                }
+            }
 
         /**
          * Update the person's data
