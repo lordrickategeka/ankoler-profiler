@@ -13,7 +13,7 @@ class Organization extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'Organizations';
+    protected $table = 'organizations';
 
     protected $fillable = [
         // Basic Information

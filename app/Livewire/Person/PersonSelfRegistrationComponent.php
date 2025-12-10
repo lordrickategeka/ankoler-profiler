@@ -2,12 +2,15 @@
 
 namespace App\Livewire\Person;
 
+use App\Models\EmailAddress;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\Person;
 use App\Models\Organization;
 use App\Models\PersonAffiliation;
 use App\Models\PersonIdentifier;
+use App\Models\Phone;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -68,7 +71,7 @@ class PersonSelfRegistrationComponent extends Component
             ]);
 
             // Check if email exists and is not verified
-            $existingUser = \App\Models\User::where('email', $this->form['email'])->first();
+            $existingUser = User::where('email', $this->form['email'])->first();
             if ($existingUser) {
                 if (!$existingUser->hasVerifiedEmail()) {
                     $existingUser->sendEmailVerificationNotification();
@@ -81,12 +84,12 @@ class PersonSelfRegistrationComponent extends Component
             }
 
             $temporaryPassword = Str::random(10);
-            $Organization = \App\Models\Organization::find($this->form['organization_id']);
+            $Organization = Organization::find($this->form['organization_id']);
             $user = null;
             DB::beginTransaction();
             try {
                 // Create User first
-                $user = \App\Models\User::create([
+                $user = User::create([
                     'name' => $this->form['given_name'] . ' ' . $this->form['family_name'],
                     'email' => $this->form['email'],
                     'password' => bcrypt($temporaryPassword),
@@ -169,7 +172,7 @@ class PersonSelfRegistrationComponent extends Component
     {
         // Phone
         if (!empty($this->form['phone'])) {
-            \App\Models\Phone::create([
+            Phone::create([
                 'person_id' => $person->id,
                 'phone_id' => \App\Helpers\IdGenerator::generatePhoneId(),
                 'number' => $this->form['phone'],
@@ -182,7 +185,7 @@ class PersonSelfRegistrationComponent extends Component
 
         // Email
         if (!empty($this->form['email'])) {
-            \App\Models\EmailAddress::create([
+            EmailAddress::create([
                 'person_id' => $person->id,
                 'email_id' => \App\Helpers\IdGenerator::generateEmailId(),
                 'email' => $this->form['email'],
