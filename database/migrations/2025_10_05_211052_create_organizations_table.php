@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('code', 20)->unique();
             $table->enum('organization_type', ['super', 'branch', 'HOLDING', 'SUBSIDIARY', 'STANDALONE'])->default('branch');
             $table->boolean('is_super')->default(false);
-            $table->foreignId('parent_organization_id')->nullable()->constrained('Organizations')->onDelete('set null');
+            $table->foreignId('parent_organization_id')->nullable()->constrained('organizations')->onDelete('set null');
             $table->string('registration_number')->nullable();
             $table->string('tax_identification_number')->unique()->nullable();
             $table->string('country_of_registration', 3)->default('UGA'); // ISO country codes
@@ -315,9 +315,9 @@ return new class extends Migration
         });
 
         // Create organization_sites table for multi-site support
-        Schema::create('Organization_sites', function (Blueprint $table) {
+        Schema::create('organization_sites', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('organization_id')->constrained('Organizations')->onDelete('cascade');
+            $table->foreignId('organization_id')->constrained('organizations')->onDelete('cascade');
             $table->string('site_name');
             $table->string('site_code', 20)->unique();
             $table->enum('site_type', ['branch', 'campus', 'ward', 'department', 'clinic', 'office']);
@@ -349,7 +349,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('Organization_sites');
-        Schema::dropIfExists('Organizations');
+        Schema::dropIfExists('organization_sites');
+        Schema::dropIfExists('organizations');
     }
 };

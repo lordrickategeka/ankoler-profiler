@@ -215,12 +215,12 @@ class TestDiscoverySeeder extends Seeder
         }
 
         // Create potential parent
-        $parent = $this->createTestPerson([
-            'given_name' => 'Susan',
-            'family_name' => 'Namuli',
-            'gender' => 'female',
-            'date_of_birth' => now()->subYears(38)
-        ]);
+        // $parent = $this->createTestPerson([
+        //     'given_name' => 'Susan',
+        //     'family_name' => 'Namuli',
+        //     'gender' => 'female',
+        //     'date_of_birth' => now()->subYears(38)
+        // ]);
 
         // Create potential child
         $org = Organization::where('category', 'school')->first();

@@ -74,7 +74,7 @@ return new class extends Migration {
 
             $table->timestamps();
 
-            $table->foreign('organization_id')->references('id')->on('Organizations')->onDelete('cascade');
+            $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
             $table->foreign('parent_unit_id')->references('id')->on('organization_units')->onDelete('set null');
             $table->foreign('unit_head')->references('id')->on('persons')->onDelete('set null');
             $table->foreign('assistant_leader')->references('id')->on('persons')->onDelete('set null');
