@@ -29,7 +29,7 @@ class CustomField extends Model
     ];
 
     /**
-     * Get the parent model (organisation, person, etc.)
+     * Get the parent model (Organization, person, etc.)
      */
     public function model()
     {

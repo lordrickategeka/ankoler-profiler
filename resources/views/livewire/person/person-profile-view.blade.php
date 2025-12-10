@@ -63,8 +63,8 @@
                                                         class="text-[#8b8b8b]">{{ $person->classification ?? 'N/A' }}</span>
                                                 </div>
                                                 <div class="flex items-center gap-2"><span
-                                                        class="font-semibold text-[#232323]">Organisation:</span> <span
-                                                        class="text-[#8b8b8b]">{{ optional($person->affiliations->first())->organisation->name ?? 'N/A' }}</span>
+                                                        class="font-semibold text-[#232323]">Organization:</span> <span
+                                                        class="text-[#8b8b8b]">{{ optional($person->affiliations->first())->Organization->name ?? 'N/A' }}</span>
                                                 </div>
                                                 <div class="flex items-center gap-2"><span
                                                         class="font-semibold text-[#232323]">Payroll</span> <span
@@ -122,10 +122,10 @@
                                                        <li class="flex items-center gap-2 mb-1">
                                                            <div class="mask mask-squircle w-12 h-12 bg-gray-200 flex items-center justify-center">
                                                                <span class="text-lg font-bold text-[#ff5c1a]">
-                                                                   {{ strtoupper(substr(optional($affiliation->organisation)->name ?? 'N/A', 0, 1)) }}
+                                                                   {{ strtoupper(substr(optional($affiliation->Organization)->name ?? 'N/A', 0, 1)) }}
                                                                </span>
                                                            </div>
-                                                           <span class="font-semibold">{{ optional($affiliation->organisation)->name ?? 'N/A' }}</span>
+                                                           <span class="font-semibold">{{ optional($affiliation->Organization)->name ?? 'N/A' }}</span>
                                                            <span class="font-semibold">{{ $affiliation->affiliation_id ?? 'N/A' }}</span>
                                                            @if ($affiliation->role_title)
                                                                <span class="ml-1 text-xs text-[#ff5c1a]">({{ $affiliation->role_title }})</span>
@@ -135,7 +135,7 @@
                                                     <li>No affiliations</li>
                                                 @endforelse
                                             </ul>
-                                                <a href="{{ route('organization-units.index') }}" class="inline-block px-3 py-1 bg-green-500 text-white rounded-full text-xs font-semibold align-middle hover:bg-green-600 transition">View Organisation Units</a>
+                                                <a href="{{ route('organization-units.index') }}" class="inline-block px-3 py-1 bg-green-500 text-white rounded-full text-xs font-semibold align-middle hover:bg-green-600 transition">View Organization Units</a>
                                         </div>
                                     </div>
                                     <div class="flex-1">
@@ -241,7 +241,7 @@
                                                             <td class="py-3 px-2 flex items-center gap-2">
                                                                 <span
                                                                     class="w-7 h-7 rounded-full bg-gray-200 inline-block"></span>
-                                                                {{ optional($affiliation->organisation)->name ?? 'N/A' }}
+                                                                {{ optional($affiliation->Organization)->name ?? 'N/A' }}
                                                             </td>
                                                             <td class="py-3 px-2">
                                                                 {{ $affiliation->start_date ? \Carbon\Carbon::parse($affiliation->start_date)->format('d/m/y') : 'N/A' }}

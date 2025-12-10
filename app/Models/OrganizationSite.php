@@ -6,14 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class OrganisationSite extends Model
+class OrganizationSite extends Model
 {
     use HasFactory;
 
-    protected $table = 'organisation_sites';
+    protected $table = 'Organization_sites';
 
     protected $fillable = [
-        'organisation_id',
+        'organization_id',
         'site_name',
         'site_code',
         'site_type',
@@ -50,9 +50,9 @@ class OrganisationSite extends Model
     /**
      * Organization that owns this site
      */
-    public function organisation(): BelongsTo
+    public function Organization(): BelongsTo
     {
-        return $this->belongsTo(Organisation::class);
+        return $this->belongsTo(Organization::class);
     }
 
     // Accessors

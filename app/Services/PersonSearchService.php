@@ -25,7 +25,7 @@ class PersonSearchService
                 $query->where('is_primary', true);
             },
             'identifiers',
-            'organisations' => function ($query) {
+            'Organizations' => function ($query) {
                 $query->wherePivot('status', 'active');
             }
         ])->paginate($perPage);
@@ -62,7 +62,7 @@ class PersonSearchService
     public function export(array $criteria): \Illuminate\Support\Collection
     {
         return $this->buildQuery($criteria)
-            ->with(['phones', 'emailAddresses', 'identifiers', 'organisations'])
+            ->with(['phones', 'emailAddresses', 'identifiers', 'Organizations'])
             ->get();
     }
 
@@ -162,10 +162,10 @@ class PersonSearchService
             $query->where('country', 'like', "%{$criteria['country']}%");
         }
 
-        // Organisation filter
-        if (!empty($criteria['organisationId'])) {
+        // Organization filter
+        if (!empty($criteria['OrganizationId'])) {
             $roleType = $criteria['roleType'] ?? null;
-            $query->byOrganisation($criteria['organisationId'], $roleType);
+            $query->byOrganization($criteria['OrganizationId'], $roleType);
         }
 
         // Age range filter
@@ -297,7 +297,7 @@ class PersonSearchRequest extends FormRequest
             'searchBy' => 'nullable|string|in:name,person_id,phone,email,identifier,global',
             'classification' => 'nullable|string|max:100',
             'gender' => 'nullable|string|in:male,female,other',
-            'organisationId' => 'nullable|exists:organisations,id',
+            'OrganizationId' => 'nullable|exists:Organizations,id',
             'roleType' => 'nullable|string|max:100',
             'status' => 'nullable|string|in:active,inactive,suspended',
             'city' => 'nullable|string|max:100',
@@ -322,7 +322,7 @@ class PersonSearchRequest extends FormRequest
         return [
             'ageTo.gte' => 'The age to must be greater than or equal to age from.',
             'createdTo.after_or_equal' => 'The created to date must be after or equal to created from date.',
-            'organisationId.exists' => 'The selected organisation does not exist.',
+            'OrganizationId.exists' => 'The selected Organization does not exist.',
             'selectedPersons.*.exists' => 'One or more selected persons do not exist.',
         ];
     }
@@ -334,7 +334,7 @@ class PersonSearchRequest extends FormRequest
     {
         return [
             'searchBy' => 'search type',
-            'organisationId' => 'organisation',
+            'OrganizationId' => 'Organization',
             'roleType' => 'role type',
             'ageFrom' => 'age from',
             'ageTo' => 'age to',

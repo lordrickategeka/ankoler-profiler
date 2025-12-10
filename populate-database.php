@@ -37,7 +37,7 @@ echo "1️⃣ Running fresh migrations and basic seeders...\n";
 system('php artisan migrate:fresh --seed');
 
 echo "\n2️⃣ Creating additional organizations...\n";
-system('php artisan tinker --execute="App\Models\Organisation::factory()->count(5)->create(); echo \'✅ Created 5 additional organizations\' . PHP_EOL;"');
+system('php artisan tinker --execute="App\Models\Organization::factory()->count(5)->create(); echo \'✅ Created 5 additional organizations\' . PHP_EOL;"');
 
 echo "\n3️⃣ Creating additional users...\n";
 system('php artisan tinker --execute="App\Models\User::factory()->count(8)->create(); echo \'✅ Created 8 additional users\' . PHP_EOL;"');
@@ -63,7 +63,7 @@ echo "\n🎉 DATABASE POPULATION COMPLETE! 🎉\n\n";
 system('php artisan tinker --execute="
 echo \'📊 FINAL DATABASE SUMMARY:\' . PHP_EOL;
 echo \'👥 Users: \' . App\Models\User::count() . PHP_EOL;
-echo \'🏢 Organizations: \' . App\Models\Organisation::count() . PHP_EOL;
+echo \'🏢 Organizations: \' . App\Models\Organization::count() . PHP_EOL;
 echo \'👤 Persons: \' . App\Models\Person::count() . PHP_EOL;
 echo \'🔗 Person Affiliations: \' . App\Models\PersonAffiliation::count() . PHP_EOL;
 echo \'📞 Phone Numbers: \' . App\Models\Phone::count() . PHP_EOL;

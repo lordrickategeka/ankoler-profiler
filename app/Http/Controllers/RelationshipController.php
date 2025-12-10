@@ -83,8 +83,8 @@ class RelationshipController extends Controller
         $query = CrossOrgRelationship::query()
             ->with([
                 'person',
-                'primaryAffiliation.organisation',
-                'secondaryAffiliation.organisation',
+                'primaryAffiliation.Organization',
+                'secondaryAffiliation.Organization',
                 'verifiedBy'
             ])
             ->where('status', 'active');
@@ -106,9 +106,9 @@ class RelationshipController extends Controller
             $orgId = $request->organization;
             $query->where(function($q) use ($orgId) {
                 $q->whereHas('primaryAffiliation', function($subQ) use ($orgId) {
-                    $subQ->where('organisation_id', $orgId);
+                    $subQ->where('organization_id', $orgId);
                 })->orWhereHas('secondaryAffiliation', function($subQ) use ($orgId) {
-                    $subQ->where('organisation_id', $orgId);
+                    $subQ->where('organization_id', $orgId);
                 });
             });
         }
@@ -143,8 +143,8 @@ class RelationshipController extends Controller
         $crossOrgRelationships = CrossOrgRelationship::forPerson($person->id)
             ->active()
             ->with([
-                'primaryAffiliation.organisation',
-                'secondaryAffiliation.organisation'
+                'primaryAffiliation.Organization',
+                'secondaryAffiliation.Organization'
             ])
             ->get();
 
@@ -319,8 +319,8 @@ class RelationshipController extends Controller
                 o.legal_name,
                 COUNT(DISTINCT cor.id) as connection_count,
                 AVG(cor.impact_score) as avg_impact
-            FROM organisations o
-            JOIN person_affiliations pa ON o.id = pa.organisation_id
+            FROM Organizations o
+            JOIN person_affiliations pa ON o.id = pa.organization_id
             JOIN cross_org_relationships cor ON (
                 pa.id = cor.primary_affiliation_id OR
                 pa.id = cor.secondary_affiliation_id
@@ -469,8 +469,8 @@ class RelationshipController extends Controller
         return CrossOrgRelationship::query()
             ->with([
                 'person',
-                'primaryAffiliation.organisation',
-                'secondaryAffiliation.organisation',
+                'primaryAffiliation.Organization',
+                'secondaryAffiliation.Organization',
                 'verifiedBy'
             ])
             ->where('status', 'active')
@@ -479,9 +479,9 @@ class RelationshipController extends Controller
                 return [
                     'cross_relationship_id' => $relationship->cross_relationship_id,
                     'person_name' => $relationship->person->given_name . ' ' . $relationship->person->family_name,
-                    'primary_organization' => $relationship->primaryAffiliation->organisation->legal_name,
+                    'primary_organization' => $relationship->primaryAffiliation->Organization->legal_name,
                     'primary_role' => $relationship->primaryAffiliation->role_type,
-                    'secondary_organization' => $relationship->secondaryAffiliation->organisation->legal_name,
+                    'secondary_organization' => $relationship->secondaryAffiliation->Organization->legal_name,
                     'secondary_role' => $relationship->secondaryAffiliation->role_type,
                     'relationship_strength' => $relationship->relationship_strength,
                     'impact_score' => $relationship->impact_score,
@@ -521,8 +521,8 @@ class RelationshipController extends Controller
             ->where('impact_score', '>=', 0.7)
             ->with([
                 'person',
-                'primaryAffiliation.organisation',
-                'secondaryAffiliation.organisation'
+                'primaryAffiliation.Organization',
+                'secondaryAffiliation.Organization'
             ])
             ->orderByDesc('impact_score')
             ->limit(10)
@@ -552,8 +552,8 @@ class RelationshipController extends Controller
             ->where('created_at', '>=', now()->subDays(7))
             ->with([
                 'person',
-                'primaryAffiliation.organisation',
-                'secondaryAffiliation.organisation'
+                'primaryAffiliation.Organization',
+                'secondaryAffiliation.Organization'
             ])
             ->orderByDesc('created_at')
             ->limit(5)

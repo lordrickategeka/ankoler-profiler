@@ -180,7 +180,7 @@
                                     <div class="flex justify-between items-start mb-2">
                                         <div>
                                             <h4 class="font-semibold text-lg">
-                                                {{ $affiliation->organisation->display_name ?? ($affiliation->organisation->legal_name ?? 'Unknown Organization') }}
+                                                {{ $affiliation->Organization->display_name ?? ($affiliation->Organization->legal_name ?? 'Unknown Organization') }}
                                             </h4>
                                             <p class="text-gray-600">{{ $affiliation->role_type }} @if ($affiliation->role_title)
                                                     - {{ $affiliation->role_title }}

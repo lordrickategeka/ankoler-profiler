@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Person;
-use App\Models\Organisation;
+use App\Models\Organization;
 use App\Models\FilterConfiguration;
 use App\Services\PersonFilterService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -13,19 +13,19 @@ class PersonFilterTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected $organisation;
+    protected $Organization;
     protected $filterService;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->organisation = Organisation::factory()->create([
-            'legal_name' => 'Test Organisation',
+        $this->Organization = Organization::factory()->create([
+            'legal_name' => 'Test Organization',
             'category' => 'hospital'
         ]);
 
-        $this->filterService = new PersonFilterService($this->organisation);
+        $this->filterService = new PersonFilterService($this->Organization);
     }
 
     public function test_can_filter_by_search_term()

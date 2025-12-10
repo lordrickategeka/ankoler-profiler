@@ -2,24 +2,24 @@
 
 namespace App\Livewire\Organizations;
 
-use App\Models\Organisation;
+use App\Models\Organization;
 use App\Models\User;
 use Livewire\Component;
 
 class Show extends Component
 {
-    public Organisation $organization;
+    public Organization $organization;
     public $showAddAdminModal = false;
 
     public function mount($id)
     {
-        $this->organization = Organisation::findOrFail($id);
+        $this->organization = Organization::findOrFail($id);
     }
 
     public function hasAdmin()
     {
-        return User::where('organisation_id', $this->organisation->id)
-                   ->role('Organisation Admin')
+        return User::where('organization_id', $this->Organization->id)
+                   ->role('Organization Admin')
                    ->exists();
     }
 

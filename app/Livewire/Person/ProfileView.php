@@ -33,7 +33,7 @@ class ProfileView extends Component
             'phones',
             'emailAddresses',
             'identifiers',
-            'affiliations.organisation'
+            'affiliations.Organization'
         ]);
     }
 

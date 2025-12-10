@@ -3,7 +3,7 @@
 namespace App\Livewire\Person;
 
 use Livewire\Component;
-use App\Models\Organisation;
+use App\Models\Organization;
 use App\Services\PersonExportService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\Log;
 class ExportPersons extends Component
 {
     // Organization context
-    public $currentOrganisation;
-    public $selectedOrganisationId;
-    public $availableOrganisations = [];
+    public $currentOrganization;
+    public $selectedOrganizationId;
+    public $availableOrganizations = [];
     public $isSuperAdmin = false;
 
     // Export options
@@ -29,7 +29,7 @@ class ExportPersons extends Component
     public $availableFieldOptions = [];
 
     protected $rules = [
-        'selectedOrganisationId' => 'required_if:isSuperAdmin,true|exists:organisations,id',
+        'selectedOrganizationId' => 'required_if:isSuperAdmin,true|exists:Organizations,id',
         'exportFormat' => 'required|in:xlsx,csv',
         'includeFields' => 'required|array|min:1',
         'filters.role_type' => 'nullable|string',
@@ -42,7 +42,7 @@ class ExportPersons extends Component
     ];
 
     protected $messages = [
-        'selectedOrganisationId.required_if' => 'Please select an organization.',
+        'selectedOrganizationId.required_if' => 'Please select an organization.',
         'includeFields.required' => 'Please select at least one field to export.',
         'includeFields.min' => 'Please select at least one field to export.',
         'filters.age_to.gte' => 'Age To must be greater than or equal to Age From.',
@@ -56,10 +56,10 @@ class ExportPersons extends Component
         $this->loadStats();
     }
 
-    public function updatedSelectedOrganisationId()
+    public function updatedSelectedOrganizationId()
     {
-        if ($this->selectedOrganisationId) {
-            $this->currentOrganisation = Organisation::find($this->selectedOrganisationId);
+        if ($this->selectedOrganizationId) {
+            $this->currentOrganization = Organization::find($this->selectedOrganizationId);
             $this->loadExportOptions();
             $this->setDefaultFields();
             $this->loadStats();
@@ -80,7 +80,7 @@ class ExportPersons extends Component
 
             $service = new PersonExportService();
             
-            $organizationId = $this->isSuperAdmin ? $this->selectedOrganisationId : $this->currentOrganisation?->id;
+            $organizationId = $this->isSuperAdmin ? $this->selectedOrganizationId : $this->currentOrganization?->id;
             
             if ($this->exportFormat === 'xlsx') {
                 $filePath = $service->exportToExcel($organizationId, $this->filters, $this->includeFields);
@@ -89,7 +89,7 @@ class ExportPersons extends Component
             }
 
             // Log the export activity
-            $orgName = $this->currentOrganisation?->legal_name ?? 'All Organizations';
+            $orgName = $this->currentOrganization?->legal_name ?? 'All Organizations';
             Log::info('Person export completed', [
                 'user_id' => Auth::id(),
                 'organization' => $orgName,
@@ -148,37 +148,37 @@ class ExportPersons extends Component
 
         if ($this->isSuperAdmin) {
             // Load all organizations for Super Admin
-            $this->availableOrganisations = Organisation::orderBy('legal_name')->get()->toArray();
+            $this->availableOrganizations = Organization::orderBy('legal_name')->get()->toArray();
 
             // Set current organization from session or default to first
-            $currentOrgId = current_organisation_id();
+            $currentOrgId = current_organization_id();
             if ($currentOrgId) {
-                $this->selectedOrganisationId = $currentOrgId;
-                $this->currentOrganisation = Organisation::find($currentOrgId);
-            } elseif (!empty($this->availableOrganisations)) {
-                $this->selectedOrganisationId = $this->availableOrganisations[0]['id'];
-                $this->currentOrganisation = Organisation::find($this->selectedOrganisationId);
+                $this->selectedOrganizationId = $currentOrgId;
+                $this->currentOrganization = Organization::find($currentOrgId);
+            } elseif (!empty($this->availableOrganizations)) {
+                $this->selectedOrganizationId = $this->availableOrganizations[0]['id'];
+                $this->currentOrganization = Organization::find($this->selectedOrganizationId);
             }
         } else {
             // Regular users use current organization context
-            $this->currentOrganisation = current_organisation();
-            if ($this->currentOrganisation) {
-                $this->selectedOrganisationId = $this->currentOrganisation->id;
+            $this->currentOrganization = current_Organization();
+            if ($this->currentOrganization) {
+                $this->selectedOrganizationId = $this->currentOrganization->id;
             }
         }
     }
 
-    private function getCurrentUserOrganisation()
+    private function getCurrentUserOrganization()
     {
         // Use helper function
-        return current_organisation();
+        return current_Organization();
     }
 
     private function loadExportOptions()
     {
         $service = new PersonExportService();
         
-        $organizationId = $this->isSuperAdmin ? $this->selectedOrganisationId : $this->currentOrganisation?->id;
+        $organizationId = $this->isSuperAdmin ? $this->selectedOrganizationId : $this->currentOrganization?->id;
         
         $this->availableFieldOptions = $service->getAvailableFields($organizationId);
         $this->availableFilterOptions = $service->getAvailableFilters($organizationId);
@@ -198,7 +198,7 @@ class ExportPersons extends Component
     {
         try {
             $service = new PersonExportService();
-            $organizationId = $this->isSuperAdmin ? $this->selectedOrganisationId : $this->currentOrganisation?->id;
+            $organizationId = $this->isSuperAdmin ? $this->selectedOrganizationId : $this->currentOrganization?->id;
             
             $this->exportStats = $service->getExportStats($organizationId, $this->filters);
         } catch (\Exception $e) {

@@ -1,5 +1,5 @@
 <div>
-    <h2 class="text-2xl font-bold mb-4">Organisation Units</h2>
+    <h2 class="text-2xl font-bold mb-4">Organization Units</h2>
     @if (session()->has('message'))
         <div class="alert alert-success mb-4">
             {{ session('message') }}
@@ -20,7 +20,7 @@
                 </div>
             </div>
         @empty
-            <div class="col-span-full text-center text-base-content/60">No organisation units found.</div>
+            <div class="col-span-full text-center text-base-content/60">No Organization units found.</div>
         @endforelse
     </div>
 </div>

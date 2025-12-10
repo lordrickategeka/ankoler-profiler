@@ -30,17 +30,17 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     @if(!empty($orgOptions) && count($orgOptions) > 0)
                         <div class="mb-3">
-                            <label class="block text-sm font-medium text-gray-700">Parent Organisation <span class="text-red-500">*</span></label>
-                            <select wire:model="organisation_id" class="input input-bordered w-full" required>
+                            <label class="block text-sm font-medium text-gray-700">Parent Organization <span class="text-red-500">*</span></label>
+                            <select wire:model="organization_id" class="input input-bordered w-full" required>
                                 <option value="">Select Organization</option>
                                 @foreach($orgOptions as $org)
                                     <option value="{{ $org->id }}">{{ $org->name }}</option>
                                 @endforeach
                             </select>
-                            @error('organisation_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            @error('organization_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
                     @else
-                        <input type="hidden" wire:model="organisation_id">
+                        <input type="hidden" wire:model="organization_id">
                     @endif
                     <div class="mb-3">
                         <label class="block text-sm font-medium text-gray-700">Unit Name <span class="text-red-500">*</span></label>

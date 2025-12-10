@@ -30,12 +30,12 @@ class Notifications extends Component
     {
         $activities = [];
         $user = Auth::user();
-        $orgId = $user->organisation_id;
+        $orgId = $user->organization_id;
 
         // Recent person registrations in user's org
-        $recentPersons = \App\Models\Person::with('affiliations.organisation')
+        $recentPersons = \App\Models\Person::with('affiliations.Organization')
             ->whereHas('affiliations', function($q) use ($orgId) {
-                $q->where('organisation_id', $orgId);
+                $q->where('organization_id', $orgId);
             })
             ->latest()
             ->limit(3)
@@ -43,7 +43,7 @@ class Notifications extends Component
 
         foreach ($recentPersons as $person) {
             $affiliation = $person->affiliations->first();
-            $orgName = $affiliation && $affiliation->organisation ? ($affiliation->organisation->display_name ?: $affiliation->organisation->legal_name) : 'Unknown Organization';
+            $orgName = $affiliation && $affiliation->Organization ? ($affiliation->Organization->display_name ?: $affiliation->Organization->legal_name) : 'Unknown Organization';
             $activities[] = [
                 'type' => 'person',
                 'title' => 'New person "' . $person->full_name . '" registered',
@@ -56,15 +56,15 @@ class Notifications extends Component
         }
 
         // Recent affiliations in user's org
-        $recentAffiliations = \App\Models\PersonAffiliation::with(['person', 'organisation'])
-            ->where('organisation_id', $orgId)
+        $recentAffiliations = \App\Models\PersonAffiliation::with(['person', 'Organization'])
+            ->where('organization_id', $orgId)
             ->where('status', 'active')
             ->latest()
             ->limit(3)
             ->get();
 
         foreach ($recentAffiliations as $affiliation) {
-            $orgDisplayName = $affiliation->organisation ? ($affiliation->organisation->display_name ?: $affiliation->organisation->legal_name) : 'Unknown Organization';
+            $orgDisplayName = $affiliation->Organization ? ($affiliation->Organization->display_name ?: $affiliation->Organization->legal_name) : 'Unknown Organization';
             $activities[] = [
                 'type' => 'affiliation',
                 'title' => 'New affiliation verified',

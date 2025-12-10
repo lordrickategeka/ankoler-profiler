@@ -7,7 +7,7 @@ use App\Models\Person;
 use App\Models\PersonAffiliation;
 use App\Models\PersonRelationship;
 use App\Models\CrossOrgRelationship;
-use App\Models\Organisation;
+use App\Models\Organization;
 use Illuminate\Support\Facades\DB;
 
 class DioceseSpecificSeeder extends Seeder
@@ -58,9 +58,9 @@ class DioceseSpecificSeeder extends Seeder
         $this->command->line('Creating parent-student-SACCO scenario...');
 
         // Get organizations
-        $school = Organisation::where('category', 'school')->first();
-        $sacco = Organisation::where('category', 'sacco')->first();
-        $parish = Organisation::where('category', 'parish')->first();
+        $school = Organization::where('category', 'school')->first();
+        $sacco = Organization::where('category', 'sacco')->first();
+        $parish = Organization::where('category', 'parish')->first();
 
         if (!$school || !$sacco) {
             $this->command->warn('Required organizations not found for parent-student-SACCO scenario');
@@ -76,7 +76,7 @@ class DioceseSpecificSeeder extends Seeder
             'address' => '156 Education Road',
             'city' => 'Kampala',
             'district' => 'Kampala'
-        ]);
+        ], $school);
 
         // Create child
         $child = $this->createPerson([
@@ -87,7 +87,7 @@ class DioceseSpecificSeeder extends Seeder
             'address' => '156 Education Road',
             'city' => 'Kampala',
             'district' => 'Kampala'
-        ]);
+        ], $school);
 
         // Create parent-child relationship
         PersonRelationship::createRelationship($parent->id, $child->id, 'parent_child', [
@@ -129,7 +129,7 @@ class DioceseSpecificSeeder extends Seeder
     {
         $this->command->line('Creating staff-patient scenario...');
 
-        $hospitals = Organisation::where('category', 'hospital')->take(2)->get();
+        $hospitals = Organization::where('category', 'hospital')->take(2)->get();
         if ($hospitals->count() < 2) {
             $this->command->warn('Need at least 2 hospitals for staff-patient scenario');
             return;
@@ -143,7 +143,7 @@ class DioceseSpecificSeeder extends Seeder
             'address' => '45 Medical Avenue',
             'city' => 'Kampala',
             'district' => 'Kampala'
-        ]);
+        ], $hospitals[0]);
 
         // Works as nurse at first hospital
         $staffAffiliation = $this->createAffiliation($nurse, $hospitals[0], 'NURSE');
@@ -172,7 +172,7 @@ class DioceseSpecificSeeder extends Seeder
     {
         $this->command->line('Creating multi-school family scenario...');
 
-        $schools = Organisation::where('category', 'school')->take(2)->get();
+        $schools = Organization::where('category', 'school')->take(2)->get();
         if ($schools->count() < 2) {
             $this->command->warn('Need at least 2 schools for multi-school family scenario');
             return;
@@ -187,7 +187,7 @@ class DioceseSpecificSeeder extends Seeder
             'address' => '78 Teachers Lane',
             'city' => 'Jinja',
             'district' => 'Jinja'
-        ]);
+        ], $schools[0]);
 
         // Create spouse
         $spouse = $this->createPerson([
@@ -198,7 +198,7 @@ class DioceseSpecificSeeder extends Seeder
             'address' => '78 Teachers Lane',
             'city' => 'Jinja',
             'district' => 'Jinja'
-        ]);
+        ], $schools[0]);
 
         // Create children
         $child1 = $this->createPerson([
@@ -209,7 +209,7 @@ class DioceseSpecificSeeder extends Seeder
             'address' => '78 Teachers Lane',
             'city' => 'Jinja',
             'district' => 'Jinja'
-        ]);
+        ], $schools[0]);
 
         $child2 = $this->createPerson([
             'given_name' => 'Faith',
@@ -219,7 +219,7 @@ class DioceseSpecificSeeder extends Seeder
             'address' => '78 Teachers Lane',
             'city' => 'Jinja',
             'district' => 'Jinja'
-        ]);
+        ], $schools[1]);
 
         // Create family relationships
         PersonRelationship::createRelationship($teacher->id, $spouse->id, 'spouse', [
@@ -248,7 +248,7 @@ class DioceseSpecificSeeder extends Seeder
         $child2Affiliation = $this->createAffiliation($child2, $schools[1], 'STUDENT');
 
         // Spouse works at SACCO
-        $sacco = Organisation::where('category', 'sacco')->first();
+        $sacco = Organization::where('category', 'sacco')->first();
         if ($sacco) {
             $spouseSaccoAffiliation = $this->createAffiliation($spouse, $sacco, 'STAFF');
         }
@@ -261,8 +261,8 @@ class DioceseSpecificSeeder extends Seeder
     {
         $this->command->line('Creating SACCO-parish leader scenario...');
 
-        $sacco = Organisation::where('category', 'sacco')->first();
-        $parish = Organisation::where('category', 'parish')->first();
+        $sacco = Organization::where('category', 'sacco')->first();
+        $parish = Organization::where('category', 'parish')->first();
 
         if (!$sacco || !$parish) {
             $this->command->warn('Need both SACCO and parish for this scenario');
@@ -277,7 +277,7 @@ class DioceseSpecificSeeder extends Seeder
             'address' => '23 Community Center',
             'city' => 'Masaka',
             'district' => 'Masaka'
-        ]);
+        ], $sacco);
 
         // Create affiliations
         $saccoAffiliation = $this->createAffiliation($leader, $sacco, 'BOARD_MEMBER');
@@ -304,9 +304,9 @@ class DioceseSpecificSeeder extends Seeder
     {
         $this->command->line('Creating hospital staff family scenario...');
 
-        $hospital = Organisation::where('category', 'hospital')->first();
-        $school = Organisation::where('category', 'school')->first();
-        $sacco = Organisation::where('category', 'sacco')->first();
+        $hospital = Organization::where('category', 'hospital')->first();
+        $school = Organization::where('category', 'school')->first();
+        $sacco = Organization::where('category', 'sacco')->first();
 
         if (!$hospital || !$school) {
             $this->command->warn('Need hospital and school for this scenario');
@@ -322,7 +322,7 @@ class DioceseSpecificSeeder extends Seeder
             'address' => '12 Medical Hill',
             'city' => 'Mbale',
             'district' => 'Mbale'
-        ]);
+        ], $hospital);
 
         // Nurse spouse
         $nurse = $this->createPerson([
@@ -333,7 +333,7 @@ class DioceseSpecificSeeder extends Seeder
             'address' => '12 Medical Hill',
             'city' => 'Mbale',
             'district' => 'Mbale'
-        ]);
+        ], $hospital);
 
         // Student child
         $student = $this->createPerson([
@@ -344,7 +344,7 @@ class DioceseSpecificSeeder extends Seeder
             'address' => '12 Medical Hill',
             'city' => 'Mbale',
             'district' => 'Mbale'
-        ]);
+        ], $school);
 
         // Create relationships
         PersonRelationship::createRelationship($doctor->id, $nurse->id, 'spouse', [
@@ -374,9 +374,9 @@ class DioceseSpecificSeeder extends Seeder
     {
         $this->command->line('Creating business family scenario...');
 
-        $corporate = Organisation::where('category', 'corporate')->first();
-        $sacco = Organisation::where('category', 'sacco')->first();
-        $school = Organisation::where('category', 'school')->first();
+        $corporate = Organization::where('category', 'corporate')->first();
+        $sacco = Organization::where('category', 'sacco')->first();
+        $school = Organization::where('category', 'school')->first();
 
         if (!$corporate || !$sacco) {
             $this->command->warn('Need corporate and SACCO organizations for this scenario');
@@ -392,7 +392,7 @@ class DioceseSpecificSeeder extends Seeder
             'address' => '100 Business Park',
             'city' => 'Kampala',
             'district' => 'Kampala'
-        ]);
+        ], $corporate);
 
         // Spouse who is a teacher
         $teacher = $this->createPerson([
@@ -403,7 +403,7 @@ class DioceseSpecificSeeder extends Seeder
             'address' => '100 Business Park',
             'city' => 'Kampala',
             'district' => 'Kampala'
-        ]);
+        ], $school ?? $corporate);
 
         // Create relationship
         PersonRelationship::createRelationship($owner->id, $teacher->id, 'spouse', [
@@ -436,30 +436,33 @@ class DioceseSpecificSeeder extends Seeder
     /**
      * Helper method to create a person
      */
-    private function createPerson(array $attributes): Person
+    private function createPerson(array $attributes, Organization $organization): Person
     {
-        // Ensure classification is always an array or null, but for DB insert, pass as JSON or array (Eloquent will cast if model is set up)
+        // Always create a user for the person
+        $user = \App\Models\User::factory()->create();
+
         $data = array_merge([
             'person_id' => 'PRS-' . str_pad(Person::count() + 1, 6, '0', STR_PAD_LEFT),
             'global_identifier' => \Illuminate\Support\Str::uuid(),
             'classification' => json_encode(['diocese_scenario']),
             'country' => 'Uganda',
             'status' => 'active',
-            'created_by' => '1'
+            'created_by' => '1',
+            'organization_id' => $organization->id,
+            'user_id' => $user->id
         ], $attributes);
-        // If the model casts 'classification' as array/json, you can also just pass the array, but to be safe, use json_encode for DB insert
         return Person::create($data);
     }
 
     /**
      * Helper method to create an affiliation
      */
-    private function createAffiliation(Person $person, Organisation $org, string $roleType): PersonAffiliation
+    private function createAffiliation(Person $person, Organization $org, string $roleType): PersonAffiliation
     {
         return PersonAffiliation::create([
             'affiliation_id' => 'AFF-' . str_pad(PersonAffiliation::count() + 1, 6, '0', STR_PAD_LEFT),
             'person_id' => $person->id,
-            'organisation_id' => $org->id,
+            'organization_id' => $org->id,
             'role_type' => $roleType,
             'start_date' => now()->subDays(rand(30, 730)),
             'status' => 'active',

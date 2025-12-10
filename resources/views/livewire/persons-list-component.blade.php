@@ -266,7 +266,7 @@
                                                     </div>
                                                     <div class="flex-1">
                                                         <span
-                                                            class="font-medium">{{ $affiliation->organisation->display_name ?? $affiliation->organisation->legal_name }}</span>
+                                                            class="font-medium">{{ $affiliation->Organization->display_name ?? $affiliation->Organization->legal_name }}</span>
 
                                                         @if ($affiliation->role_title)
                                                             <div class="text-xs text-gray-400">

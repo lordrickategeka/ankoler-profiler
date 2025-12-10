@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\FilterConfiguration;
-use App\Models\Organisation;
+use App\Models\Organization;
 
 class FilterConfigurationSeeder extends Seeder
 {
@@ -15,13 +15,13 @@ class FilterConfigurationSeeder extends Seeder
     public function run(): void
     {
         // Get all organizations
-        $organisations = Organisation::all();
+        $Organizations = Organization::all();
 
-        foreach ($organisations as $organisation) {
+        foreach ($Organizations as $Organization) {
             // Create some common filter configurations for each organization
             $filterConfigs = [
                 [
-                    'organisation_id' => $organisation->id,
+                    'organization_id' => $Organization->id,
                     'field_name' => 'department',
                     'field_type' => 'select',
                     'field_options' => [
@@ -32,7 +32,7 @@ class FilterConfigurationSeeder extends Seeder
                     'sort_order' => 1
                 ],
                 [
-                    'organisation_id' => $organisation->id,
+                    'organization_id' => $Organization->id,
                     'field_name' => 'employment_type',
                     'field_type' => 'select',
                     'field_options' => [
@@ -43,7 +43,7 @@ class FilterConfigurationSeeder extends Seeder
                     'sort_order' => 2
                 ],
                 [
-                    'organisation_id' => $organisation->id,
+                    'organization_id' => $Organization->id,
                     'field_name' => 'experience_years',
                     'field_type' => 'number',
                     'field_options' => [
@@ -53,7 +53,7 @@ class FilterConfigurationSeeder extends Seeder
                     'sort_order' => 3
                 ],
                 [
-                    'organisation_id' => $organisation->id,
+                    'organization_id' => $Organization->id,
                     'field_name' => 'location',
                     'field_type' => 'text',
                     'field_options' => [
@@ -65,9 +65,9 @@ class FilterConfigurationSeeder extends Seeder
             ];
 
             // Create additional organization-specific filters based on category
-            if ($organisation->category === 'HEALTH') {
+            if ($Organization->category === 'HEALTH') {
                 $filterConfigs[] = [
-                    'organisation_id' => $organisation->id,
+                    'organization_id' => $Organization->id,
                     'field_name' => 'medical_specialization',
                     'field_type' => 'select',
                     'field_options' => [
@@ -79,9 +79,9 @@ class FilterConfigurationSeeder extends Seeder
                 ];
             }
 
-            if ($organisation->category === 'EDUCATION') {
+            if ($Organization->category === 'EDUCATION') {
                 $filterConfigs[] = [
-                    'organisation_id' => $organisation->id,
+                    'organization_id' => $Organization->id,
                     'field_name' => 'subject_area',
                     'field_type' => 'select',
                     'field_options' => [
@@ -93,9 +93,9 @@ class FilterConfigurationSeeder extends Seeder
                 ];
             }
 
-            if ($organisation->category === 'FINANCE') {
+            if ($Organization->category === 'FINANCE') {
                 $filterConfigs[] = [
-                    'organisation_id' => $organisation->id,
+                    'organization_id' => $Organization->id,
                     'field_name' => 'account_type',
                     'field_type' => 'select',
                     'field_options' => [
@@ -111,7 +111,7 @@ class FilterConfigurationSeeder extends Seeder
             foreach ($filterConfigs as $config) {
                 FilterConfiguration::updateOrCreate(
                     [
-                        'organisation_id' => $config['organisation_id'],
+                        'organization_id' => $config['organization_id'],
                         'field_name' => $config['field_name']
                     ],
                     $config

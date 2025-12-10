@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('organisations', function (Blueprint $table) {
+        Schema::create('organizations', function (Blueprint $table) {
             $table->id();
 
             // COMMON FIELDS - Basic Information
@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('code', 20)->unique();
             $table->enum('organization_type', ['super', 'branch', 'HOLDING', 'SUBSIDIARY', 'STANDALONE'])->default('branch');
             $table->boolean('is_super')->default(false);
-            $table->foreignId('parent_organization_id')->nullable()->constrained('organisations')->onDelete('set null');
+            $table->foreignId('parent_organization_id')->nullable()->constrained('Organizations')->onDelete('set null');
             $table->string('registration_number')->nullable();
             $table->string('tax_identification_number')->unique()->nullable();
             $table->string('country_of_registration', 3)->default('UGA'); // ISO country codes
@@ -315,9 +315,9 @@ return new class extends Migration
         });
 
         // Create organization_sites table for multi-site support
-        Schema::create('organisation_sites', function (Blueprint $table) {
+        Schema::create('Organization_sites', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('organisation_id')->constrained('organisations')->onDelete('cascade');
+            $table->foreignId('organization_id')->constrained('Organizations')->onDelete('cascade');
             $table->string('site_name');
             $table->string('site_code', 20)->unique();
             $table->enum('site_type', ['branch', 'campus', 'ward', 'department', 'clinic', 'office']);
@@ -339,7 +339,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 
-            $table->index(['organisation_id', 'is_active']);
+            $table->index(['organization_id', 'is_active']);
             $table->index(['site_type']);
         });
     }
@@ -349,7 +349,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('organisation_sites');
-        Schema::dropIfExists('organisations');
+        Schema::dropIfExists('Organization_sites');
+        Schema::dropIfExists('Organizations');
     }
 };

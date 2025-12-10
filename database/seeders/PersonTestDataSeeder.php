@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Person;
-use App\Models\Organisation;
+use App\Models\Organization;
 use App\Models\PersonAffiliation;
 use App\Models\Phone;
 use App\Models\EmailAddress;
@@ -20,7 +20,7 @@ class PersonTestDataSeeder extends Seeder
     public function run(): void
     {
         // Make sure we have organizations
-        $hospital = Organisation::firstOrCreate([
+        $hospital = Organization::firstOrCreate([
             'legal_name' => 'St. Mary Hospital'
         ], [
             'code' => 'SMH001',
@@ -41,7 +41,7 @@ class PersonTestDataSeeder extends Seeder
             'is_active' => true
         ]);
 
-        $sacco = Organisation::firstOrCreate([
+        $sacco = Organization::firstOrCreate([
             'legal_name' => 'Unity SACCO'
         ], [
             'code' => 'USC001',
@@ -110,7 +110,7 @@ class PersonTestDataSeeder extends Seeder
         // Create affiliation for Jane at hospital
         PersonAffiliation::create([
             'person_id' => $jane->id,
-            'organisation_id' => $hospital->id,
+            'organization_id' => $hospital->id,
             'role_type' => 'STAFF',
             'role_title' => 'Senior Nurse',
             'site' => 'ICU',
@@ -165,7 +165,7 @@ class PersonTestDataSeeder extends Seeder
         // Create affiliation for John at SACCO
         PersonAffiliation::create([
             'person_id' => $john->id,
-            'organisation_id' => $sacco->id,
+            'organization_id' => $sacco->id,
             'role_type' => 'MEMBER',
             'role_title' => 'Senior Member',
             'site' => 'Kampala Branch',
@@ -207,7 +207,7 @@ class PersonTestDataSeeder extends Seeder
 
         PersonAffiliation::create([
             'person_id' => $mary->id,
-            'organisation_id' => $hospital->id,
+            'organization_id' => $hospital->id,
             'role_type' => 'PATIENT',
             'start_date' => '2023-08-15',
             'status' => 'active'

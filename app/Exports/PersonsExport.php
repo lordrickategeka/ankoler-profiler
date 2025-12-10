@@ -3,7 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Person;
-use App\Models\Organisation;
+use App\Models\Organization;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -30,7 +30,7 @@ class PersonsExport implements FromCollection, WithHeadings, WithMapping, WithSt
         $this->includeFields = empty($includeFields) ? $this->getDefaultFields() : $includeFields;
         
         if ($organizationId) {
-            $this->organization = Organisation::find($organizationId);
+            $this->organization = Organization::find($organizationId);
         }
     }
 
@@ -51,9 +51,9 @@ class PersonsExport implements FromCollection, WithHeadings, WithMapping, WithSt
             },
             'affiliations' => function($query) {
                 if ($this->organizationId) {
-                    $query->where('organisation_id', $this->organizationId);
+                    $query->where('organization_id', $this->organizationId);
                 }
-                $query->where('status', 'active')->with('organisation');
+                $query->where('status', 'active')->with('Organization');
             },
             'patientRecords',
             'studentRecords', 
@@ -65,7 +65,7 @@ class PersonsExport implements FromCollection, WithHeadings, WithMapping, WithSt
         // Filter by organization if specified
         if ($this->organizationId) {
             $query->whereHas('affiliations', function($q) {
-                $q->where('organisation_id', $this->organizationId)
+                $q->where('organization_id', $this->organizationId)
                   ->where('status', 'active');
             });
         }
@@ -240,11 +240,11 @@ class PersonsExport implements FromCollection, WithHeadings, WithMapping, WithSt
 
         if (in_array('affiliation_info', $this->includeFields)) {
             $affiliation = $this->organizationId ? 
-                $person->affiliations->where('organisation_id', $this->organizationId)->first() :
+                $person->affiliations->where('organization_id', $this->organizationId)->first() :
                 $person->affiliations->first();
                 
             $row = array_merge($row, [
-                $affiliation->organisation->legal_name ?? '',
+                $affiliation->Organization->legal_name ?? '',
                 $affiliation->role_type ?? '',
                 $affiliation->role_title ?? '',
                 $affiliation->site ?? '',

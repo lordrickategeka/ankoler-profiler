@@ -7,11 +7,11 @@ use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\OrganisationTemplateExport;
+use App\Exports\OrganizationTemplateExport;
 use App\Models\CustomField;
-use App\Models\Organisation;
+use App\Models\Organization;
 
-class ImportOrganisations extends Component
+class ImportOrganizations extends Component
 {
     use WithFileUploads;
 
@@ -46,18 +46,18 @@ class ImportOrganisations extends Component
             $standardFields = [];
             $customFields = [];
             foreach ($data as $key => $value) {
-                if (in_array($key, (new Organisation)->getFillable())) {
+                if (in_array($key, (new Organization)->getFillable())) {
                     $standardFields[$key] = $value;
                 } else {
                     $customFields[$key] = $value;
                 }
             }
-            $org = new Organisation($standardFields);
+            $org = new Organization($standardFields);
             $org->save();
-            // Save custom fields for this organisation
+            // Save custom fields for this Organization
             foreach ($customFields as $field => $value) {
                 CustomField::create([
-                    'model_type' => Organisation::class,
+                    'model_type' => Organization::class,
                     'model_id' => $org->id,
                     'field_name' => $field,
                     'field_label' => ucfirst(str_replace('_', ' ', $field)),
@@ -83,7 +83,7 @@ class ImportOrganisations extends Component
         // Save custom fields to custom_fields table
         foreach ($fields as $field) {
             CustomField::updateOrCreate([
-                'model_type' => 'organisation_template',
+                'model_type' => 'Organization_template',
                 'model_id' => 0,
                 'field_name' => $field,
             ], [
@@ -98,12 +98,12 @@ class ImportOrganisations extends Component
             ]);
         }
 
-        $export = new OrganisationTemplateExport([], $headers);
-        return Excel::download($export, 'custom_organisation_template.xlsx');
+        $export = new OrganizationTemplateExport([], $headers);
+        return Excel::download($export, 'custom_Organization_template.xlsx');
     }
 
     public function render()
     {
-        return view('livewire.organizations.import-organisations');
+        return view('livewire.organizations.import-Organizations');
     }
 }

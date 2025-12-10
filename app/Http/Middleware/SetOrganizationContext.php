@@ -1,14 +1,14 @@
 <?php
-// app/Http/Middleware/SetorganisationContext.php
+// app/Http/Middleware/SetOrganizationContext.php
 
 namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use App\Models\Organisation;
+use App\Models\Organization;
 use Symfony\Component\HttpFoundation\Response;
 
-class SetorganisationContext
+class SetOrganizationContext
 {
     /**
      * Handle an incoming request.
@@ -18,30 +18,30 @@ class SetorganisationContext
         if (auth()->check()) {
             $user = auth()->user();
             
-            // If no organisation in session, set user's primary org
-            if (!session()->has('current_organisation_id')) {
-                $this->setDefaultorganisation($user);
+            // If no Organization in session, set user's primary org
+            if (!session()->has('current_organization_id')) {
+                $this->setDefaultOrganization($user);
             }
             
-            // Verify user still has access to current organisation
-            $currentOrgId = session('current_organisation_id');
-            if ($currentOrgId && !$user->canAccessorganisation($currentOrgId)) {
-                // User lost access, reset to primary organisation
-                $this->setDefaultorganisation($user);
+            // Verify user still has access to current Organization
+            $currentOrgId = session('current_organization_id');
+            if ($currentOrgId && !$user->canAccessOrganization($currentOrgId)) {
+                // User lost access, reset to primary Organization
+                $this->setDefaultOrganization($user);
             }
             
-            // Store organisation details for easy access
-            if (session('current_organisation_id')) {
-                $org = Organisation::find(session('current_organisation_id'));
+            // Store Organization details for easy access
+            if (session('current_organization_id')) {
+                $org = Organization::find(session('current_organization_id'));
                 if ($org) {
                     session([
-                        'current_organisation_name' => $org->display_name,
-                        'current_organisation_code' => $org->code,
-                        'current_organisation_logo' => $org->logo_path,
+                        'current_Organization_name' => $org->display_name,
+                        'current_Organization_code' => $org->code,
+                        'current_Organization_logo' => $org->logo_path,
                     ]);
                     
                     // Share with all views
-                    view()->share('currentorganisation', $org);
+                    view()->share('currentOrganization', $org);
                 }
             }
         }
@@ -50,21 +50,21 @@ class SetorganisationContext
     }
 
     /**
-     * Set user's default/primary organisation
+     * Set user's default/primary Organization
      */
-    private function setDefaultorganisation($user)
+    private function setDefaultOrganization($user)
     {
-        $defaultOrg = $user->organisation_id;
+        $defaultOrg = $user->organization_id;
         
-        // If no primary org set, get first accessible organisation
+        // If no primary org set, get first accessible Organization
         if (!$defaultOrg) {
-            $accessible = $user->accessibleorganisations();
+            $accessible = $user->accessibleOrganizations();
             $defaultOrg = $accessible->first()?->id;
         }
         
         if ($defaultOrg) {
             session([
-                'current_organisation_id' => $defaultOrg
+                'current_organization_id' => $defaultOrg
             ]);
         }
     }

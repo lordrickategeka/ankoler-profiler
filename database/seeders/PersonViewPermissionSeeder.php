@@ -16,8 +16,8 @@ class PersonViewPermissionSeeder extends Seeder
     {
         // Ensure permissions exist
         $permissions = [
-            'can_view_organisational_persons' => 'Can view persons from their organization',
-            'can_view_all_organisational_persons' => 'Can view persons from all organizations',
+            'can_view_Organizational_persons' => 'Can view persons from their organization',
+            'can_view_all_Organizational_persons' => 'Can view persons from all organizations',
         ];
 
         foreach ($permissions as $name => $description) {
@@ -30,23 +30,23 @@ class PersonViewPermissionSeeder extends Seeder
         // Assign permissions to roles
         $rolePermissions = [
             'Super Admin' => [
-                'can_view_organisational_persons',
-                'can_view_all_organisational_persons'
-            ],
-            'Organisation Admin' => [
-                'can_view_organisational_persons'
+                'can_view_Organizational_persons',
+                'can_view_all_Organizational_persons'
             ],
             'Organization Admin' => [
-                'can_view_organisational_persons'
+                'can_view_Organizational_persons'
+            ],
+            'Organization Admin' => [
+                'can_view_Organizational_persons'
             ],
             'Organization Manager' => [
-                'can_view_organisational_persons'
+                'can_view_Organizational_persons'
             ],
             'Staff' => [
-                'can_view_organisational_persons'
+                'can_view_Organizational_persons'
             ],
             'Manager' => [
-                'can_view_organisational_persons'
+                'can_view_Organizational_persons'
             ]
         ];
 

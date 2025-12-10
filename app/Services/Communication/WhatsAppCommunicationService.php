@@ -371,7 +371,7 @@ class WhatsAppCommunicationService implements CommunicationChannelInterface
             '{last_name}' => $person->family_name,
             '{full_name}' => $person->full_name,
             '{phone}' => $person->phones->where('is_primary', true)->first()?->number ?? '',
-            '{organization}' => $person->currentAffiliation?->organisation?->display_name ?? '',
+            '{organization}' => $person->currentAffiliation?->Organization?->display_name ?? '',
         ];
 
         return str_replace(array_keys($replacements), array_values($replacements), $template);

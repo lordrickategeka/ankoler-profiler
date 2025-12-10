@@ -7,7 +7,7 @@ use App\Models\PersonAffiliation;
 use App\Models\Phone;
 use App\Models\EmailAddress;
 use App\Models\PersonIdentifier;
-use App\Models\Organisation;
+use App\Models\Organization;
 use App\Services\PersonDeduplicationService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -22,7 +22,7 @@ class PersonsImport implements ToCollection, WithHeadingRow, WithValidation, Wit
 {
     use Importable;
 
-    private Organisation $organization;
+    private Organization $organization;
     private string $defaultRoleType;
     private bool $skipDuplicates;
     private bool $updateExisting;
@@ -40,7 +40,7 @@ class PersonsImport implements ToCollection, WithHeadingRow, WithValidation, Wit
     ];
 
     public function __construct(
-        Organisation $organization,
+        Organization $organization,
         string $defaultRoleType = 'STAFF',
         bool $skipDuplicates = true,
         bool $updateExisting = false,
@@ -260,7 +260,7 @@ class PersonsImport implements ToCollection, WithHeadingRow, WithValidation, Wit
             if ($this->skipDuplicates && !$this->updateExisting) {
                 // Just create affiliation if not exists
                 $existingAffiliation = PersonAffiliation::where('person_id', $existingPerson->id)
-                    ->where('organisation_id', $this->organization->id)
+                    ->where('organization_id', $this->organization->id)
                     ->first();
 
                 if (!$existingAffiliation) {
@@ -445,14 +445,14 @@ class PersonsImport implements ToCollection, WithHeadingRow, WithValidation, Wit
         $roleType = $row['role_type'] ?? $this->defaultRoleType;
 
         $existingAffiliation = PersonAffiliation::where('person_id', $person->id)
-            ->where('organisation_id', $this->organization->id)
+            ->where('organization_id', $this->organization->id)
             ->where('role_type', $roleType)
             ->first();
 
         if ($existingAffiliation) {
             Log::info("PersonImport: Affiliation already exists", [
                 'person_id' => $person->id,
-                'organisation_id' => $this->organization->id,
+                'organization_id' => $this->organization->id,
                 'role_type' => $roleType
             ]);
             return; // Don't create duplicate affiliation
@@ -460,7 +460,7 @@ class PersonsImport implements ToCollection, WithHeadingRow, WithValidation, Wit
 
         $affiliation = PersonAffiliation::create([
             'person_id' => $person->id,
-            'organisation_id' => $this->organization->id,
+            'organization_id' => $this->organization->id,
             'role_type' => $roleType,
             'role_title' => $row['role_title'] ?? null,
             'site' => $row['site'] ?? null,

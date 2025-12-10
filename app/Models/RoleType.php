@@ -15,7 +15,15 @@ class RoleType extends Model
         'name',
         'description',
         'active',
+        'organization_id',
     ];
+    /**
+     * Get the organization that owns the role type
+     */
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class);
+    }
 
     protected $casts = [
         'active' => 'boolean',

@@ -8,7 +8,7 @@
                     Bulk import persons into selected organization
                 @else
                     Bulk import persons and automatically affiliate them to
-                    {{ $currentOrganisation->display_name ?? ($currentOrganisation->legal_name ?? 'your organization') }}
+                    {{ $currentOrganization->display_name ?? ($currentOrganization->legal_name ?? 'your organization') }}
                 @endif
             </p>
         </div>
@@ -21,10 +21,10 @@
                 </svg>
                 Download Excel Template
             </button>
-            @if ($currentOrganisation)
+            @if ($currentOrganization)
                 <span class="text-xs text-base-content/60">
-                    {{ ucfirst($currentOrganisation->category) }} template for
-                    {{ $currentOrganisation->display_name ?? $currentOrganisation->legal_name }}
+                    {{ ucfirst($currentOrganization->category) }} template for
+                    {{ $currentOrganization->display_name ?? $currentOrganization->legal_name }}
                 </span>
             @endif
         </div>
@@ -70,14 +70,14 @@
                             <span class="label-text font-medium">Target Organization <span
                                     class="text-red-500">*</span></span>
                         </label>
-                        <select wire:model.live="selectedOrganisationId" class="select select-bordered">
+                        <select wire:model.live="selectedOrganizationId" class="select select-bordered">
                             <option value="">Select Organization</option>
-                            @foreach ($availableOrganisations as $org)
+                            @foreach ($availableOrganizations as $org)
                                 <option value="{{ $org['id'] }}">{{ $org['display_name'] ?? $org['legal_name'] }}
                                 </option>
                             @endforeach
                         </select>
-                        @error('selectedOrganisationId')
+                        @error('selectedOrganizationId')
                             <span class="text-red-600 text-sm mt-1">{{ $message }}</span>
                         @enderror
                     </div>
@@ -87,7 +87,7 @@
                             <span class="label-text font-medium">Target Organization</span>
                         </label>
                         <input type="text"
-                            value="{{ $currentOrganisation->display_name ?? ($currentOrganisation->legal_name ?? 'Current Organization') }}"
+                            value="{{ $currentOrganization->display_name ?? ($currentOrganization->legal_name ?? 'Current Organization') }}"
                             class="input input-bordered" readonly>
                         <div class="alert alert-info mt-2">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
@@ -428,12 +428,12 @@
     @endif
 
     <!-- Template Information -->
-    <div class="card bg-base-100 shadow-xl">
+    {{-- <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
             <h3 class="card-title text-lg mb-4">
                 Template Information
-                @if ($currentOrganisation)
-                    <span class="badge badge-primary ml-2">{{ ucfirst($currentOrganisation->category) }}
+                @if ($currentOrganization)
+                    <span class="badge badge-primary ml-2">{{ ucfirst($currentOrganization->category) }}
                         Organization</span>
                 @endif
             </h3>
@@ -453,16 +453,16 @@
 
                     <h4 class="font-bold mt-3">Role Type Column:</h4>
                     <p><strong>role_type</strong> - Specify the role for each person in your Excel file.
-                    @if ($currentOrganisation)
-                        Valid options for {{ $currentOrganisation->category }} organizations:
+                    @if ($currentOrganization)
+                        Valid options for {{ $currentOrganization->category }} organizations:
                         <span class="font-mono text-sm bg-base-200 px-2 py-1 rounded">{{ implode(', ', array_keys($availableRoles)) }}</span>
                     @endif
                     If not specified, defaults to <span class="font-mono text-sm bg-base-200 px-2 py-1 rounded">{{ $defaultRoleType }}</span>.</p>
 
-                    @if ($currentOrganisation)
-                        <h4 class="font-bold mt-3">{{ ucfirst($currentOrganisation->category) }}-Specific Columns:
+                    @if ($currentOrganization)
+                        <h4 class="font-bold mt-3">{{ ucfirst($currentOrganization->category) }}-Specific Columns:
                         </h4>
-                        @switch($currentOrganisation->category)
+                        @switch($currentOrganization->category)
                             @case('hospital')
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
                                     <div>
@@ -584,7 +584,7 @@
                         <li>Role type will default to "{{ $availableRoles[$defaultRoleType] ?? 'Staff Member' }}" if
                             not specified</li>
                         <li>All persons will be affiliated with
-                            {{ $currentOrganisation->display_name ?? ($currentOrganisation->legal_name ?? 'current organization') }}
+                            {{ $currentOrganization->display_name ?? ($currentOrganization->legal_name ?? 'current organization') }}
                         </li>
                         <li><strong>Download the template above to get a file with sample data and proper column headers
                                 for your organization type</strong></li>
@@ -592,7 +592,7 @@
                 </div>
             </div>
 
-            @if ($currentOrganisation)
+            @if ($currentOrganization)
                 <div class="alert alert-success">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -601,11 +601,11 @@
                     <div>
                         <h4 class="font-bold">Customized Template Available</h4>
                         <p>The template download will include all relevant fields for a
-                            <strong>{{ ucfirst($currentOrganisation->category) }}</strong> organization, with sample
+                            <strong>{{ ucfirst($currentOrganization->category) }}</strong> organization, with sample
                             data and field descriptions.</p>
                     </div>
                 </div>
             @endif
         </div>
-    </div>
+    </div> --}}
 </div>

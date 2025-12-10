@@ -13,12 +13,12 @@ class DomainRecordsSeeder extends Seeder
         // First create some person affiliations that the domain records can reference
         $affiliationIds = [];
 
-        // Create basic person affiliations (assuming some persons and organisations exist)
+        // Create basic person affiliations (assuming some persons and Organizations exist)
         for ($i = 1; $i <= 5; $i++) {
             $affiliationId = DB::table('person_affiliations')->insertGetId([
                 'affiliation_id' => 'AFF-' . str_pad($i, 6, '0', STR_PAD_LEFT),
                 'person_id' => 1, // Assuming person with ID 1 exists
-                'organisation_id' => 1, // Assuming organisation with ID 1 exists
+                'organization_id' => 1, // Assuming Organization with ID 1 exists
                 'role_type' => ['STAFF', 'STUDENT', 'PATIENT', 'MEMBER', 'MEMBER'][$i-1],
                 'start_date' => now()->subDays(30),
                 'status' => 'active',

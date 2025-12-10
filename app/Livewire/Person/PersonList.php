@@ -19,7 +19,7 @@ class PersonList extends Component
     public $filters = [
         'search' => '',
         'classification' => '',
-        'organisation_id' => '',
+        'organization_id' => '',
         'age_range' => '',
         'gender' => '',
         'status' => '',
@@ -68,7 +68,7 @@ class PersonList extends Component
         $this->filters = [
             'search' => '',
             'classification' => '',
-            'organisation_id' => '',
+            'organization_id' => '',
             'age_range' => '',
             'gender' => '',
             'status' => '',
@@ -88,12 +88,14 @@ class PersonList extends Component
         $user = Auth::user();
         $currentOrganization = user_current_organization();
 
+        $isSuperAdmin = ($user instanceof \App\Models\User) && $user->hasRole('Super Admin');
+
         $patterns = [
             'person_list_' . md5(serialize([
                 $this->filters,
                 $this->dynamicFilters,
                 $currentOrganization?->id ?? 'all',
-                ($user && method_exists($user, 'hasRole') && $user->hasRole('Super Admin')) ? 'all' : 'org'
+                $isSuperAdmin ? 'all' : 'org'
             ])),
             'person_list_additional_' . ($currentOrganization?->id ?? 'all')
         ];
@@ -124,11 +126,11 @@ class PersonList extends Component
             }
 
             $currentOrganization = user_current_organization();
-            $canViewAllPersons = method_exists($user, 'hasRole') && $user->hasRole('Super Admin');
+            $canViewAllPersons = ($user instanceof \App\Models\User) && $user->hasRole('Super Admin');
 
             if (!$canViewAllPersons && $currentOrganization) {
                 $hasAffiliation = $person->affiliations()
-                    ->where('organisation_id', $currentOrganization->id)
+                    ->where('organization_id', $currentOrganization->id)
                     ->exists();
 
                 if (!$hasAffiliation) {
@@ -163,11 +165,11 @@ class PersonList extends Component
             }
 
             $currentOrganization = user_current_organization();
-            $canViewAllPersons = method_exists($user, 'hasRole') && $user->hasRole('Super Admin');
+            $canViewAllPersons = ($user instanceof \App\Models\User) && $user->hasRole('Super Admin');
 
             if (!$canViewAllPersons && $currentOrganization) {
                 $hasAffiliation = $person->affiliations()
-                    ->where('organisation_id', $currentOrganization->id)
+                    ->where('organization_id', $currentOrganization->id)
                     ->exists();
 
                 if (!$hasAffiliation) {
@@ -273,10 +275,10 @@ class PersonList extends Component
 
     protected function loadDynamicFilters()
     {
-        $currentOrganisation = user_current_organization();
+        $currentOrganization = user_current_organization();
 
-        if ($currentOrganisation) {
-            $configurations = FilterConfiguration::activeForOrganisation($currentOrganisation->id)->get();
+        if ($currentOrganization) {
+            $configurations = FilterConfiguration::activeForOrganization($currentOrganization->id)->get();
 
             foreach ($configurations as $config) {
                 if (!isset($this->dynamicFilters[$config->field_name])) {
@@ -291,30 +293,23 @@ class PersonList extends Component
         $user = Auth::user();
         $currentOrganization = user_current_organization();
 
-        $canViewAllPersons = $user && method_exists($user, 'hasRole') && $user->hasRole('Super Admin');
-        $canViewOrgPersons = $user && method_exists($user, 'hasRole') &&
-            (is_array(['Organisation Admin', 'Department Manager', 'Data Entry Clerk'])
-                ? $user->hasRole(['Organisation Admin', 'Department Manager', 'Data Entry Clerk'])
-                : false);
+            $canViewAllPersons = ($user instanceof \App\Models\User) && $user->hasRole('Super Admin');
+            $canViewOrgPersons = ($user instanceof \App\Models\User) && $user->hasRole('Organization Admin');
 
+        // Only allow Super Admins and Organization Admins to view persons
         if (!($user && method_exists($user, 'hasRole')) || (!$canViewAllPersons && !$canViewOrgPersons)) {
             return $this->renderEmptyState();
         }
 
         try {
-            // Initialize filter service
-            $filterService = new PersonFilterService($canViewAllPersons ? null : $currentOrganization);
-
-            // Handle organization filtering for non-super admins
+            // For Organization Admins, always filter by their organization
             if ($canViewOrgPersons && !$canViewAllPersons && $currentOrganization) {
-                if (empty($this->filters['organisation_id']) || $this->filters['organisation_id'] != $currentOrganization->id) {
-                    $this->filters['organisation_id'] = $currentOrganization->id;
-                }
+                $this->filters['organization_id'] = $currentOrganization->id;
             }
 
             // Allow Super Admins to clear organization filter
-            if ($canViewAllPersons && isset($this->filters['organisation_id']) && $this->filters['organisation_id'] === '') {
-                unset($this->filters['organisation_id']);
+            if ($canViewAllPersons && isset($this->filters['organization_id']) && $this->filters['organization_id'] === '') {
+                unset($this->filters['organization_id']);
             }
 
             // Merge and clean filters
@@ -329,7 +324,8 @@ class PersonList extends Component
                 return $value !== '' && $value !== null;
             });
 
-            // Apply filters and get paginated results
+            // Initialize filter service
+            $filterService = new PersonFilterService($canViewAllPersons ? null : $currentOrganization);
             $persons = $filterService->applyFilters($allFilters)->paginate(10);
             $persons->withPath(request()->url());
 
@@ -343,7 +339,7 @@ class PersonList extends Component
             $query = Person::query();
             if ($canViewOrgPersons && !$canViewAllPersons && $currentOrganization) {
                 $query->whereHas('affiliations', function ($q) use ($currentOrganization) {
-                    $q->where('organisation_id', $currentOrganization->id);
+                    $q->where('organization_id', $currentOrganization->id);
                 });
             }
             $persons = $query->paginate(10);
@@ -372,13 +368,13 @@ class PersonList extends Component
                 'statusOptions' => ['active', 'inactive', 'suspended'],
                 'ageRanges' => ['18-25', '26-35', '36-45', '46-55', '56-65', '65+'],
                 'organizations' => $canViewAllPersons ?
-                    \App\Models\Organisation::select('id', 'legal_name', 'display_name')
+                    \App\Models\Organization::select('id', 'legal_name', 'display_name')
                         ->where('is_active', true)
                         ->orderBy('legal_name')
                         ->get() :
                     ($currentOrganization ? collect([$currentOrganization]) : collect()),
                 'filterConfigurations' => $currentOrganization ?
-                    FilterConfiguration::activeForOrganisation($currentOrganization->id)->get() :
+                    FilterConfiguration::activeForOrganization($currentOrganization->id)->get() :
                     collect()
             ];
         });

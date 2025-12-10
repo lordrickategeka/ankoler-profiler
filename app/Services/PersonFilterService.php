@@ -3,22 +3,22 @@
 namespace App\Services;
 
 use App\Models\Person;
-use App\Models\Organisation;
+use App\Models\Organization;
 use Illuminate\Database\Eloquent\Builder;
 
 class PersonFilterService
 {
     protected $query;
     protected $filters = [];
-    protected $organisation;
+    protected $Organization;
 
-    public function __construct($organisation = null)
+    public function __construct($Organization = null)
     {
-        $this->organisation = $organisation;
+        $this->Organization = $Organization;
         $this->query = Person::with([
             'phones' => fn($q) => $q->where('is_primary', true),
             'emailAddresses' => fn($q) => $q->where('is_primary', true),
-            'affiliations.organisation'
+            'affiliations.Organization'
         ]);
     }
 
@@ -44,8 +44,8 @@ class PersonFilterService
             case 'classification':
                 $this->applyClassificationFilter($value);
                 break;
-            case 'organisation_id':
-                $this->applyOrganisationFilter($value);
+            case 'organization_id':
+                $this->applyOrganizationFilter($value);
                 break;
             case 'age_range':
                 $this->applyAgeRangeFilter($value);
@@ -96,10 +96,10 @@ class PersonFilterService
         }
     }
 
-    protected function applyOrganisationFilter($organisationId): void
+    protected function applyOrganizationFilter($OrganizationId): void
     {
-        $this->query->whereHas('affiliations', function($q) use ($organisationId) {
-            $q->where('organisation_id', $organisationId)
+        $this->query->whereHas('affiliations', function($q) use ($OrganizationId) {
+            $q->where('organization_id', $OrganizationId)
               ->where('status', 'active');
         });
     }
@@ -143,9 +143,9 @@ class PersonFilterService
 
     protected function applyDynamicFilter($field, $value): void
     {
-        // Handle dynamic fields based on organisation configuration
-        if ($this->organisation) {
-            $fieldConfig = $this->getOrganisationFieldConfig($field);
+        // Handle dynamic fields based on Organization configuration
+        if ($this->Organization) {
+            $fieldConfig = $this->getOrganizationFieldConfig($field);
 
             if ($fieldConfig) {
                 switch ($fieldConfig['type']) {
@@ -165,11 +165,11 @@ class PersonFilterService
         }
     }
 
-    protected function getOrganisationFieldConfig($field): ?array
+    protected function getOrganizationFieldConfig($field): ?array
     {
-        // This would come from organisation-specific configuration
-        if ($this->organisation && isset($this->organisation->filter_configurations)) {
-            return $this->organisation->filter_configurations[$field] ?? null;
+        // This would come from Organization-specific configuration
+        if ($this->Organization && isset($this->Organization->filter_configurations)) {
+            return $this->Organization->filter_configurations[$field] ?? null;
         }
 
         return null;
@@ -203,9 +203,9 @@ class PersonFilterService
      */
     public function applyOrganizationConstraint(): void
     {
-        if ($this->organisation) {
+        if ($this->Organization) {
             $this->query->whereHas('affiliations', function($q) {
-                $q->where('organisation_id', $this->organisation->id)
+                $q->where('organization_id', $this->Organization->id)
                   ->where('status', 'active');
             });
         }

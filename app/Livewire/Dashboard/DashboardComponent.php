@@ -4,7 +4,7 @@ namespace App\Livewire\Dashboard;
 
 use Livewire\Component;
 use App\Models\Person;
-use App\Models\Organisation;
+use App\Models\Organization;
 use App\Models\PersonAffiliation;
 use App\Models\AuditLog;
 use Illuminate\Support\Facades\Auth;
@@ -84,8 +84,8 @@ class DashboardComponent extends Component
                 // Super Admin sees all data
                 $stats['total_persons'] = Person::count();
                 $stats['persons_today'] = Person::whereDate('created_at', today())->count();
-                $stats['total_organizations'] = Organisation::where('is_active', true)->count();
-                $stats['new_organizations'] = Organisation::where('is_active', true)
+                $stats['total_organizations'] = Organization::where('is_active', true)->count();
+                $stats['new_organizations'] = Organization::where('is_active', true)
                     ->whereDate('created_at', '>=', now()->subDays(30))
                     ->count();
                 $stats['active_affiliations'] = PersonAffiliation::where('status', 'active')->count();
@@ -96,11 +96,11 @@ class DashboardComponent extends Component
             } else {
                 // Organization Admin sees only their organization data
                 if ($this->currentOrganization) {
-                    $stats['total_persons'] = PersonAffiliation::where('organisation_id', $this->currentOrganization->id)
+                    $stats['total_persons'] = PersonAffiliation::where('organization_id', $this->currentOrganization->id)
                         ->distinct('person_id')
                         ->count('person_id');
 
-                    $stats['persons_today'] = PersonAffiliation::where('organisation_id', $this->currentOrganization->id)
+                    $stats['persons_today'] = PersonAffiliation::where('organization_id', $this->currentOrganization->id)
                         ->whereDate('person_affiliations.created_at', today())
                         ->distinct('person_id')
                         ->count('person_id');
@@ -108,11 +108,11 @@ class DashboardComponent extends Component
                     $stats['total_organizations'] = 1; // Only their organization
                     $stats['new_organizations'] = 0;
 
-                    $stats['active_affiliations'] = PersonAffiliation::where('organisation_id', $this->currentOrganization->id)
+                    $stats['active_affiliations'] = PersonAffiliation::where('organization_id', $this->currentOrganization->id)
                         ->where('status', 'active')
                         ->count();
 
-                    $stats['expired_affiliations'] = PersonAffiliation::where('organisation_id', $this->currentOrganization->id)
+                    $stats['expired_affiliations'] = PersonAffiliation::where('organization_id', $this->currentOrganization->id)
                         ->where('status', 'inactive')
                         ->whereNotNull('end_date')
                         ->where('end_date', '<', now())
@@ -157,7 +157,7 @@ class DashboardComponent extends Component
 
             if (!$this->isSuperAdmin && $this->currentOrganization) {
                 $query->whereHas('affiliations', function($q) {
-                    $q->where('organisation_id', $this->currentOrganization->id);
+                    $q->where('organization_id', $this->currentOrganization->id);
                 });
             }
 
@@ -181,7 +181,7 @@ class DashboardComponent extends Component
 
                 if (!$this->isSuperAdmin && $this->currentOrganization) {
                     $query->whereHas('person.affiliations', function($q) {
-                        $q->where('organisation_id', $this->currentOrganization->id);
+                        $q->where('organization_id', $this->currentOrganization->id);
                     });
                 }
 
@@ -242,13 +242,13 @@ class DashboardComponent extends Component
             $activities = [];
 
             // Get recent person registrations
-            $recentPersons = Person::with('affiliations.organisation')
+            $recentPersons = Person::with('affiliations.Organization')
                 ->latest()
                 ->limit(3);
 
             if (!$this->isSuperAdmin && $this->currentOrganization) {
                 $recentPersons->whereHas('affiliations', function($q) {
-                    $q->where('organisation_id', $this->currentOrganization->id);
+                    $q->where('organization_id', $this->currentOrganization->id);
                 });
             }
 
@@ -256,10 +256,10 @@ class DashboardComponent extends Component
                 $affiliation = $person->affiliations->first();
                 $orgName = 'Unknown Organization';
 
-                if ($affiliation && $affiliation->organisation) {
-                    $orgName = $affiliation->organisation->display_name
-                        ? $affiliation->organisation->display_name
-                        : $affiliation->organisation->legal_name;
+                if ($affiliation && $affiliation->Organization) {
+                    $orgName = $affiliation->Organization->display_name
+                        ? $affiliation->Organization->display_name
+                        : $affiliation->Organization->legal_name;
                 }
 
                 $activities[] = [
@@ -275,7 +275,7 @@ class DashboardComponent extends Component
 
             // Get recent organization updates (Super Admin only)
             if ($this->isSuperAdmin) {
-                $recentOrgs = Organisation::latest('updated_at')->limit(2)->get();
+                $recentOrgs = Organization::latest('updated_at')->limit(2)->get();
 
                 foreach ($recentOrgs as $org) {
                     $orgDisplayName = $org->display_name ? $org->display_name : $org->legal_name;
@@ -293,19 +293,19 @@ class DashboardComponent extends Component
             }
 
             // Get recent affiliations
-            $recentAffiliations = PersonAffiliation::with(['person', 'organisation'])
+            $recentAffiliations = PersonAffiliation::with(['person', 'Organization'])
                 ->where('status', 'active')
                 ->latest()
                 ->limit(3);
 
             if (!$this->isSuperAdmin && $this->currentOrganization) {
-                $recentAffiliations->where('organisation_id', $this->currentOrganization->id);
+                $recentAffiliations->where('organization_id', $this->currentOrganization->id);
             }
 
             foreach ($recentAffiliations->get() as $affiliation) {
-                $orgDisplayName = $affiliation->organisation->display_name
-                    ? $affiliation->organisation->display_name
-                    : $affiliation->organisation->legal_name;
+                $orgDisplayName = $affiliation->Organization->display_name
+                    ? $affiliation->Organization->display_name
+                    : $affiliation->Organization->legal_name;
 
                 $activities[] = [
                     'type' => 'affiliation',

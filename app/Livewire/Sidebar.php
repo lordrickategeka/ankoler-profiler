@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class Sidebar extends Component
@@ -26,7 +27,7 @@ class Sidebar extends Component
 
     public function loadMenuItems()
     {
-        $user = Auth()->user();
+        $user = Auth::user();
 
         if (!$user) {
             $this->menuItems = $this->getDefaultMenu();
@@ -34,19 +35,19 @@ class Sidebar extends Component
         }
 
         // Get menu based on user role
-        if ($user->hasRole('Super Admin')) {
+        if (method_exists($user, 'hasRole') && $user->hasRole('Super Admin')) {
             $this->menuItems = $this->getSuperAdminMenu();
-        } elseif ($user->hasRole('Organisation Admin')) {
+        } elseif (method_exists($user, 'hasRole') && $user->hasRole('Organization Admin')) {
             $this->menuItems = $this->getOrganizationAdminMenu();
-        } elseif ($user->hasRole('Department Manager')) {
+        } elseif (method_exists($user, 'hasRole') && $user->hasRole('Department Manager')) {
             $this->menuItems = $this->getDepartmentManagerMenu();
-        } elseif ($user->hasRole('Data Entry Clerk')) {
+        } elseif (method_exists($user, 'hasRole') && $user->hasRole('Data Entry Clerk')) {
             $this->menuItems = $this->getDataEntryClerkMenu();
-        } elseif ($user->hasRole('Compliance Officer')) {
+        } elseif (method_exists($user, 'hasRole') && $user->hasRole('Compliance Officer')) {
             $this->menuItems = $this->getComplianceOfficerMenu();
-        } elseif ($user->hasRole('Read Only')) {
+        } elseif (method_exists($user, 'hasRole') && $user->hasRole('Read Only')) {
             $this->menuItems = $this->getReadOnlyMenu();
-        } elseif ($user->hasRole('Person')) {
+        } elseif (method_exists($user, 'hasRole') && $user->hasRole('Person')) {
             $this->menuItems = $this->getPersonMenu();
         } else {
             $this->menuItems = $this->getDefaultMenu();
@@ -55,7 +56,7 @@ class Sidebar extends Component
 
     public function getPersonMenu()
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $unreadCount = $user ? $user->unreadNotifications->count() : 0;
         return [
             'person-actions' => [
@@ -70,50 +71,50 @@ class Sidebar extends Component
                     ],
 
                     [
-                    'label' => 'My Products',
-                    'icon' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
-                    'route' => 'person-products',
-                    'permission' => 'view-persons'
+                        'label' => 'My Products',
+                        'icon' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+                        'route' => 'person-products',
+                        'permission' => 'view-persons'
                     ],
                     [
-                    'label' => 'My Organizations',
-                    'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 4h1m4 0h1M9 16h1',
-                    'route' => 'dashboard',
-                    'permission' => 'view-org-persons'
+                        'label' => 'My Organizations',
+                        'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 4h1m4 0h1M9 16h1',
+                        'route' => 'dashboard',
+                        'permission' => 'view-org-persons'
                     ],
                     [
-                    'label' => 'Privacy Settings',
-                    'icon' => 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z',
-                    'route' => 'dashboard',
-                    'permission' => 'edit-persons'
+                        'label' => 'Privacy Settings',
+                        'icon' => 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z',
+                        'route' => 'dashboard',
+                        'permission' => 'edit-persons'
                     ],
                     [
-                    'label' => 'Notifications',
-                    'icon' => 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9',
-                    'route' => 'person.notifications',
-                    'permission' => 'view-persons',
-                    'badge' => $unreadCount
+                        'label' => 'Notifications',
+                        'icon' => 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9',
+                        'route' => 'person.notifications',
+                        'permission' => 'view-persons',
+                        'badge' => $unreadCount
                     ],
                     [
-                    'label' => 'My Documents',
-                    'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
-                    'route' => 'dashboard',
-                    'permission' => 'view-persons-document'
-                ],
-                [
-                    'label' => 'Family Connections',
-                    'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
-                    'route' => 'dashboard',
-                    'permission' => 'view-persons'
-                ],
-                [
-                    'label' => 'Help & Support',
-                    'icon' => 'M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-                    'route' => 'dashboard',
-                    'permission' => 'Support-persons'
-                ],
+                        'label' => 'My Documents',
+                        'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
+                        'route' => 'dashboard',
+                        'permission' => 'view-persons-document'
+                    ],
+                    [
+                        'label' => 'Family Connections',
+                        'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
+                        'route' => 'dashboard',
+                        'permission' => 'view-persons'
+                    ],
+                    [
+                        'label' => 'Help & Support',
+                        'icon' => 'M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+                        'route' => 'dashboard',
+                        'permission' => 'Support-persons'
+                    ],
+                ]
             ]
-        ]
 
         ];
     }
@@ -144,10 +145,10 @@ class Sidebar extends Component
                 'title' => 'Organization Mgt',
                 'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
                 'items' => [
-                    ['label' => 'All Organizations', 'route' => 'organizations.index', 'permission' => 'view-organisations', 'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5'],
-                    ['label' => 'Add New', 'route' => 'organizations.create', 'permission' => 'create-organisations', 'icon' => 'M12 6v6m0 0v6m0-6h6m-6 0H6'],
-                       ['label' => 'Import Organizations', 'route' => 'organizations.import', 'permission' => 'import-organisations', 'icon' => 'M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10'],
-                    // ['label' => 'Hierarchy', 'route' => 'dashboard', 'permission' => 'view-organisations-hierarchy', 'icon' => 'M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z'],
+                    ['label' => 'All Organizations', 'route' => 'organizations.index', 'permission' => 'view-Organizations', 'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5'],
+                    ['label' => 'Add New', 'route' => 'organizations.create', 'permission' => 'create-Organizations', 'icon' => 'M12 6v6m0 0v6m0-6h6m-6 0H6'],
+                    ['label' => 'Import Organizations', 'route' => 'organizations.import', 'permission' => 'import-Organizations', 'icon' => 'M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10'],
+                    // ['label' => 'Hierarchy', 'route' => 'dashboard', 'permission' => 'view-Organizations-hierarchy', 'icon' => 'M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z'],
                     // ['label' => 'Sites & Locations', 'route' => 'dashboard', 'permission' => 'view-sites', 'icon' => 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z'],
                     ['label' => 'Organizational Units', 'route' => 'organization-units.index', 'permission' => 'view-units', 'icon' => 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z']
                 ]
@@ -156,7 +157,7 @@ class Sidebar extends Component
                 'title' => 'Person Registry',
                 'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
                 'items' => [
-                    ['label' => 'All Persons', 'route' => 'persons.all', 'permission' => ['view-persons', 'can_view_all_organisational_persons'], 'icon' => 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z'],
+                    ['label' => 'All Persons', 'route' => 'persons.all', 'permission' => ['view-persons', 'can_view_all_Organizational_persons'], 'icon' => 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z'],
                     ['label' => 'Add New Person', 'route' => 'persons.create', 'permission' => 'create-persons', 'icon' => 'M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z'],
                     ['label' => 'Import Persons', 'route' => 'persons.import', 'permission' => 'import-org-persons', 'icon' => 'M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10'],
                     ['label' => 'Export Persons', 'route' => 'persons.export', 'permission' => 'export-org-persons', 'icon' => 'M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10'],
@@ -192,7 +193,7 @@ class Sidebar extends Component
                 'items' => [
                     ['label' => 'Permissions', 'route' => 'admin.permissions.index', 'permission' => 'manage-roles', 'icon' => 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.042-.133-2.052-.382-3.016z'],
                     ['label' => 'Roles', 'route' => 'admin.roles.index', 'permission' => 'manage-roles', 'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z'],
-                    ['label' => 'Role Types', 'route' => 'admin.role-types.index', 'permission' => 'manage-roles', 'icon' => 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'],
+                    ['label' => 'Role Types', 'route' => 'admin.role-types.index', 'permission' => 'manage-role-types', 'icon' => 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'],
                     ['label' => 'Users', 'route' => 'admin.users.index', 'permission' => 'manage-roles', 'icon' => 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z']
                 ]
             ],
@@ -332,15 +333,15 @@ class Sidebar extends Component
                     ['label' => 'Filter Profiles', 'route' => 'communication.filter-profiles', 'permission' => 'send-communications', 'icon' => 'M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z'],
                 ]
             ],
-            'affiliations' => [
-                'title' => 'Affiliations',
-                'icon' => 'M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1',
-                'items' => [
-                    ['label' => 'All Affiliations', 'route' => 'dashboard', 'permission' => 'view-org-affiliations'],
-                    ['label' => 'Create Affiliation', 'route' => 'dashboard', 'permission' => 'create-org-affiliations'],
-                    ['label' => 'Manage Roles', 'route' => 'dashboard', 'permission' => 'manage-org-roles']
-                ]
-            ],
+            // 'affiliations' => [
+            //     'title' => 'Affiliations',
+            //     'icon' => 'M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1',
+            //     'items' => [
+            //         ['label' => 'All Affiliations', 'route' => 'dashboard', 'permission' => 'view-org-affiliations'],
+            //         ['label' => 'Create Affiliation', 'route' => 'dashboard', 'permission' => 'create-org-affiliations'],
+            //         ['label' => 'Manage Roles', 'route' => 'dashboard', 'permission' => 'manage-org-roles']
+            //     ]
+            // ],
             'communication' => [
                 'title' => 'Communication',
                 'icon' => 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z',
@@ -351,15 +352,25 @@ class Sidebar extends Component
                     ['label' => 'Analytics', 'route' => 'communication.index', 'permission' => 'view-communication-analytics', 'icon' => 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z']
                 ]
             ],
-            'reports' => [
-                'title' => 'Reports',
-                'icon' => 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
+            // 'reports' => [
+            //     'title' => 'Reports',
+            //     'icon' => 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
+            //     'items' => [
+            //         ['label' => 'Organization Reports', 'route' => 'dashboard', 'permission' => 'view-org-reports'],
+            //         ['label' => 'Staff Reports', 'route' => 'dashboard', 'permission' => 'view-org-reports'],
+            //         ['label' => 'Demographic Reports', 'route' => 'dashboard', 'permission' => 'view-org-reports']
+            //     ]
+            // ],
+            'admin' => [
+                'title' => 'Administration',
+                'icon' => 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z',
                 'items' => [
-                    ['label' => 'Organization Reports', 'route' => 'dashboard', 'permission' => 'view-org-reports'],
-                    ['label' => 'Staff Reports', 'route' => 'dashboard', 'permission' => 'view-org-reports'],
-                    ['label' => 'Demographic Reports', 'route' => 'dashboard', 'permission' => 'view-org-reports']
+                    ['label' => 'Permissions', 'route' => 'admin.permissions.index', 'permission' => 'manage-roles', 'icon' => 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.042-.133-2.052-.382-3.016z'],
+                    ['label' => 'Roles', 'route' => 'admin.roles.index', 'permission' => 'manage-roles', 'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z'],
+                    ['label' => 'Role Types', 'route' => 'admin.role-types.index', 'permission' => 'manage-role-types', 'icon' => 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'],
+                    ['label' => 'Users', 'route' => 'admin.users.index', 'permission' => 'manage-roles', 'icon' => 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z']
                 ]
-            ]
+            ],
         ];
     }
 

@@ -30,7 +30,7 @@ class PersonDeduplicationService
                 $query->where('number', $personData['phone'])
                       ->where('status', 'active');
             })
-            ->with(['affiliations.organisation', 'phones', 'emailAddresses', 'identifiers'])
+            ->with(['affiliations.Organization', 'phones', 'emailAddresses', 'identifiers'])
             ->get();
 
             foreach ($phoneMatches as $person) {
@@ -50,7 +50,7 @@ class PersonDeduplicationService
                 $query->where('email', strtolower($personData['email']))
                       ->where('status', 'active');
             })
-            ->with(['affiliations.organisation', 'phones', 'emailAddresses', 'identifiers'])
+            ->with(['affiliations.Organization', 'phones', 'emailAddresses', 'identifiers'])
             ->get();
 
             foreach ($emailMatches as $person) {
@@ -71,7 +71,7 @@ class PersonDeduplicationService
                       ->where('identifier', $personData['national_id'])
                       ->where('status', 'active');
             })
-            ->with(['affiliations.organisation', 'phones', 'emailAddresses', 'identifiers'])
+            ->with(['affiliations.Organization', 'phones', 'emailAddresses', 'identifiers'])
             ->get();
 
             foreach ($idMatches as $person) {
@@ -100,7 +100,7 @@ class PersonDeduplicationService
                     $query->where('given_name', 'LIKE', '%' . $personData['given_name'] . '%')
                           ->orWhere('family_name', 'LIKE', '%' . $personData['family_name'] . '%');
                 })
-                ->with(['affiliations.organisation', 'phones', 'emailAddresses', 'identifiers'])
+                ->with(['affiliations.Organization', 'phones', 'emailAddresses', 'identifiers'])
                 ->get();
 
             foreach ($nameMatches as $person) {
@@ -138,7 +138,7 @@ class PersonDeduplicationService
                     $dob->copy()->addDays(3)
                 ])
                 ->where('status', 'active')
-                ->with(['affiliations.organisation', 'phones', 'emailAddresses', 'identifiers'])
+                ->with(['affiliations.Organization', 'phones', 'emailAddresses', 'identifiers'])
                 ->get();
 
             foreach ($closeMatches as $person) {
@@ -259,7 +259,7 @@ class PersonDeduplicationService
             'person_id' => $existingPerson->id,
             'user_id' => Auth::id(),
             'action' => 'cross_org_link',
-            'new_organization' => $affiliationData['organisation_id'] ?? null,
+            'new_organization' => $affiliationData['organization_id'] ?? null,
             'role_type' => $affiliationData['role_type'] ?? null
         ]);
 

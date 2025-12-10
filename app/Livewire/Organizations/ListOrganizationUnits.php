@@ -136,7 +136,7 @@ class ListOrganizationUnits extends Component {
             return;
         }
         $affiliation = PersonAffiliation::where('person_id', $user->id)
-            ->where('organisation_id', $this->selectedUnit->organisation_id)
+            ->where('organization_id', $this->selectedUnit->organization_id)
             ->where('domain_record_type', 'unit')
             ->where('domain_record_id', $this->selectedUnit->id)
             ->first();
@@ -156,7 +156,7 @@ class ListOrganizationUnits extends Component {
 
         // Check for existing pending application
         $existing = DB::table('organization_unit_applications')
-            ->where('organisation_id', $this->selectedUnit->organisation_id)
+            ->where('organization_id', $this->selectedUnit->organization_id)
             ->where('unit_id', $this->selectedUnit->id)
             ->where('person_id', $user->id)
             ->where('status', 'pending')
@@ -168,7 +168,7 @@ class ListOrganizationUnits extends Component {
 
         // Create new application
         $appId = DB::table('organization_unit_applications')->insertGetId([
-            'organisation_id' => $this->selectedUnit->organisation_id,
+            'organization_id' => $this->selectedUnit->organization_id,
             'unit_id' => $this->selectedUnit->id,
             'person_id' => $user->id,
             'status' => 'pending',
@@ -178,8 +178,8 @@ class ListOrganizationUnits extends Component {
         $this->applicationStatus = 'pending';
 
         // Notify all admins of the organization (optional: you may want to update notification logic to use the new application model)
-        $admins = \App\Models\User::where('organisation_id', $this->selectedUnit->organisation_id)
-            ->role('Organisation Admin')
+        $admins = \App\Models\User::where('organization_id', $this->selectedUnit->organization_id)
+            ->role('Organization Admin')
             ->get();
         foreach ($admins as $admin) {
             $admin->notify(new \App\Notifications\NewUnitApplicationSubmitted((object)[

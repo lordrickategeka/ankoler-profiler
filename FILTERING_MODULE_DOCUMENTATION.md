@@ -26,7 +26,7 @@ The sophisticated filtering module provides a flexible, organization-specific fi
 ### 2. Database Schema
 
 The `filter_configurations` table stores:
-- `organisation_id`: Links to organization
+- `organization_id`: Links to organization
 - `field_name`: Unique field identifier
 - `field_type`: Type of filter (text, select, etc.)
 - `field_options`: JSON field storing options and validation rules
@@ -76,7 +76,7 @@ $persons = $filterService->applyFilters($allFilters)->paginate(10);
 ```php
 // Create a new filter configuration
 FilterConfiguration::create([
-    'organisation_id' => $org->id,
+    'organization_id' => $org->id,
     'field_name' => 'department',
     'field_type' => 'select',
     'field_options' => [
@@ -92,7 +92,7 @@ FilterConfiguration::create([
 
 ```php
 // The service automatically handles different filter types
-$filterService = new PersonFilterService($organisation);
+$filterService = new PersonFilterService($Organization);
 
 $filters = [
     'search' => 'john',

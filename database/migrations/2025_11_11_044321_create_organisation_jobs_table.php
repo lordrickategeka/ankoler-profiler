@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('organisation_jobs', function (Blueprint $table) {
+        Schema::create('Organization_jobs', function (Blueprint $table) {
            $table->id();
-            $table->unsignedBigInteger('organisation_id')->nullable()->index();
+            $table->unsignedBigInteger('organization_id')->nullable()->index();
             $table->unsignedBigInteger('category_id')->nullable()->index();
             $table->unsignedBigInteger('posted_by')->nullable()->index();
 
@@ -30,7 +30,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Foreign keys
-            $table->foreign('organisation_id')->references('id')->on('organisations')->onDelete('set null');
+            $table->foreign('organization_id')->references('id')->on('Organizations')->onDelete('set null');
             $table->foreign('category_id')->references('id')->on('job_categories')->onDelete('set null');
             $table->foreign('posted_by')->references('id')->on('users')->onDelete('set null');
 
@@ -42,6 +42,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('organisation_jobs');
+        Schema::dropIfExists('Organization_jobs');
     }
 };

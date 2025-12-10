@@ -1,10 +1,12 @@
 <?php
 
 namespace App\Livewire\Admin;
+use Illuminate\Support\Facades\Auth;
 
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\RoleType;
+use App\Models\Organization;
 use Spatie\Permission\Models\Permission;
 
 class RoleTypeManager extends Component
@@ -19,6 +21,7 @@ class RoleTypeManager extends Component
     public $showPermissionsModal = false;
 
     public $roleTypeId;
+    public $organization_id = '';
     public $code = '';
     public $name = '';
     public $description = '';
@@ -26,6 +29,7 @@ class RoleTypeManager extends Component
     public $selectedPermissions = [];
 
     protected $rules = [
+        'organization_id' => 'required|exists:organizations,id',
         'code' => 'required|string|max:50|unique:role_types,code',
         'name' => 'required|string|max:255',
         'description' => 'nullable|string|max:500',
@@ -36,10 +40,13 @@ class RoleTypeManager extends Component
         'code.required' => 'Role type code is required.',
         'code.unique' => 'A role type with this code already exists.',
         'name.required' => 'Role type name is required.',
+        'organization_id.required' => 'Organization is required.',
+        'organization_id.exists' => 'Selected organization does not exist.',
     ];
 
     public function render()
     {
+        $user = Auth::user();
         $query = RoleType::query();
 
         if ($this->search) {
@@ -56,12 +63,23 @@ class RoleTypeManager extends Component
             $query->where('is_active', false);
         }
 
+        // Only Super Admin can see all organizations
+        if ($user && !$user->hasRole('Super Admin')) {
+            // Only show role types for user's organization
+            $orgId = $user->organization_id;
+            $query->where('organization_id', $orgId);
+            $organizations = Organization::where('id', $orgId)->get();
+        } else {
+            $organizations = Organization::orderBy('display_name')->get();
+        }
+
         $roleTypes = $query->orderBy('name')->paginate(15);
         $permissions = Permission::orderBy('name')->get();
 
         return view('livewire.admin.role-type-manager', [
             'roleTypes' => $roleTypes,
             'permissions' => $permissions,
+            'organizations' => $organizations,
         ]);
     }
 
@@ -78,6 +96,10 @@ class RoleTypeManager extends Component
     public function openCreateModal()
     {
         $this->resetForm();
+        $user = Auth::user();
+        if ($user && !$user->hasRole('Super Admin')) {
+            $this->organization_id = $user->organization_id;
+        }
         $this->showCreateModal = true;
     }
 
@@ -86,6 +108,7 @@ class RoleTypeManager extends Component
         $roleType = RoleType::findOrFail($roleTypeId);
 
         $this->roleTypeId = $roleType->id;
+        $this->organization_id = $roleType->organization_id;
         $this->code = $roleType->code;
         $this->name = $roleType->name;
         $this->description = $roleType->description ?? '';
@@ -112,9 +135,14 @@ class RoleTypeManager extends Component
 
     public function createRoleType()
     {
+        $user = Auth::user();
+        if ($user && !$user->hasRole('Super Admin')) {
+            $this->organization_id = $user->organization_id;
+        }
         $this->validate();
 
         RoleType::create([
+            'organization_id' => $this->organization_id,
             'code' => strtoupper($this->code),
             'name' => $this->name,
             'description' => $this->description,
@@ -130,6 +158,7 @@ class RoleTypeManager extends Component
     public function updateRoleType()
     {
         $this->validate([
+            'organization_id' => 'required|exists:organizations,id',
             'code' => 'required|string|max:50|unique:role_types,code,' . $this->roleTypeId,
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:500',
@@ -138,6 +167,7 @@ class RoleTypeManager extends Component
 
         $roleType = RoleType::findOrFail($this->roleTypeId);
         $roleType->update([
+            'organization_id' => $this->organization_id,
             'code' => strtoupper($this->code),
             'name' => $this->name,
             'description' => $this->description,
@@ -201,6 +231,7 @@ class RoleTypeManager extends Component
     private function resetForm()
     {
         $this->roleTypeId = null;
+        $this->organization_id = '';
         $this->code = '';
         $this->name = '';
         $this->description = '';

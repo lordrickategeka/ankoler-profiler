@@ -4,8 +4,8 @@ namespace Database\Factories;
 
 use App\Models\PersonAffiliation;
 use App\Models\Person;
-use App\Models\Organisation;
-use App\Models\OrganisationSite;
+use App\Models\Organization;
+use App\Models\OrganizationSite;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -24,7 +24,7 @@ class PersonAffiliationFactory extends Factory
     {
         return [
             'person_id' => Person::factory(),
-            'organisation_id' => 1, // Will be overridden in the seeder
+            'organization_id' => 1, // Will be overridden in the seeder
             'site' => null, // Will be set based on organization
             'role_type' => 'STAFF',
             'role_title' => $this->faker->jobTitle(),
@@ -39,7 +39,7 @@ class PersonAffiliationFactory extends Factory
     /**
      * Configure for hospital organization
      */
-    public function forHospital(Organisation $hospital): static
+    public function forHospital(Organization $hospital): static
     {
         return $this->state(function (array $attributes) use ($hospital) {
             $roles = ['PATIENT', 'DOCTOR', 'NURSE', 'STAFF', 'ADMIN'];
@@ -54,7 +54,7 @@ class PersonAffiliationFactory extends Factory
             ];
 
             return [
-                'organisation_id' => $hospital->id,
+                'organization_id' => $hospital->id,
                 'role_type' => $roleType,
                 'role_title' => $this->faker->randomElement($roleTitles[$roleType]),
             ];
@@ -64,7 +64,7 @@ class PersonAffiliationFactory extends Factory
     /**
      * Configure for school organization
      */
-    public function forSchool(Organisation $school): static
+    public function forSchool(Organization $school): static
     {
         return $this->state(function (array $attributes) use ($school) {
             $roles = ['STUDENT', 'TEACHER', 'STAFF', 'ADMIN'];
@@ -78,7 +78,7 @@ class PersonAffiliationFactory extends Factory
             ];
 
             return [
-                'organisation_id' => $school->id,
+                'organization_id' => $school->id,
                 'role_type' => $roleType,
                 'role_title' => $this->faker->randomElement($roleTitles[$roleType]),
             ];
@@ -88,7 +88,7 @@ class PersonAffiliationFactory extends Factory
     /**
      * Configure for SACCO organization
      */
-    public function forSacco(Organisation $sacco): static
+    public function forSacco(Organization $sacco): static
     {
         return $this->state(function (array $attributes) use ($sacco) {
             $roles = ['MEMBER', 'STAFF', 'ADMIN', 'BOARD_MEMBER'];
@@ -102,7 +102,7 @@ class PersonAffiliationFactory extends Factory
             ];
 
             return [
-                'organisation_id' => $sacco->id,
+                'organization_id' => $sacco->id,
                 'role_type' => $roleType,
                 'role_title' => $this->faker->randomElement($roleTitles[$roleType]),
             ];
@@ -112,7 +112,7 @@ class PersonAffiliationFactory extends Factory
     /**
      * Configure for parish organization
      */
-    public function forParish(Organisation $parish): static
+    public function forParish(Organization $parish): static
     {
         return $this->state(function (array $attributes) use ($parish) {
             $roles = ['MEMBER', 'CLERGY', 'STAFF', 'ADMIN'];
@@ -126,7 +126,7 @@ class PersonAffiliationFactory extends Factory
             ];
 
             return [
-                'organisation_id' => $parish->id,
+                'organization_id' => $parish->id,
                 'role_type' => $roleType,
                 'role_title' => $this->faker->randomElement($roleTitles[$roleType]),
             ];
@@ -136,7 +136,7 @@ class PersonAffiliationFactory extends Factory
     /**
      * Configure for corporate organization
      */
-    public function forCorporate(Organisation $corporate): static
+    public function forCorporate(Organization $corporate): static
     {
         return $this->state(function (array $attributes) use ($corporate) {
             $roles = ['EMPLOYEE', 'MANAGER', 'ADMIN'];
@@ -149,7 +149,7 @@ class PersonAffiliationFactory extends Factory
             ];
 
             return [
-                'organisation_id' => $corporate->id,
+                'organization_id' => $corporate->id,
                 'role_type' => $roleType,
                 'role_title' => $this->faker->randomElement($roleTitles[$roleType]),
             ];

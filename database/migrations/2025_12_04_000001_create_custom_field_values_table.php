@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('custom_field_values', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('organisation_id');
+            $table->unsignedBigInteger('organization_id');
             $table->unsignedBigInteger('custom_field_id');
             $table->text('value')->nullable();
             $table->timestamps();
 
-            $table->foreign('organisation_id')->references('id')->on('organisations')->onDelete('cascade');
+            $table->foreign('organization_id')->references('id')->on('Organizations')->onDelete('cascade');
             $table->foreign('custom_field_id')->references('id')->on('custom_fields')->onDelete('cascade');
-            $table->index(['organisation_id', 'custom_field_id']);
+            $table->index(['organization_id', 'custom_field_id']);
         });
     }
 

@@ -3,19 +3,19 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Organisation;
-use App\Models\OrganisationSite;
+use App\Models\Organization;
+use App\Models\OrganizationSite;
 
-class OrganisationSeeder extends Seeder
+class OrganizationSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        // Super Organisation
-        $superOrg = Organisation::updateOrCreate(
-            ['legal_name' => 'Ankole Profiler Super Organisation'],
+        // Super Organization
+        $superOrg = Organization::updateOrCreate(
+            ['legal_name' => 'Ankole Profiler Super Organization'],
             [
                 'display_name' => 'Ankole Profiler HQ',
                 'code' => 'SUPER001',
@@ -27,7 +27,7 @@ class OrganisationSeeder extends Seeder
                 'website_url' => 'https://ankoleprofiler.com',
                 'contact_email' => 'hq@ankoleprofiler.com',
                 'contact_phone' => '+256700000001',
-                'description' => 'The main super organisation for Ankole Profiler.',
+                'description' => 'The main super Organization for Ankole Profiler.',
                 'address_line_1' => 'Main Street',
                 'city' => 'Mbarara',
                 'district' => 'Mbarara',
@@ -45,7 +45,7 @@ class OrganisationSeeder extends Seeder
                 'default_currency' => 'UGX',
                 'timezone' => 'Africa/Kampala',
                 'corporate_details' => [
-                    'corporate_type' => 'super_organisation',
+                    'corporate_type' => 'super_Organization',
                     'ownership_type' => 'private',
                     'number_of_branches' => 0,
                 ],
@@ -54,7 +54,7 @@ class OrganisationSeeder extends Seeder
             ]
         );
         // Hospital Organizations
-        $bugema = Organisation::updateOrCreate(
+        $bugema = Organization::updateOrCreate(
             ['legal_name' => 'Bugema Adventist Secondary School'],
             [
                 'display_name' => 'Bugema Secondary School',
@@ -109,7 +109,7 @@ class OrganisationSeeder extends Seeder
             ]
         );
 
-        $nsambya = Organisation::updateOrCreate([
+        $nsambya = Organization::updateOrCreate([
             'legal_name' => 'St. Francis Hospital Nsambya'],
             [
                 'display_name' => 'Nsambya Hospital',
@@ -161,7 +161,7 @@ class OrganisationSeeder extends Seeder
         );
 
         // School Organizations
-        $makerere = Organisation::updateOrCreate([
+        $makerere = Organization::updateOrCreate([
             'legal_name' => 'Makerere University'],
             [
                 'display_name' => 'Makerere University',
@@ -216,7 +216,7 @@ class OrganisationSeeder extends Seeder
             ]
         );
 
-        $bugema = Organisation::updateOrCreate([
+        $bugema = Organization::updateOrCreate([
             'legal_name' => 'Bugema Adventist Secondary School'],
             [
                 'display_name' => 'Bugema Secondary School',
@@ -282,7 +282,7 @@ class OrganisationSeeder extends Seeder
         );
 
         // SACCO Organizations
-        $wazalendo = Organisation::updateOrCreate(
+        $wazalendo = Organization::updateOrCreate(
             ['legal_name' => 'Wazalendo Teachers Savings and Credit Cooperative Society'],
             [
             'legal_name' => 'Wazalendo Teachers Savings and Credit Cooperative Society',
@@ -367,7 +367,7 @@ class OrganisationSeeder extends Seeder
         ]);
 
         // Parish Organizations
-        $rubaga = Organisation::updateOrCreate(
+        $rubaga = Organization::updateOrCreate(
             ['legal_name' => 'Rubaga Cathedral Parish'],
             [
             'legal_name' => 'Rubaga Cathedral Parish',
@@ -405,7 +405,7 @@ class OrganisationSeeder extends Seeder
         ]);
 
         // Corporate Organizations
-        $mtn = Organisation::updateOrCreate(
+        $mtn = Organization::updateOrCreate(
             ['legal_name' => 'MTN Uganda Limited'],
             [
             'legal_name' => 'MTN Uganda Limited',
@@ -448,10 +448,10 @@ class OrganisationSeeder extends Seeder
         ]);
 
         // Create some multi-site entries for MTN
-        OrganisationSite::updateOrCreate(
+        OrganizationSite::updateOrCreate(
             ['site_code' => 'MTN-KLA-001'],
             [
-                'organisation_id' => $mtn->id,
+                'organization_id' => $mtn->id,
                 'site_name' => 'MTN Kampala Regional Office',
                 'site_type' => 'office',
                 'address_line_1' => 'Commercial Plaza, Jinja Road',
@@ -465,10 +465,10 @@ class OrganisationSeeder extends Seeder
             ]
         );
 
-        OrganisationSite::updateOrCreate(
+        OrganizationSite::updateOrCreate(
             ['site_code' => 'MTN-GUL-001'],
             [
-                'organisation_id' => $mtn->id,
+                'organization_id' => $mtn->id,
                 'site_name' => 'MTN Gulu Branch',
                 'site_type' => 'branch',
                 'address_line_1' => 'Main Street',

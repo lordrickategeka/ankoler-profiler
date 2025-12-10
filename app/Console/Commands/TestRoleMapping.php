@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Models\Organisation;
+use App\Models\Organization;
 
 class TestRoleMapping extends Command
 {
@@ -45,12 +45,12 @@ class TestRoleMapping extends Command
 
         // Check existing organizations
         $this->info('Existing Organizations:');
-        $organisations = Organisation::select('legal_name', 'category', 'is_super')->get();
+        $Organizations = Organization::select('legal_name', 'category', 'is_super')->get();
 
-        if ($organisations->isEmpty()) {
+        if ($Organizations->isEmpty()) {
             $this->warn('No organizations found in database');
         } else {
-            foreach ($organisations as $org) {
+            foreach ($Organizations as $org) {
                 $superLabel = $org->is_super ? ' [SUPER]' : '';
                 $this->line("• {$org->legal_name} ({$org->category}){$superLabel}");
             }

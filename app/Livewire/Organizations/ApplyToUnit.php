@@ -40,7 +40,7 @@ class ApplyToUnit extends Component
 
         // Check for existing pending application
         $existing = DB::table('organization_unit_applications')
-            ->where('organisation_id', $this->unit->organisation_id)
+            ->where('organization_id', $this->unit->organization_id)
             ->where('unit_id', $this->unit->id)
             ->where('person_id', $user->person->id)
             ->where('status', 'pending')
@@ -53,7 +53,7 @@ class ApplyToUnit extends Component
 
         // Create new application
         DB::table('organization_unit_applications')->insert([
-            'organisation_id' => $this->unit->organisation_id,
+            'organization_id' => $this->unit->organization_id,
             'unit_id' => $this->unit->id,
             'person_id' => $user->person->id,
             'status' => 'pending',

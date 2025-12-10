@@ -18,20 +18,20 @@
 
         <div class="p-6">
             <!-- Organization Selection (Super Admin only) -->
-            @if($isSuperAdmin && !empty($availableOrganisations))
+            @if($isSuperAdmin && !empty($availableOrganizations))
                 <div class="mb-6">
-                    <label for="organisation" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="Organization" class="block text-sm font-medium text-gray-700 mb-2">
                         Select Organization
                     </label>
-                    <select wire:model.live="selectedOrganisationId" 
-                            id="organisation" 
+                    <select wire:model.live="selectedOrganizationId" 
+                            id="Organization" 
                             class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                         <option value="">Choose an organization...</option>
-                        @foreach($availableOrganisations as $org)
+                        @foreach($availableOrganizations as $org)
                             <option value="{{ $org['id'] }}">{{ $org['legal_name'] }}</option>
                         @endforeach
                     </select>
-                    @error('selectedOrganisationId')
+                    @error('selectedOrganizationId')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>

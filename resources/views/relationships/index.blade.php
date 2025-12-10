@@ -161,10 +161,10 @@
                                         </div>
                                         <div class="text-muted small">
                                             {{ $relationship->primaryAffiliation->role_type }} at
-                                            {{ $relationship->primaryAffiliation->organisation->legal_name }}
+                                            {{ $relationship->primaryAffiliation->Organization->legal_name }}
                                             ↔
                                             {{ $relationship->secondaryAffiliation->role_type }} at
-                                            {{ $relationship->secondaryAffiliation->organisation->legal_name }}
+                                            {{ $relationship->secondaryAffiliation->Organization->legal_name }}
                                         </div>
                                     </div>
                                     <div class="btn-group btn-group-sm">
@@ -226,8 +226,8 @@
                                                 {{ $relationship->person->family_name }}</strong>
                                         </div>
                                         <div class="text-muted small">
-                                            {{ $relationship->primaryAffiliation->organisation->legal_name }} ↔
-                                            {{ $relationship->secondaryAffiliation->organisation->legal_name }}
+                                            {{ $relationship->primaryAffiliation->Organization->legal_name }} ↔
+                                            {{ $relationship->secondaryAffiliation->Organization->legal_name }}
                                         </div>
                                     </div>
                                     <div class="text-muted small">

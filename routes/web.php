@@ -11,9 +11,9 @@ use App\Livewire\Person\Notifications as PersonNotificationsLivewire;
 use App\Models\CustomField;
 
 
-use App\Exports\OrganisationTemplateExport;
+use App\Exports\OrganizationTemplateExport;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Http\Livewire\Organizations\ImportOrganisations;
+use App\Http\Livewire\Organizations\ImportOrganizations;
 
 // Custom organization template export (POST)
 Route::post('/organizations/export-template', function (\Illuminate\Http\Request $request) {
@@ -23,7 +23,7 @@ Route::post('/organizations/export-template', function (\Illuminate\Http\Request
     // Save custom fields to custom_fields table
     foreach ($fields as $field) {
         CustomField::updateOrCreate([
-            'model_type' => 'organisation_template',
+            'model_type' => 'Organization_template',
             'model_id' => 0,
             'field_name' => $field,
         ], [
@@ -38,17 +38,19 @@ Route::post('/organizations/export-template', function (\Illuminate\Http\Request
         ]);
     }
 
-    $export = new OrganisationTemplateExport([], $headers);
-    return Excel::download($export, 'custom_organisation_template.xlsx');
-})->name('organizations.export-template')->middleware(['auth:sanctum', config('jetstream.auth_session')]);
+    $export = new OrganizationTemplateExport([], $headers);
+    return Excel::download($export, 'custom_Organization_template.xlsx');
+})->name('organizations.export-template');
+// })->name('organizations.export-template')->middleware(['auth:sanctum', config('jetstream.auth_session')]);
+
 // Organization template export
 Route::get('/organizations/template', function () {
-    $export = new OrganisationTemplateExport();
-    return Excel::download($export, 'organisation_import_template.xlsx');
+    $export = new OrganizationTemplateExport();
+    return Excel::download($export, 'Organization_import_template.xlsx');
 })->name('organizations.template')->middleware(['auth:sanctum', config('jetstream.auth_session')]);
 
 // Organization Import route
-Route::get('/organizations/import', ImportOrganisations::class)
+Route::get('/organizations/import', ImportOrganizations::class)
     ->name('organizations.import')
     ->middleware(['auth:sanctum', config('jetstream.auth_session')]);
 
@@ -87,15 +89,15 @@ Route::middleware([
     // Organizations routes
     Route::get('/organizations', App\Livewire\Organizations\Index::class)
         ->name('organizations.index')
-        ->middleware('can:view-organisations');
+        ->middleware('can:view-Organizations');
 
     Route::get('/organizations/create', App\Livewire\Organizations\Create::class)
         ->name('organizations.create')
-        ->middleware('can:create-organisations');
+        ->middleware('can:create-Organizations');
 
     Route::get('/organizations/{id}', App\Livewire\Organizations\Show::class)
         ->name('organizations.show')
-        ->middleware('can:view-organisations');
+        ->middleware('can:view-Organizations');
 
     // Person routes
     // Route::get('/persons/all', App\Livewire\Person\PersonList::class)->name('persons.all');
@@ -121,9 +123,9 @@ Route::middleware([
     Route::get('/persons/profile-current', App\Livewire\Person\ProfileView::class)
         ->name('persons.profile-current');
 
-    // Organisation Units for current user
-    Route::get('/my-organisation-units', App\Livewire\Person\OrganisationUnitsList::class)
-        ->name('person.organisation-units');
+    // Organization Units for current user
+    Route::get('/my-Organization-units', App\Livewire\Person\OrganizationUnitsList::class)
+        ->name('person.Organization-units');
 
 
     Route::get('/person/notifications', PersonNotificationsLivewire::class)->name('person.notifications');
@@ -131,7 +133,7 @@ Route::middleware([
     // Organization Units - User listing and application
     Route::get('/organization-units', App\Livewire\Organizations\ListOrganizationUnits::class)
         ->name('organization-units.index')
-        ->middleware('can:view-organisation-units');
+        ->middleware('can:view-Organization-units');
 
     Route::get('/organization-units/create', App\Livewire\Organizations\CreateOrganizationUnit::class)
         ->name('organization-units.create')
@@ -165,7 +167,7 @@ Route::middleware([
     });
 
     // Organization Units routes
-    // Route::get('/organization-units', App\Livewire\Organizations\OrganisationUnitsComponent::class)
+    // Route::get('/organization-units', App\Livewire\Organizations\OrganizationUnitsComponent::class)
     //     ->name('organization-units.index')
     //     ->middleware('can:view-units');
 

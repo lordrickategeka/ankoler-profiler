@@ -27,7 +27,7 @@ class MessageHistory extends Component
 
     public function deleteMessage($id)
     {
-        $message = CommunicationMessage::where('organisation_id', Auth::user()->organisation_id)
+        $message = CommunicationMessage::where('organization_id', Auth::user()->organization_id)
             ->findOrFail($id);
         $message->delete();
         session()->flash('success', 'Message deleted successfully.');
@@ -36,7 +36,7 @@ class MessageHistory extends Component
 
     public function editMessage($id)
     {
-        $this->editingMessage = CommunicationMessage::where('organisation_id', Auth::user()->organisation_id)
+        $this->editingMessage = CommunicationMessage::where('organization_id', Auth::user()->organization_id)
             ->findOrFail($id);
         // You can now use $editingMessage in your Blade view to show an edit form/modal/drawer
     }
@@ -88,7 +88,7 @@ class MessageHistory extends Component
     {
         $query = CommunicationMessage::query()
             ->with(['recipientPerson', 'sentByUser'])
-            ->where('organisation_id', Auth::user()->organisation_id)
+            ->where('organization_id', Auth::user()->organization_id)
             ->orderBy('created_at', 'desc');
 
         // Apply search
@@ -128,7 +128,7 @@ class MessageHistory extends Component
     public function getChannelStats()
     {
         $communicationManager = app(CommunicationManager::class);
-        return $communicationManager->getOrganisationStats(Auth::user()->organisation_id, 'month');
+        return $communicationManager->getOrganizationStats(Auth::user()->organization_id, 'month');
     }
 
     public function render()

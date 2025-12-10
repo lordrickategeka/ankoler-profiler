@@ -5,7 +5,7 @@ namespace App\Livewire\Admin;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\User;
-use App\Models\Organisation;
+use App\Models\Organization;
 use Spatie\Permission\Models\Role;
 
 class UserManager extends Component
@@ -25,7 +25,7 @@ class UserManager extends Component
 
     public function render()
     {
-        $query = User::with(['roles', 'organisation']);
+        $query = User::with(['roles', 'Organization']);
 
         if ($this->search) {
             $query->where(function($q) {
@@ -41,13 +41,13 @@ class UserManager extends Component
         }
 
         if ($this->organizationFilter !== 'all') {
-            $query->where('organisation_id', $this->organizationFilter);
+            $query->where('organization_id', $this->organizationFilter);
         }
 
         $users = $query->orderBy('name')->paginate(15);
         $roles = Role::orderBy('name')->get();
         $allRoles = Role::orderBy('name')->get();
-        $organizations = Organisation::orderBy('legal_name')->get();
+        $organizations = Organization::orderBy('legal_name')->get();
 
         return view('livewire.admin.user-manager', [
             'users' => $users,
@@ -97,10 +97,10 @@ class UserManager extends Component
 
     public function openOrganizationModal($userId)
     {
-        $user = User::with('organisation')->findOrFail($userId);
+        $user = User::with('Organization')->findOrFail($userId);
 
         $this->userId = $user->id;
-        $this->selectedOrganization = $user->organisation_id;
+        $this->selectedOrganization = $user->organization_id;
 
         $this->showOrganizationModal = true;
     }
@@ -110,7 +110,7 @@ class UserManager extends Component
         $user = User::findOrFail($this->userId);
 
         $user->update([
-            'organisation_id' => $this->selectedOrganization
+            'organization_id' => $this->selectedOrganization
         ]);
 
         $this->showOrganizationModal = false;

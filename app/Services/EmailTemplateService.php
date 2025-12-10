@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Contracts\Communication\CommunicationMessage;
 use App\Models\CommunicationTemplate;
-use App\Models\Organisation;
+use App\Models\Organization;
 use App\Models\Person;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -133,12 +133,12 @@ class EmailTemplateService
      */
     public function getAvailableTemplates(
         int $userId,
-        int $organisationId,
+        int $OrganizationId,
         ?string $category = null,
         ?string $channel = null
     ): Collection {
         $query = CommunicationTemplate::active()
-            ->accessibleBy($userId, $organisationId);
+            ->accessibleBy($userId, $OrganizationId);
 
         if ($category) {
             $query->where('category', $category);
@@ -249,7 +249,7 @@ class EmailTemplateService
     public function cloneTemplate(
         CommunicationTemplate $originalTemplate,
         int $newUserId,
-        ?int $newOrganisationId = null,
+        ?int $newOrganizationId = null,
         array $modifications = []
     ): CommunicationTemplate {
         $data = $originalTemplate->toArray();
@@ -259,7 +259,7 @@ class EmailTemplateService
         
         // Set new ownership
         $data['user_id'] = $newUserId;
-        $data['organisation_id'] = $newOrganisationId;
+        $data['organization_id'] = $newOrganizationId;
         $data['usage_count'] = 0;
         $data['last_used_at'] = null;
         
@@ -330,7 +330,7 @@ class EmailTemplateService
         $affiliation = $person->affiliations->first();
         if ($affiliation) {
             $variables['role_title'] = $affiliation->role_title;
-            $variables['organization_name'] = $affiliation->organisation->legal_name ?? '';
+            $variables['organization_name'] = $affiliation->Organization->legal_name ?? '';
         }
 
         // Add contact information
@@ -359,13 +359,13 @@ class EmailTemplateService
         $person->gender = 'M';
 
         // Mock affiliation
-        $organisation = new Organisation();
-        $organisation->legal_name = 'Sample Organization Ltd.';
+        $Organization = new Organization();
+        $Organization->legal_name = 'Sample Organization Ltd.';
         
         // We'll simulate the relationships for preview
         $person->setRelation('affiliations', collect([(object)[
             'role_title' => 'Manager',
-            'organisation' => $organisation
+            'Organization' => $Organization
         ]]));
 
         return $person;

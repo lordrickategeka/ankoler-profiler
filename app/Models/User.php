@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -11,7 +11,7 @@ use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens;
 
@@ -31,8 +31,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'organisation_id',
-        'person_id',
+        'current_team_id',
+        'profile_photo_path',
     ];
 
     /**
@@ -69,9 +69,9 @@ class User extends Authenticatable
         ];
     }
 
-    public function organisation()
+    public function Organization()
     {
-        return $this->belongsTo(Organisation::class, 'organisation_id');
+        return $this->belongsTo(Organization::class, 'organization_id');
     }
 
     /**
@@ -90,7 +90,7 @@ class User extends Authenticatable
     {
         // Super Admin can access ALL organizations
         if ($this->hasRole('Super Admin')) {
-            return Organisation::where('is_active', true)
+            return Organization::where('is_active', true)
                                ->orderBy('display_name')
                                ->get();
         }
@@ -101,7 +101,7 @@ class User extends Authenticatable
             return collect([$this->organization]);
         }
 
-        return Organisation::whereHas('affiliations', function($query) {
+        return Organization::whereHas('affiliations', function($query) {
             $query->where('person_id', $this->person_id)
                   ->where('status', 'ACTIVE');
         })
@@ -113,7 +113,7 @@ class User extends Authenticatable
     /**
      * Check if user can access a specific organization
      */
-    public function canAccessOrganisation($organizationId)
+    public function canAccessOrganization($organizationId)
     {
         // Super Admin can access all
         if ($this->hasRole('Super Admin')) {

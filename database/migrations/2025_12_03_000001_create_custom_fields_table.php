@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('custom_fields', function (Blueprint $table) {
             $table->id();
-            $table->string('model_type'); // e.g., 'organisation', 'person'
+            $table->string('model_type'); // e.g., 'Organization', 'person'
             $table->unsignedBigInteger('model_id');
             $table->string('field_name');
             $table->string('field_label')->nullable();

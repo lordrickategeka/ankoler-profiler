@@ -200,7 +200,7 @@ class EmailCommunicationService implements CommunicationChannelInterface
             '{full_name}' => $person->full_name,
             '{email}' => $person->emailAddresses->where('is_primary', true)->first()?->email ?? '',
             '{phone}' => $person->phones->where('is_primary', true)->first()?->number ?? '',
-            '{organization}' => $person->currentAffiliation?->organisation?->display_name ?? '',
+            '{organization}' => $person->currentAffiliation?->Organization?->display_name ?? '',
         ];
 
         return str_replace(array_keys($replacements), array_values($replacements), $template);

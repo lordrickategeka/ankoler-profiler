@@ -4,7 +4,7 @@ namespace App\Livewire\Person;
 
 use Livewire\Component;
 use Livewire\WithFileUploads;
-use App\Models\Organisation;
+use App\Models\Organization;
 use App\Models\Person;
 use App\Services\PersonImportService;
 use Illuminate\Support\Facades\Auth;
@@ -26,9 +26,9 @@ class ImportPersons extends Component
     public $showResults = false;
 
     // Organization context
-    public $currentOrganisation;
-    public $selectedOrganisationId;
-    public $availableOrganisations = [];
+    public $currentOrganization;
+    public $selectedOrganizationId;
+    public $availableOrganizations = [];
     public $isSuperAdmin = false;
 
     // Import options
@@ -46,7 +46,7 @@ class ImportPersons extends Component
 
     protected $rules = [
         'importFile' => 'required|file|mimes:csv,xlsx,xls|max:10240', // 10MB max
-        'selectedOrganisationId' => 'required_if:isSuperAdmin,true|exists:organisations,id',
+        'selectedOrganizationId' => 'required_if:isSuperAdmin,true|exists:Organizations,id',
         'defaultRoleType' => 'required|string',
         'skipDuplicates' => 'boolean',
         'updateExisting' => 'boolean',
@@ -56,7 +56,7 @@ class ImportPersons extends Component
         'importFile.required' => 'Please select a file to import.',
         'importFile.mimes' => 'File must be a CSV or Excel file (.csv, .xlsx, .xls).',
         'importFile.max' => 'File size cannot exceed 10MB.',
-        'selectedOrganisationId.required_if' => 'Please select an organization.',
+        'selectedOrganizationId.required_if' => 'Please select an organization.',
     ];
 
     public function mount()
@@ -85,36 +85,36 @@ class ImportPersons extends Component
 
         if ($this->isSuperAdmin) {
             // Load all organizations for Super Admin
-            $this->availableOrganisations = Organisation::orderBy('legal_name')->get()->toArray();
+            $this->availableOrganizations = Organization::orderBy('legal_name')->get()->toArray();
 
             // Set current organization from session or default to first
             $currentOrgId = session('current_organization_id');
             if ($currentOrgId) {
-                $this->selectedOrganisationId = $currentOrgId;
-                $this->currentOrganisation = Organisation::find($currentOrgId);
-            } elseif (!empty($this->availableOrganisations)) {
-                $this->selectedOrganisationId = $this->availableOrganisations[0]['id'];
-                $this->currentOrganisation = Organisation::find($this->selectedOrganisationId);
+                $this->selectedOrganizationId = $currentOrgId;
+                $this->currentOrganization = Organization::find($currentOrgId);
+            } elseif (!empty($this->availableOrganizations)) {
+                $this->selectedOrganizationId = $this->availableOrganizations[0]['id'];
+                $this->currentOrganization = Organization::find($this->selectedOrganizationId);
             }
         } else {
             // Regular users use current organization context
-            $this->currentOrganisation = $this->getCurrentUserOrganisation();
-            if ($this->currentOrganisation) {
-                $this->selectedOrganisationId = $this->currentOrganisation->id;
+            $this->currentOrganization = $this->getCurrentUserOrganization();
+            if ($this->currentOrganization) {
+                $this->selectedOrganizationId = $this->currentOrganization->id;
             }
         }
     }
 
-    private function getCurrentUserOrganisation()
+    private function getCurrentUserOrganization()
     {
         // Use the new helper function for better organization detection
         return user_current_organization();
     }
 
-    public function updatedSelectedOrganisationId()
+    public function updatedSelectedOrganizationId()
     {
-        if ($this->selectedOrganisationId) {
-            $this->currentOrganisation = Organisation::find($this->selectedOrganisationId);
+        if ($this->selectedOrganizationId) {
+            $this->currentOrganization = Organization::find($this->selectedOrganizationId);
             $this->setAvailableRolesForOrganization();
             $this->resetImportState();
         }
@@ -122,13 +122,13 @@ class ImportPersons extends Component
 
     private function setAvailableRolesForOrganization()
     {
-        if (!$this->currentOrganisation) {
+        if (!$this->currentOrganization) {
             $this->availableRoles = ['STAFF' => 'Staff Member'];
             return;
         }
 
         // Map organization categories to appropriate role types
-        $this->availableRoles = match($this->currentOrganisation->category) {
+        $this->availableRoles = match($this->currentOrganization->category) {
             'hospital' => [
                 'STAFF' => 'Staff Member',
                 'PATIENT' => 'Patient',
@@ -227,7 +227,7 @@ class ImportPersons extends Component
             $this->importResults = $service->import(
                 $this->importFile->getRealPath(),
                 [
-                    'organization_id' => $this->selectedOrganisationId,
+                    'organization_id' => $this->selectedOrganizationId,
                     'default_role_type' => $this->defaultRoleType,
                     'skip_duplicates' => $this->skipDuplicates,
                     'update_existing' => $this->updateExisting,
@@ -295,13 +295,13 @@ class ImportPersons extends Component
         try {
             // For non-Super Admin users, ensure we use their current organization
             if (!$this->isSuperAdmin) {
-                $this->currentOrganisation = user_current_organization();
-                if ($this->currentOrganisation) {
-                    $this->selectedOrganisationId = $this->currentOrganisation->id;
+                $this->currentOrganization = user_current_organization();
+                if ($this->currentOrganization) {
+                    $this->selectedOrganizationId = $this->currentOrganization->id;
                 }
             }
 
-            if (!$this->currentOrganisation) {
+            if (!$this->currentOrganization) {
                 $message = $this->isSuperAdmin
                     ? 'Please select an organization first.'
                     : 'Unable to determine your current organization. Please contact administrator.';
@@ -312,8 +312,8 @@ class ImportPersons extends Component
             $service = new PersonImportService();
 
             $templatePath = $service->generateExcelTemplateFile(
-                $this->currentOrganisation->category,
-                $this->currentOrganisation->display_name ?? $this->currentOrganisation->legal_name
+                $this->currentOrganization->category,
+                $this->currentOrganization->display_name ?? $this->currentOrganization->legal_name
             );
 
             return response()->download($templatePath)->deleteFileAfterSend(true);

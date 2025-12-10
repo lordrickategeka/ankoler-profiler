@@ -29,7 +29,7 @@ class RunFactories extends Command
 
         // Create Organizations
         $this->info('Creating Organizations...');
-        \App\Models\Organisation::factory()->count(10)->create();
+        \App\Models\Organization::factory()->count(10)->create();
         $this->info('✓ Created 10 organizations');
 
         // Create Users
@@ -58,7 +58,7 @@ class RunFactories extends Command
         $this->table(
             ['Model', 'Count'],
             [
-                ['Organizations', \App\Models\Organisation::count()],
+                ['Organizations', \App\Models\Organization::count()],
                 ['Users', \App\Models\User::count()],
                 ['Persons', \App\Models\Person::count()],
                 ['Phone Numbers', \App\Models\Phone::count()],

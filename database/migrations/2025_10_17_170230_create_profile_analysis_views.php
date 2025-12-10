@@ -34,8 +34,8 @@ return new class extends Migration
                 p.country,
                 p.status as person_status,
                 GROUP_CONCAT(DISTINCT CONCAT(o.legal_name, ' (', pa.role_type, ')') ORDER BY pa.start_date DESC SEPARATOR '; ') as all_roles,
-                COUNT(DISTINCT pa.organisation_id) as organization_count,
-                COUNT(DISTINCT CASE WHEN pa.status = 'active' THEN pa.organisation_id END) as active_organization_count,
+                COUNT(DISTINCT pa.organization_id) as organization_count,
+                COUNT(DISTINCT CASE WHEN pa.status = 'active' THEN pa.organization_id END) as active_organization_count,
                 GROUP_CONCAT(DISTINCT ph.number ORDER BY ph.is_primary DESC SEPARATOR ', ') as phone_numbers,
                 GROUP_CONCAT(DISTINCT ea.email ORDER BY ea.is_primary DESC SEPARATOR ', ') as email_addresses,
                 GROUP_CONCAT(DISTINCT CONCAT(
@@ -51,7 +51,7 @@ return new class extends Migration
                 p.updated_at as person_updated_at
             FROM persons p
             LEFT JOIN person_affiliations pa ON p.id = pa.person_id AND pa.status IN ('active', 'inactive')
-            LEFT JOIN organisations o ON pa.organisation_id = o.id
+            LEFT JOIN Organizations o ON pa.organization_id = o.id
             LEFT JOIN phones ph ON p.id = ph.person_id AND ph.status = 'active'
             LEFT JOIN email_addresses ea ON p.id = ea.person_id AND ea.status = 'active'
             LEFT JOIN person_relationships pr ON (p.id = pr.person_a_id OR p.id = pr.person_b_id) AND pr.status = 'active'
@@ -83,8 +83,8 @@ return new class extends Migration
                 COUNT(DISTINCT cor.person_id) as unique_connected_persons,
                 o.created_at,
                 o.updated_at
-            FROM organisations o
-            LEFT JOIN person_affiliations pa ON o.id = pa.organisation_id
+            FROM Organizations o
+            LEFT JOIN person_affiliations pa ON o.id = pa.organization_id
             LEFT JOIN cross_org_relationships cor ON pa.id = cor.primary_affiliation_id AND cor.status = 'active'
             LEFT JOIN cross_org_relationships cor2 ON pa.id = cor2.secondary_affiliation_id AND cor2.status = 'active'
             LEFT JOIN person_relationships pr ON (pa.person_id = pr.person_a_id OR pa.person_id = pr.person_b_id) AND pr.status = 'active'
@@ -113,7 +113,7 @@ return new class extends Migration
                 pr.status as relationship_status,
                 GROUP_CONCAT(DISTINCT CONCAT(o1.legal_name, ' (', pa1.role_type, ')') SEPARATOR '; ') as person_a_organizations,
                 GROUP_CONCAT(DISTINCT CONCAT(o2.legal_name, ' (', pa2.role_type, ')') SEPARATOR '; ') as person_b_organizations,
-                COUNT(DISTINCT CASE WHEN pa1.organisation_id = pa2.organisation_id THEN pa1.organisation_id END) as shared_organizations,
+                COUNT(DISTINCT CASE WHEN pa1.organization_id = pa2.organization_id THEN pa1.organization_id END) as shared_organizations,
                 CASE
                     WHEN p1.city = p2.city AND p1.district = p2.district THEN 'Same Location'
                     WHEN p1.district = p2.district THEN 'Same District'
@@ -127,8 +127,8 @@ return new class extends Migration
             JOIN persons p2 ON pr.person_b_id = p2.id
             LEFT JOIN person_affiliations pa1 ON p1.id = pa1.person_id AND pa1.status = 'active'
             LEFT JOIN person_affiliations pa2 ON p2.id = pa2.person_id AND pa2.status = 'active'
-            LEFT JOIN organisations o1 ON pa1.organisation_id = o1.id
-            LEFT JOIN organisations o2 ON pa2.organisation_id = o2.id
+            LEFT JOIN Organizations o1 ON pa1.organization_id = o1.id
+            LEFT JOIN Organizations o2 ON pa2.organization_id = o2.id
             WHERE pr.status = 'active'
             GROUP BY pr.id
         ");
@@ -166,8 +166,8 @@ return new class extends Migration
             JOIN persons p ON cor.person_id = p.id
             JOIN person_affiliations pa1 ON cor.primary_affiliation_id = pa1.id
             JOIN person_affiliations pa2 ON cor.secondary_affiliation_id = pa2.id
-            JOIN organisations o1 ON pa1.organisation_id = o1.id
-            JOIN organisations o2 ON pa2.organisation_id = o2.id
+            JOIN Organizations o1 ON pa1.organization_id = o1.id
+            JOIN Organizations o2 ON pa2.organization_id = o2.id
             WHERE cor.status = 'active'
         ");
 
@@ -189,7 +189,7 @@ return new class extends Migration
                 CASE WHEN pa.role_type LIKE '%STAFF%' THEN 1 ELSE 0 END as is_staff_segment,
                 CASE WHEN pa.role_type LIKE '%PATIENT%' THEN 1 ELSE 0 END as is_patient_segment,
                 CASE WHEN pa.role_type LIKE '%MEMBER%' THEN 1 ELSE 0 END as is_member_segment,
-                CASE WHEN COUNT(DISTINCT pa.organisation_id) > 1 THEN 1 ELSE 0 END as is_multi_org,
+                CASE WHEN COUNT(DISTINCT pa.organization_id) > 1 THEN 1 ELSE 0 END as is_multi_org,
                 CASE WHEN COUNT(DISTINCT pa.role_type) > 1 THEN 1 ELSE 0 END as is_multi_role,
                 'email' as preferred_channel,
                 p.updated_at as last_profile_update
@@ -197,7 +197,7 @@ return new class extends Migration
             LEFT JOIN phones ph ON p.id = ph.person_id AND ph.is_primary = 1 AND ph.status = 'active'
             LEFT JOIN email_addresses ea ON p.id = ea.person_id AND ea.is_primary = 1 AND ea.status = 'active'
             LEFT JOIN person_affiliations pa ON p.id = pa.person_id AND pa.status = 'active'
-            LEFT JOIN organisations o ON pa.organisation_id = o.id
+            LEFT JOIN Organizations o ON pa.organization_id = o.id
             LEFT JOIN person_relationships pr ON (p.id = pr.person_a_id OR p.id = pr.person_b_id) AND pr.status = 'active'
             WHERE p.status = 'active'
             GROUP BY p.id

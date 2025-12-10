@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Person;
 use App\Models\PersonAffiliation;
-use App\Models\Organisation;
+use App\Models\Organization;
 use App\Models\Phone;
 use App\Models\EmailAddress;
 use Illuminate\Support\Facades\DB;
@@ -41,7 +41,6 @@ class TestDiscoverySeeder extends Seeder
             DB::commit();
             $this->command->info('Test discovery data created successfully!');
             $this->command->info('Run "php artisan relationships:discover --type=all" to test the algorithms');
-
         } catch (\Exception $e) {
             DB::rollBack();
             $this->command->error('Test data creation failed: ' . $e->getMessage());
@@ -54,58 +53,63 @@ class TestDiscoverySeeder extends Seeder
      */
     private function createAddressBasedTestData(): void
     {
-        $this->command->line('Creating address-based test data...');
+        $org = Organization::where('category', 'school')->first();
+        if (!$org) {
+            throw new \Exception('No organization found for test data');
+        } {
+            $this->command->line('Creating address-based test data...');
 
-        $sharedAddress = '789 Discovery Street';
-        $sharedCity = 'Kampala';
-        $sharedDistrict = 'Kampala';
+            $sharedAddress = '789 Discovery Street';
+            $sharedCity = 'Kampala';
+            $sharedDistrict = 'Kampala';
 
-        // Create a family that should be discovered via address matching
-        $familyMembers = [
-            [
-                'given_name' => 'Michael',
-                'family_name' => 'Ssebunya',
-                'gender' => 'male',
-                'date_of_birth' => now()->subYears(45),
-            ],
-            [
-                'given_name' => 'Christine',
-                'family_name' => 'Ssebunya',
+            // Create a family that should be discovered via address matching
+            $familyMembers = [
+                [
+                    'given_name' => 'Michael',
+                    'family_name' => 'Ssebunya',
+                    'gender' => 'male',
+                    'date_of_birth' => now()->subYears(45),
+                ],
+                [
+                    'given_name' => 'Christine',
+                    'family_name' => 'Ssebunya',
+                    'gender' => 'female',
+                    'date_of_birth' => now()->subYears(42),
+                ],
+                [
+                    'given_name' => 'David',
+                    'family_name' => 'Ssebunya',
+                    'gender' => 'male',
+                    'date_of_birth' => now()->subYears(17),
+                ],
+                [
+                    'given_name' => 'Ruth',
+                    'family_name' => 'Ssebunya',
+                    'gender' => 'female',
+                    'date_of_birth' => now()->subYears(14),
+                ]
+            ];
+
+            foreach ($familyMembers as $memberData) {
+                $this->createTestPerson(array_merge($memberData, [
+                    'address' => $sharedAddress,
+                    'city' => $sharedCity,
+                    'district' => $sharedDistrict
+                ]), $org);
+            }
+
+            // Create unrelated person with same address (should be discovered as dependent/emergency contact)
+            $this->createTestPerson([
+                'given_name' => 'Grace',
+                'family_name' => 'Namukasa',
                 'gender' => 'female',
-                'date_of_birth' => now()->subYears(42),
-            ],
-            [
-                'given_name' => 'David',
-                'family_name' => 'Ssebunya',
-                'gender' => 'male',
-                'date_of_birth' => now()->subYears(17),
-            ],
-            [
-                'given_name' => 'Ruth',
-                'family_name' => 'Ssebunya',
-                'gender' => 'female',
-                'date_of_birth' => now()->subYears(14),
-            ]
-        ];
-
-        foreach ($familyMembers as $memberData) {
-            $this->createTestPerson(array_merge($memberData, [
+                'date_of_birth' => now()->subYears(25),
                 'address' => $sharedAddress,
                 'city' => $sharedCity,
                 'district' => $sharedDistrict
-            ]));
+            ], $org);
         }
-
-        // Create unrelated person with same address (should be discovered as dependent/emergency contact)
-        $this->createTestPerson([
-            'given_name' => 'Grace',
-            'family_name' => 'Namukasa',
-            'gender' => 'female',
-            'date_of_birth' => now()->subYears(25),
-            'address' => $sharedAddress,
-            'city' => $sharedCity,
-            'district' => $sharedDistrict
-        ]);
     }
 
     /**
@@ -119,19 +123,21 @@ class TestDiscoverySeeder extends Seeder
         $sharedEmail = 'family.contact@example.com';
 
         // Create people who share contact information
+        $org = Organization::where('category', 'school')->first();
+        if (!$org) { throw new \Exception('No organization found for test data'); }
         $person1 = $this->createTestPerson([
             'given_name' => 'Andrew',
             'family_name' => 'Kiwanuka',
             'gender' => 'male',
             'date_of_birth' => now()->subYears(35)
-        ]);
+        ], $org);
 
         $person2 = $this->createTestPerson([
             'given_name' => 'Esther',
             'family_name' => 'Namusisi',
             'gender' => 'female',
             'date_of_birth' => now()->subYears(32)
-        ]);
+        ], $org);
 
         // Add shared phone number
         $this->createSharedPhone($person1, $sharedPhone);
@@ -147,6 +153,10 @@ class TestDiscoverySeeder extends Seeder
      */
     private function createNamePatternTestData(): void
     {
+        $org = Organization::where('category', 'school')->first();
+        if (!$org) {
+            throw new \Exception('No organization found for test data');
+        }
         $this->command->line('Creating name pattern test data...');
 
         $familyName = 'Bwambale';
@@ -187,7 +197,7 @@ class TestDiscoverySeeder extends Seeder
             $this->createTestPerson(array_merge($memberData, [
                 'family_name' => $familyName,
                 'district' => 'Kasese'
-            ]));
+            ]), $org);
         }
     }
 
@@ -198,7 +208,7 @@ class TestDiscoverySeeder extends Seeder
     {
         $this->command->line('Creating temporal pattern test data...');
 
-        $school = Organisation::where('category', 'school')->first();
+        $school = Organization::where('category', 'school')->first();
         if (!$school) {
             $this->command->warn('No school found for temporal pattern test');
             return;
@@ -213,33 +223,33 @@ class TestDiscoverySeeder extends Seeder
         ]);
 
         // Create potential child
+        $org = Organization::where('category', 'school')->first();
+        if (!$org) { throw new \Exception('No organization found for test data'); }
+        $parent = $this->createTestPerson([
+            'given_name' => 'Susan',
+            'family_name' => 'Namuli',
+            'gender' => 'female',
+            'date_of_birth' => now()->subYears(38),
+            'address' => '456 Temporal Road',
+            'city' => 'Mbarara',
+            'district' => 'Mbarara'
+        ], $org);
         $child = $this->createTestPerson([
             'given_name' => 'James',
             'family_name' => 'Namuli',
             'gender' => 'male',
-            'date_of_birth' => now()->subYears(16)
-        ]);
-
-        // Create affiliations with dates close together (suggesting parent enrolled child)
-        $parentStartDate = now()->subDays(100);
-        $childStartDate = now()->subDays(95); // 5 days later
-
-        PersonAffiliation::create([
-            'affiliation_id' => 'AFF-TEST-' . Str::random(6),
-            'person_id' => $parent->id,
-            'organisation_id' => $school->id,
-            'role_type' => 'PARENT',
-            'start_date' => $parentStartDate,
-            'status' => 'active',
-            'created_by' => '1'
-        ]);
-
+            'date_of_birth' => now()->subYears(16),
+            'address' => '456 Temporal Road',
+            'city' => 'Mbarara',
+            'district' => 'Mbarara'
+        ], $org);
         PersonAffiliation::create([
             'affiliation_id' => 'AFF-TEST-' . Str::random(6),
             'person_id' => $child->id,
-            'organisation_id' => $school->id,
+            'organization_id' => $school->id,
             'role_type' => 'STUDENT',
-            'start_date' => $childStartDate,
+            // 'start_date' => $childStartDate,
+            'start_date' => now(),
             'status' => 'active',
             'created_by' => '1'
         ]);
@@ -252,9 +262,9 @@ class TestDiscoverySeeder extends Seeder
     {
         $this->command->line('Creating cross-organizational test data...');
 
-        $hospital = Organisation::where('category', 'hospital')->first();
-        $sacco = Organisation::where('category', 'sacco')->first();
-        $school = Organisation::where('category', 'school')->first();
+        $hospital = Organization::where('category', 'hospital')->first();
+        $sacco = Organization::where('category', 'sacco')->first();
+        $school = Organization::where('category', 'school')->first();
 
         if (!$hospital || !$sacco || !$school) {
             $this->command->warn('Need hospital, SACCO, and school for cross-org test');
@@ -267,7 +277,7 @@ class TestDiscoverySeeder extends Seeder
             'family_name' => 'Namukasa',
             'gender' => 'female',
             'date_of_birth' => now()->subYears(40)
-        ]);
+        ], $hospital);
 
         // Create multiple affiliations
         $affiliations = [
@@ -280,7 +290,7 @@ class TestDiscoverySeeder extends Seeder
             PersonAffiliation::create([
                 'affiliation_id' => 'AFF-TEST-' . Str::random(6),
                 'person_id' => $multiRolePerson->id,
-                'organisation_id' => $org->id,
+                'organization_id' => $org->id,
                 'role_type' => $role,
                 'start_date' => now()->subDays(rand(30, 200)),
                 'status' => 'active',
@@ -292,15 +302,18 @@ class TestDiscoverySeeder extends Seeder
     /**
      * Helper method to create a test person
      */
-    private function createTestPerson(array $attributes): Person
+    private function createTestPerson(array $attributes, Organization $organization): Person
     {
+        $user = \App\Models\User::factory()->create();
         $data = array_merge([
             'person_id' => 'TEST-' . str_pad(rand(1000, 9999), 6, '0', STR_PAD_LEFT),
             'global_identifier' => Str::uuid(),
             'classification' => json_encode(['test_discovery']),
             'country' => 'Uganda',
             'status' => 'active',
-            'created_by' => '1'
+            'created_by' => '1',
+            'organization_id' => $organization->id,
+            'user_id' => $user->id
         ], $attributes);
         return Person::create($data);
     }

@@ -20,13 +20,13 @@ class UnitApplicationsSeeder extends Seeder
             foreach ($persons->random(3) as $person) {
                 $roleType = Arr::random(['MEMBER', 'APPLICANT']);
                 $exists = PersonAffiliation::where('person_id', $person->id)
-                    ->where('organisation_id', $unit->organisation_id)
+                    ->where('organization_id', $unit->organization_id)
                     ->where('role_type', $roleType)
                     ->exists();
                 if (!$exists) {
                     PersonAffiliation::create([
                         'person_id' => $person->id,
-                        'organisation_id' => $unit->organisation_id,
+                        'organization_id' => $unit->organization_id,
                         'domain_record_type' => 'unit',
                         'domain_record_id' => $unit->id,
                         'status' => 'inactive',

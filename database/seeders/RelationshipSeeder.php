@@ -7,7 +7,7 @@ use App\Models\Person;
 use App\Models\PersonRelationship;
 use App\Models\CrossOrgRelationship;
 use App\Models\PersonAffiliation;
-use App\Models\Organisation;
+use App\Models\Organization;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -302,7 +302,7 @@ class RelationshipSeeder extends Seeder
         // Get persons with multiple affiliations
         $multiAffiliatedPersons = Person::whereHas('affiliations', function($query) {
             $query->where('status', 'active');
-        }, '>=', 2)->with('affiliations.organisation')->get();
+        }, '>=', 2)->with('affiliations.Organization')->get();
 
         $created = 0;
 
@@ -376,13 +376,13 @@ class RelationshipSeeder extends Seeder
     private function createScenario(string $role1, string $orgType1, string $role2, string $orgType2, int &$created): void
     {
         // Find organizations of the specified types
-        $org1 = Organisation::where('category', $orgType1)->where('is_active', 1)->first();
-        $org2 = Organisation::where('category', $orgType2)->where('is_active', 1)->first();
+        $org1 = Organization::where('category', $orgType1)->where('is_active', 1)->first();
+        $org2 = Organization::where('category', $orgType2)->where('is_active', 1)->first();
 
         if (!$org1 || !$org2) return;
 
         // Get a person with role1 at org1
-        $affiliation1 = PersonAffiliation::where('organisation_id', $org1->id)
+        $affiliation1 = PersonAffiliation::where('organization_id', $org1->id)
             ->where('role_type', $role1)
             ->where('status', 'active')
             ->first();
@@ -391,7 +391,7 @@ class RelationshipSeeder extends Seeder
 
         // Create a second affiliation for the same person at org2
         $existingAffiliation2 = PersonAffiliation::where('person_id', $affiliation1->person_id)
-            ->where('organisation_id', $org2->id)
+            ->where('organization_id', $org2->id)
             ->where('role_type', $role2)
             ->first();
 
@@ -399,7 +399,7 @@ class RelationshipSeeder extends Seeder
             $affiliation2 = PersonAffiliation::create([
                 'affiliation_id' => 'AFF-' . str_pad(PersonAffiliation::max('id') + 1, 6, '0', STR_PAD_LEFT),
                 'person_id' => $affiliation1->person_id,
-                'organisation_id' => $org2->id,
+                'organization_id' => $org2->id,
                 'role_type' => $role2,
                 'start_date' => now()->subMonths(rand(1, 24)),
                 'status' => 'active',

@@ -34,7 +34,7 @@ class NewUnitApplicationSubmitted extends Notification implements ShouldQueue
             'Email: ' . ($person->primaryEmail()->email ?? 'N/A'),
             'Phone: ' . ($person->primaryPhone()->phone ?? 'N/A'),
             'Unit: ' . ($unit->name ?? ''),
-            'Organisation: ' . (optional($unit->organisation)->display_name ?? 'N/A'),
+            'Organization: ' . (optional($unit->Organization)->display_name ?? 'N/A'),
         ];
         return (new MailMessage)
             ->subject('New Unit Membership Application Submitted')

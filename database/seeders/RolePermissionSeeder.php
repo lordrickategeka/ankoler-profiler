@@ -35,20 +35,20 @@ class RolePermissionSeeder extends Seeder
             'view-communications',
             'manage-communications',
 
-            // organisation permissions
-            'view-organisations',
-            'view-organisations-hierarchy',
-            'create-organisations',
-            'edit-organisations',
-            'delete-organisations',
-            'view-own-organisation',
+            // Organization permissions
+            'view-Organizations',
+            'view-Organizations-hierarchy',
+            'create-Organizations',
+            'edit-Organizations',
+            'delete-Organizations',
+            'view-own-Organization',
             'view-sites',
             'create-sites',
             'view-own-sites',
             'view-units',
             'view-own-units',
             'create-units',
-            'view-organisation-units',
+            'view-Organization-units',
 
 
             // Person permissions
@@ -131,6 +131,7 @@ class RolePermissionSeeder extends Seeder
             'manage-roles',
             'manage-access',
             'manage-org-roles',
+            'manage-role-types',
 
             // Settings permissions
             'manage-settings',
@@ -143,8 +144,8 @@ class RolePermissionSeeder extends Seeder
             'view-quality-issues',
 
             'manage-sites',
-            'import-organisations',
-            'export-organisations'
+            'import-Organizations',
+            'export-Organizations'
         ];
 
         foreach ($permissions as $permission) {
@@ -155,12 +156,12 @@ class RolePermissionSeeder extends Seeder
         $superAdmin = Role::firstOrCreate(['name' => 'Super Admin']);
         $superAdmin->syncPermissions(Permission::all());
 
-        $orgAdmin = Role::firstOrCreate(['name' => 'Organisation Admin']);
+        $orgAdmin = Role::firstOrCreate(['name' => 'Organization Admin']);
         $orgAdmin->syncPermissions([
             'view-dashboard',
             'view-org-analytics',
-            'view-own-organisation',
-            'view-organisations-hierarchy',
+            'view-own-Organization',
+            'view-Organizations-hierarchy',
             'view-own-sites',
             'view-own-units',
             'view-org-persons',
@@ -170,6 +171,7 @@ class RolePermissionSeeder extends Seeder
             'view-org-affiliations',
             'create-org-affiliations',
             'manage-org-roles',
+            'manage-role-types',
             'view-phones',
             'view-emails',
             'view-addresses',
@@ -245,7 +247,7 @@ class RolePermissionSeeder extends Seeder
             'edit-persons',
             'Support-persons',
             'view-affiliations',
-            'view-organisation-units',
+            'view-Organization-units',
             // Do NOT include: 'edit-units', 'delete-units', 'move-units'
         ]);
     }

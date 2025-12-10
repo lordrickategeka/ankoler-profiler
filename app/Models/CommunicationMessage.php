@@ -17,7 +17,7 @@ class CommunicationMessage extends Model
         'message_id',
         'provider_message_id',
         'sent_by_user_id',
-        'organisation_id',
+        'organization_id',
         'recipient_person_id',
         'recipient_identifier',
         'recipient_type',
@@ -182,11 +182,11 @@ class CommunicationMessage extends Model
     }
 
     /**
-     * Scope for filtering by organisation
+     * Scope for filtering by Organization
      */
-    public function scopeByOrganisation($query, int $organisationId)
+    public function scopeByOrganization($query, int $OrganizationId)
     {
-        return $query->where('organisation_id', $organisationId);
+        return $query->where('organization_id', $OrganizationId);
     }
 
     /**
@@ -227,9 +227,9 @@ class CommunicationMessage extends Model
         return $this->belongsTo(User::class, 'sent_by_user_id');
     }
 
-    public function organisation(): BelongsTo
+    public function Organization(): BelongsTo
     {
-        return $this->belongsTo(Organisation::class);
+        return $this->belongsTo(Organization::class);
     }
 
     public function recipientPerson(): BelongsTo

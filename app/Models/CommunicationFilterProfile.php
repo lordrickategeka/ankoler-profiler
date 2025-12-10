@@ -11,7 +11,7 @@ class CommunicationFilterProfile extends Model
     use HasFactory;
 
     protected $fillable = [
-        'organisation_id',
+        'organization_id',
         'user_id',
 
         'name',
@@ -41,9 +41,9 @@ class CommunicationFilterProfile extends Model
     /**
      * Relationship to organization
      */
-    public function organisation(): BelongsTo
+    public function Organization(): BelongsTo
     {
-        return $this->belongsTo(Organisation::class);
+        return $this->belongsTo(Organization::class);
     }
 
     /**
@@ -51,7 +51,7 @@ class CommunicationFilterProfile extends Model
      */
     public function getEstimatedPersonCount(): int
     {
-        $filterService = new \App\Services\PersonFilterService($this->organisation);
+        $filterService = new \App\Services\PersonFilterService($this->Organization);
         return $filterService->applyFilters($this->filter_criteria)->count();
     }
 
@@ -60,7 +60,7 @@ class CommunicationFilterProfile extends Model
      */
     public function getFilteredPersons()
     {
-        $filterService = new \App\Services\PersonFilterService($this->organisation);
+        $filterService = new \App\Services\PersonFilterService($this->Organization);
         return $filterService->applyFilters($this->filter_criteria)->get();
     }
 
@@ -84,12 +84,12 @@ class CommunicationFilterProfile extends Model
     /**
      * Scope for user's own profiles or shared profiles in their organization
      */
-    public function scopeAccessibleBy($query, $userId, $organisationId)
+    public function scopeAccessibleBy($query, $userId, $OrganizationId)
     {
-        return $query->where(function ($q) use ($userId, $organisationId) {
+        return $query->where(function ($q) use ($userId, $OrganizationId) {
             $q->where('user_id', $userId)
-              ->orWhere(function ($q2) use ($organisationId) {
-                  $q2->where('organisation_id', $organisationId)
+              ->orWhere(function ($q2) use ($OrganizationId) {
+                  $q2->where('organization_id', $OrganizationId)
                      ->where('is_shared', true);
               });
         });
@@ -101,7 +101,7 @@ class CommunicationFilterProfile extends Model
         return $query->where('user_id', $userId)->where('is_active', true);
     }
 
-    
+
     public function getFilterSummaryAttribute()
     {
         if (empty($this->filter_criteria)) {

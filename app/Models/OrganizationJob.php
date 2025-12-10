@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class OrganisationJob extends Model
+class OrganizationJob extends Model
 {
      use HasFactory;
     protected $fillable = [
@@ -30,7 +30,7 @@ class OrganisationJob extends Model
     // Job belongs to an organization
     public function organization()
     {
-        return $this->belongsTo(Organisation::class);
+        return $this->belongsTo(Organization::class);
     }
 
     // Job belongs to a category

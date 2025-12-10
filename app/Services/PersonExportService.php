@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Organisation;
+use App\Models\Organization;
 use App\Models\Person;
 use App\Exports\PersonsExport;
 use Illuminate\Support\Facades\Storage;
@@ -53,7 +53,7 @@ class PersonExportService
         // Filter by organization if specified
         if ($organizationId) {
             $query->whereHas('affiliations', function($q) use ($organizationId) {
-                $q->where('organisation_id', $organizationId)
+                $q->where('organization_id', $organizationId)
                   ->where('status', 'active');
             });
         }
@@ -67,7 +67,7 @@ class PersonExportService
         $roleDistribution = [];
         if ($organizationId) {
             $roleDistribution = $query->join('person_affiliations', 'persons.id', '=', 'person_affiliations.person_id')
-                ->where('person_affiliations.organisation_id', $organizationId)
+                ->where('person_affiliations.organization_id', $organizationId)
                 ->where('person_affiliations.status', 'active')
                 ->selectRaw('role_type, COUNT(*) as count')
                 ->groupBy('role_type')
@@ -103,7 +103,7 @@ class PersonExportService
             'role_distribution' => $roleDistribution,
             'gender_distribution' => $genderDistribution,
             'age_distribution' => $ageDistribution,
-            'organization' => $organizationId ? Organisation::find($organizationId) : null
+            'organization' => $organizationId ? Organization::find($organizationId) : null
         ];
     }
 
@@ -146,7 +146,7 @@ class PersonExportService
         ];
 
         if ($organizationId) {
-            $organization = Organisation::find($organizationId);
+            $organization = Organization::find($organizationId);
             if ($organization) {
                 $baseFields['domain_records'] = [
                     'label' => ucfirst($organization->category) . '-Specific Data',
@@ -223,7 +223,7 @@ class PersonExportService
     {
         $orgCode = 'ALL';
         if ($organizationId) {
-            $organization = Organisation::find($organizationId);
+            $organization = Organization::find($organizationId);
             $orgCode = $organization ? Str::slug($organization->code ?? $organization->legal_name) : 'ORG';
         }
         
@@ -290,7 +290,7 @@ class PersonExportService
             ];
         }
 
-        $organization = Organisation::find($organizationId);
+        $organization = Organization::find($organizationId);
         if (!$organization) {
             return [];
         }

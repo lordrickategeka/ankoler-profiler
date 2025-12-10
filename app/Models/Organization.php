@@ -9,19 +9,19 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
 
-class Organisation extends Model
+class Organization extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'organisations';
+    protected $table = 'Organizations';
 
     protected $fillable = [
         // Basic Information
         'legal_name',
         'display_name',
         'code',
-        'organisation_type',
-        'parent_organisation_id',
+        'Organization_type',
+        'parent_organization_id',
         'registration_number',
         'tax_identification_number',
         'country_of_registration',
@@ -146,27 +146,27 @@ class Organisation extends Model
     // Relationships
 
     /**
-     * Parent organisation relationship
+     * Parent Organization relationship
      */
-    public function parentorganisation(): BelongsTo
+    public function parentOrganization(): BelongsTo
     {
-        return $this->belongsTo(Organisation::class, 'parent_organisation_id');
+        return $this->belongsTo(Organization::class, 'parent_organization_id');
     }
 
     /**
-     * Child organisations relationship
+     * Child Organizations relationship
      */
-    public function childorganisations(): HasMany
+    public function childOrganizations(): HasMany
     {
-        return $this->hasMany(Organisation::class, 'parent_organisation_id');
+        return $this->hasMany(Organization::class, 'parent_organization_id');
     }
 
     /**
-     * organisation sites relationship
+     * Organization sites relationship
      */
     public function sites(): HasMany
     {
-        return $this->hasMany(OrganisationSite::class);
+        return $this->hasMany(OrganizationSite::class);
     }
 
     /**
@@ -179,12 +179,12 @@ class Organisation extends Model
 
     public function affiliations()
     {
-        return $this->hasMany(\App\Models\PersonAffiliation::class, 'organisation_id');
+        return $this->hasMany(\App\Models\PersonAffiliation::class, 'organization_id');
     }
 
 
     /**
-     * User who verified this organisation
+     * User who verified this Organization
      */
     public function verifiedBy(): BelongsTo
     {
@@ -192,7 +192,7 @@ class Organisation extends Model
     }
 
     /**
-     * Filter configurations for this organisation
+     * Filter configurations for this Organization
      */
     public function filterConfigurations(): HasMany
     {
@@ -234,7 +234,7 @@ class Organisation extends Model
     }
 
     /**
-     * Check if organisation is verified
+     * Check if Organization is verified
      */
     public function getIsVerifiedAttribute(): bool
     {
@@ -292,7 +292,7 @@ class Organisation extends Model
     }
 
     /**
-     * Scope to get active organisations
+     * Scope to get active Organizations
      */
     public function scopeActive($query)
     {
@@ -300,7 +300,7 @@ class Organisation extends Model
     }
 
     /**
-     * Scope to get verified organisations
+     * Scope to get verified Organizations
      */
     public function scopeVerified($query)
     {
@@ -308,7 +308,7 @@ class Organisation extends Model
     }
 
     /**
-     * Scope to get organisations with expiring licenses
+     * Scope to get Organizations with expiring licenses
      */
     public function scopeLicenseExpiringIn($query, int $days = 30)
     {
@@ -320,7 +320,7 @@ class Organisation extends Model
     }
 
     /**
-     * Scope to get organisations by country
+     * Scope to get Organizations by country
      */
     public function scopeByCountry($query, string $country)
     {
@@ -328,7 +328,7 @@ class Organisation extends Model
     }
 
     /**
-     * Scope to search organisations
+     * Scope to search Organizations
      */
     public function scopeSearch($query, string $search)
     {
@@ -346,7 +346,7 @@ class Organisation extends Model
     // Helper Methods
 
     /**
-     * Get category-specific details based on organisation category
+     * Get category-specific details based on Organization category
      */
     public function getCategoryDetails(): ?array
     {
@@ -376,7 +376,7 @@ class Organisation extends Model
     }
 
     /**
-     * Get organisation type badge color
+     * Get Organization type badge color
      */
     public function getTypeColorAttribute(): string
     {
@@ -393,7 +393,7 @@ class Organisation extends Model
     }
 
     /**
-     * Get organisation category display name
+     * Get Organization category display name
      */
     public function getCategoryDisplayAttribute(): string
     {
@@ -401,7 +401,7 @@ class Organisation extends Model
             'hospital' => 'Hospital/Health Facility',
             'school' => 'School/Educational Institution',
             'sacco' => 'SACCO/Financial Cooperative',
-            'parish' => 'Parish/Religious organisation',
+            'parish' => 'Parish/Religious Organization',
             'corporate' => 'Corporate/Business',
             'government' => 'Government Agency',
             'ngo' => 'NGO/Non-Profit',
@@ -410,7 +410,7 @@ class Organisation extends Model
     }
 
     /**
-     * Check if organisation has specific feature/service
+     * Check if Organization has specific feature/service
      */
     public function hasFeature(string $feature): bool
     {

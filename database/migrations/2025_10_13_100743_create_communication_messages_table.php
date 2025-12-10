@@ -18,7 +18,7 @@ return new class extends Migration
 
             // Sender information
             $table->foreignId('sent_by_user_id')->nullable()->constrained('users')->onDelete('set null');
-            $table->foreignId('organisation_id')->constrained('organisations')->onDelete('cascade');
+            $table->foreignId('organization_id')->constrained('organizations')->onDelete('cascade');
 
             // Recipient information
             $table->foreignId('recipient_person_id')->nullable()->constrained('persons')->onDelete('set null');
@@ -62,7 +62,7 @@ return new class extends Migration
             // Indexes
             $table->index(['channel', 'status']);
             $table->index(['recipient_person_id']);
-            $table->index(['organisation_id']);
+            $table->index(['organization_id']);
             $table->index(['sent_by_user_id']);
             $table->index(['bulk_message_id']);
             $table->index(['scheduled_at']);

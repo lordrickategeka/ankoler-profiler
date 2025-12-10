@@ -87,7 +87,7 @@ class RelationshipGrid extends Component
 
         // Fetch the related persons with their details
         $relatedPersons = Person::whereIn('id', $relatedPersonIds)
-            ->with(['phones', 'emailAddresses', 'affiliations.organisation'])
+            ->with(['phones', 'emailAddresses', 'affiliations.Organization'])
             ->get();
 
         // Attach relationship context to each person

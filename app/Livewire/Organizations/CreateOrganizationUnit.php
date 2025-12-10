@@ -18,7 +18,7 @@ class CreateOrganizationUnit extends Component
     public $code = '';
     public $description = '';
     public $parent_unit_id = null;
-    public $organisation_id = null;
+    public $organization_id = null;
     public $unit_type = '';
     public $department = '';
     public $community = '';
@@ -84,7 +84,7 @@ class CreateOrganizationUnit extends Component
         if ($user && method_exists($user, 'can') && $user->can('assign-organization-unit')) {
             $this->orgOptions = method_exists($user, 'accessibleOrganizations') ? $user->accessibleOrganizations() : [];
         } else {
-            $this->organisation_id = $user && property_exists($user, 'organisation_id') ? $user->organisation_id : null;
+            $this->organization_id = $user && property_exists($user, 'organization_id') ? $user->organization_id : null;
         }
     }
 
@@ -127,7 +127,7 @@ class CreateOrganizationUnit extends Component
         return view('livewire.organizations.create-organization-unit', [
             'units' => $units,
             'orgOptions' => $this->orgOptions,
-            'organisation_id' => $this->organisation_id,
+            'organization_id' => $this->organization_id,
             'currentStep' => $this->currentStep,
             'totalSteps' => $this->totalSteps,
         ]);

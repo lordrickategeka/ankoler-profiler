@@ -9,7 +9,7 @@ return new class extends Migration {
     {
         Schema::create('organization_units', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('organisation_id');
+            $table->unsignedBigInteger('organization_id');
             $table->string('name');
             $table->string('code')->unique();
             $table->text('description')->nullable();
@@ -74,7 +74,7 @@ return new class extends Migration {
 
             $table->timestamps();
 
-            $table->foreign('organisation_id')->references('id')->on('organisations')->onDelete('cascade');
+            $table->foreign('organization_id')->references('id')->on('Organizations')->onDelete('cascade');
             $table->foreign('parent_unit_id')->references('id')->on('organization_units')->onDelete('set null');
             $table->foreign('unit_head')->references('id')->on('persons')->onDelete('set null');
             $table->foreign('assistant_leader')->references('id')->on('persons')->onDelete('set null');

@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
     //     $this->call([
     //         RolePermissionSeeder::class,
     //         UserSeeder::class,
-    //         OrganisationSeeder::class,
+    //         OrganizationSeeder::class,
     //         PersonTestDataSeeder::class,
     //         PersonSeeder::class,
     //         RolePermissionSeeder::class,
@@ -42,8 +42,8 @@ class DatabaseSeeder extends Seeder
                 UserSeeder::class,
 
                 // Organization structure
-                OrganisationSeeder::class,
-                // OrganisationSiteSeeder::class,
+                OrganizationSeeder::class,
+                // OrganizationSiteSeeder::class,
 
                 // Person data
                 PersonSeeder::class,
@@ -91,7 +91,7 @@ class DatabaseSeeder extends Seeder
         $this->command->info('=== SEEDING SUMMARY ===');
 
         // Organizations
-        $orgCount = DB::table('organisations')->count();
+        $orgCount = DB::table('Organizations')->count();
         $this->command->line("Organizations: {$orgCount}");
 
         // Persons

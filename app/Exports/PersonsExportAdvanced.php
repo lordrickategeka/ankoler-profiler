@@ -53,7 +53,7 @@ class PersonsExportAdvanced implements FromCollection, WithHeadings, WithMapping
             'City',
             'District',
             'Country',
-            'Organisations',
+            'Organizations',
             'Status',
             'Created Date',
             'Updated Date',
@@ -82,7 +82,7 @@ class PersonsExportAdvanced implements FromCollection, WithHeadings, WithMapping
             $person->city,
             $person->district,
             $person->country,
-            $this->getOrganisationsString($person),
+            $this->getOrganizationsString($person),
             ucfirst($person->status),
             $person->created_at->format('Y-m-d H:i:s'),
             $person->updated_at->format('Y-m-d H:i:s'),
@@ -140,7 +140,7 @@ class PersonsExportAdvanced implements FromCollection, WithHeadings, WithMapping
             'N' => 15, // City
             'O' => 15, // District
             'P' => 15, // Country
-            'Q' => 30, // Organisations
+            'Q' => 30, // Organizations
             'R' => 10, // Status
             'S' => 18, // Created Date
             'T' => 18, // Updated Date
@@ -188,30 +188,30 @@ class PersonsExportAdvanced implements FromCollection, WithHeadings, WithMapping
                 $sheet->getStyle('H:H')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // Gender
                 $sheet->getStyle('R:R')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // Status
                 
-                // Wrap text for address and organisations columns
+                // Wrap text for address and Organizations columns
                 $sheet->getStyle('M:M')->getAlignment()->setWrapText(true); // Address
-                $sheet->getStyle('Q:Q')->getAlignment()->setWrapText(true); // Organisations
+                $sheet->getStyle('Q:Q')->getAlignment()->setWrapText(true); // Organizations
             },
         ];
     }
 
     /**
-     * Get organisations string for a person
+     * Get Organizations string for a person
      */
-    private function getOrganisationsString($person): string
+    private function getOrganizationsString($person): string
     {
-        if (!$person->organisations || $person->organisations->isEmpty()) {
+        if (!$person->Organizations || $person->Organizations->isEmpty()) {
             return '';
         }
 
         $orgStrings = [];
-        foreach ($person->organisations as $organisation) {
-            $orgString = $organisation->name;
+        foreach ($person->Organizations as $Organization) {
+            $orgString = $Organization->name;
             
-            if ($organisation->pivot->role_title) {
-                $orgString .= ' (' . $organisation->pivot->role_title . ')';
-            } elseif ($organisation->pivot->role_type) {
-                $orgString .= ' (' . ucfirst($organisation->pivot->role_type) . ')';
+            if ($Organization->pivot->role_title) {
+                $orgString .= ' (' . $Organization->pivot->role_title . ')';
+            } elseif ($Organization->pivot->role_type) {
+                $orgString .= ' (' . ucfirst($Organization->pivot->role_type) . ')';
             }
             
             $orgStrings[] = $orgString;

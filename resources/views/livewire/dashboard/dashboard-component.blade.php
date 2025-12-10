@@ -1,5 +1,5 @@
 <div class="p-8" style="background-color: #eeeff2;">
-    @role('Person')
+    @role(['Person', 'Organization Admin'])
     {{-- Person Dashboard: Quick Actions --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8 max-w-7xl mx-auto">
         <!-- Profile Card -->

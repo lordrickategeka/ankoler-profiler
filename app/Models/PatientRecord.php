@@ -40,7 +40,7 @@ class PatientRecord extends Model
 
     public function primaryCareUnit()
     {
-        return $this->belongsTo(Organisation::class, 'primary_care_unit_id');
+        return $this->belongsTo(Organization::class, 'primary_care_unit_id');
     }
 
     public function person()

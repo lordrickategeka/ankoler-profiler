@@ -123,8 +123,8 @@ class VerifyRelationships extends Command
             ->where('impact_score', '>=', $minConfidence)
             ->with([
                 'person',
-                'primaryAffiliation.organisation',
-                'secondaryAffiliation.organisation'
+                'primaryAffiliation.Organization',
+                'secondaryAffiliation.Organization'
             ])
             ->orderByDesc('impact_score')
             ->get();
@@ -208,8 +208,8 @@ class VerifyRelationships extends Command
         $this->line('=== CROSS-ORG RELATIONSHIP REVIEW ===');
 
         $person = $relationship->person;
-        $primaryOrg = $relationship->primaryAffiliation->organisation;
-        $secondaryOrg = $relationship->secondaryAffiliation->organisation;
+        $primaryOrg = $relationship->primaryAffiliation->Organization;
+        $secondaryOrg = $relationship->secondaryAffiliation->Organization;
 
         $this->info("Person: {$person->given_name} {$person->family_name}");
         $this->newLine();

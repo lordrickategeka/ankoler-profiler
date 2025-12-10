@@ -2,7 +2,7 @@
     <form wire:submit.prevent="import">
         <input type="file" wire:model="file" accept=".csv,.xlsx">
         @error('file') <span class="error">{{ $message }}</span> @enderror
-        <button type="submit" class="btn btn-primary mt-2">Import Organisations</button>
+        <button type="submit" class="btn btn-primary mt-2">Import Organizations</button>
     </form>
     <a href="{{ route('organizations.template') }}" class="btn btn-outline btn-secondary mt-2" target="_blank">
         Download Default Template

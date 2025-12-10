@@ -28,7 +28,7 @@ class ProfiledNotification extends Notification
     {
         $mail = (new MailMessage)
             ->subject('You are now enrolled on the platform')
-            ->line('Your profile has been created by your organisation.');
+            ->line('Your profile has been created by your Organization.');
 
         if ($this->temporaryPassword) {
             $mail->line('Your temporary password for signing in is: **' . $this->temporaryPassword . '**')

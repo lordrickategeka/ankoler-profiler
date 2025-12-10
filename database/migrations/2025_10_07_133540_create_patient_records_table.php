@@ -36,7 +36,7 @@ return new class extends Migration
 
             $table->foreign('primary_care_unit_id')
                   ->references('id')
-                  ->on('organisations')
+                  ->on('Organizations')
                   ->onDelete('set null');
 
             $table->index('patient_number');

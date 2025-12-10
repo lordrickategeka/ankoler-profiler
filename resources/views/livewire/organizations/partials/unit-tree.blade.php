@@ -5,7 +5,7 @@
                 <button class="font-semibold text-base text-blue-700 hover:underline focus:outline-none" style="background: none; border: none; padding: 0;" wire:click="selectUnit({{ $unit->id }})">
                     {{ $unit->name }}
                 </button>
-                <div class="text-xs text-gray-500">Organisation: <span class="font-semibold text-gray-800">{{ optional($unit->organisation)->name ?? (optional(\App\Models\Organisation::find($unit->organisation_id))->name ?? 'N/A') }}</span></div>
+                <div class="text-xs text-gray-500">Organization: <span class="font-semibold text-gray-800">{{ optional($unit->Organization)->name ?? (optional(\App\Models\Organization::find($unit->organization_id))->name ?? 'N/A') }}</span></div>
                 <div class="text-xs text-gray-600">Code: {{ $unit->code }}</div>
                 <div class="text-xs text-gray-600">Description: {{ $unit->description }}</div>
                 <div class="flex flex-wrap gap-2 mt-1">

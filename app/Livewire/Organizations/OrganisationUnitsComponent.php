@@ -5,7 +5,7 @@ namespace App\Livewire\Organizations;
 use Livewire\Component;
 use App\Models\OrganizationUnit;
 
-class OrganisationUnitsComponent extends Component
+class OrganizationUnitsComponent extends Component
 {
     public $organizationUnits;
 
@@ -36,7 +36,7 @@ class OrganisationUnitsComponent extends Component
 
     public function render()
     {
-        return view('livewire.organizations.organisation-units-component', [
+        return view('livewire.organizations.Organization-units-component', [
             'organizationUnits' => $this->organizationUnits,
         ]);
     }
@@ -117,7 +117,7 @@ class OrganisationUnitsComponent extends Component
             'description' => $this->createForm['description'],
             'parent_unit_id' => $this->createForm['parent_unit_id'],
             'is_active' => $this->createForm['is_active'],
-            'organisation_id' => auth()->user()->organisation_id ?? null,
+            'organization_id' => auth()->user()->organization_id ?? null,
         ]);
 
         $this->showCreateForm = false;

@@ -9,14 +9,14 @@ class CustomFieldValue extends Model
     protected $table = 'custom_field_values';
 
     protected $fillable = [
-        'organisation_id',
+        'organization_id',
         'custom_field_id',
         'value',
     ];
 
-    public function organisation()
+    public function Organization()
     {
-        return $this->belongsTo(Organisation::class);
+        return $this->belongsTo(Organization::class);
     }
 
     public function customField()

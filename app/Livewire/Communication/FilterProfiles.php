@@ -9,7 +9,7 @@ use App\Models\Person;
 use App\Services\PersonFilterService;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\OrganizationHelperNew as OrganizationHelper;
-use App\Models\Organisation;
+use App\Models\Organization;
 use App\Traits\HandlesSweetAlerts;
 use Illuminate\Support\Facades\Log;
 
@@ -80,7 +80,7 @@ class FilterProfiles extends Component
     {
         $user = Auth::user();
         if ($user && $user->hasRole('Super Admin')) {
-            $this->availableOrganizations = Organisation::select('id', 'display_name')
+            $this->availableOrganizations = Organization::select('id', 'display_name')
                 ->orderBy('display_name')
                 ->get()
                 ->toArray();
@@ -95,7 +95,7 @@ class FilterProfiles extends Component
         $this->selectedOrganizationId = OrganizationHelper::getCurrentOrganization()?->id;
 
         if (Auth::user()->hasRole('Super Admin')) {
-            $this->availableOrganizations = Organisation::select('id', 'display_name')
+            $this->availableOrganizations = Organization::select('id', 'display_name')
                 ->where('is_active', 1)->orderBy('display_name')->get()->toArray();
         }
     }
@@ -118,7 +118,7 @@ class FilterProfiles extends Component
             }
 
             $profiles = CommunicationFilterProfile::accessibleBy(Auth::id(), $organization->id)
-                ->with(['user', 'organisation'])
+                ->with(['user', 'Organization'])
                 ->orderBy('last_used_at', 'desc')
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
@@ -268,7 +268,7 @@ class FilterProfiles extends Component
             'name' => $this->name,
             'description' => $this->description,
             'user_id' => Auth::id(),
-            'organisation_id' => $organization->id,
+            'organization_id' => $organization->id,
             'filter_criteria' => $this->filter_criteria,
             'is_shared' => $this->is_shared,
             'is_active' => true
@@ -304,7 +304,7 @@ class FilterProfiles extends Component
             'name' => $this->name,
             'description' => $this->description,
             'user_id' => Auth::id(),
-            'organisation_id' => $organization->id,
+            'organization_id' => $organization->id,
             'filter_criteria' => $this->filter_criteria,
             'is_shared' => $this->is_shared,
             'is_active' => true
@@ -391,7 +391,7 @@ class FilterProfiles extends Component
         } else {
             $orgId = $this->selectedOrganizationId ?: OrganizationHelper::getCurrentOrganization()?->id;
             $baseQuery = Person::whereHas('affiliations', function ($q) use ($orgId) {
-                $q->where('organisation_id', $orgId);
+                $q->where('organization_id', $orgId);
             });
         }
 
@@ -451,7 +451,7 @@ class FilterProfiles extends Component
 
         // For now, allow org admins to manage shared profiles in their organization
         // We can enhance permissions later
-        if ($profile->is_shared && $profile->organisation_id === $user->organisation_id) {
+        if ($profile->is_shared && $profile->organization_id === $user->organization_id) {
             return true;
         }
 
@@ -465,11 +465,11 @@ class FilterProfiles extends Component
         if ($this->considerAllOrganizations && Auth::user()->hasRole('Super Admin')) {
             $baseQuery = Person::query();
         } else {
-            $org = $organization ?: Organisation::find($this->selectedOrganizationId);
+            $org = $organization ?: Organization::find($this->selectedOrganizationId);
             if (!$org) return $this->getEmptyFieldOptions();
 
             $baseQuery = Person::whereHas('affiliations', function ($q) use ($org) {
-                $q->where('organisation_id', $org->id);
+                $q->where('organization_id', $org->id);
             });
         }
 

@@ -5,7 +5,7 @@ namespace App\Livewire\Person;
 use Livewire\Component;
 use App\Services\PersonDeduplicationService;
 use App\Models\Person;
-use App\Models\Organisation;
+use App\Models\Organization;
 use App\Models\PersonAffiliation;
 use App\Models\Phone;
 use App\Models\EmailAddress;
@@ -90,21 +90,21 @@ class CreatePerson extends Component
     public $duplicateAction = null; // 'link', 'create_new', 'view_profile'
 
     // Organization context
-    public $currentOrganisation = null;
+    public $currentOrganization = null;
     public $availableRoles = [];
     public $currentAffiliationRoles = []; // Roles for current affiliation organization
 
     // Super Admin organization selection
     public $isSuperAdmin = false;
-    public $selectedOrganisationId = null;
-    public $availableOrganisations = [];
+    public $selectedOrganizationId = null;
+    public $availableOrganizations = [];
     public $isOrganizationLocked = false;
-    public $selectedOrganisationName = '';
+    public $selectedOrganizationName = '';
 
     // Multiple Affiliations Management
     public $affiliations = [];
     public $currentAffiliation = [
-        'organisation_id' => '',
+        'organization_id' => '',
         'role_type' => 'STAFF',
         'role_title' => '',
         'site' => '',
@@ -361,28 +361,28 @@ class CreatePerson extends Component
         $this->isSuperAdmin = false;
         if ($user) {
             // Check if user has all organizational persons permission (Super Admin level)
-            $this->isSuperAdmin = $user->can('can_view_all_organisational_persons');
+            $this->isSuperAdmin = $user->can('can_view_all_Organizational_persons');
         }
 
         if ($this->isSuperAdmin) {
             // Super Admin can select any organization
-            $this->loadAvailableOrganisations();
+            $this->loadAvailableOrganizations();
             // Set default to current session organization or first available
-            $this->selectedOrganisationId = session('current_organization_id') ?? (count($this->availableOrganisations) > 0 ? $this->availableOrganisations[0]['id'] : null);
+            $this->selectedOrganizationId = session('current_organization_id') ?? (count($this->availableOrganizations) > 0 ? $this->availableOrganizations[0]['id'] : null);
         } else {
             // For non-Super Admin users, automatically set their current organization
             $currentOrganization = user_current_organization();
             if ($currentOrganization) {
-                $this->selectedOrganisationId = $currentOrganization->id;
+                $this->selectedOrganizationId = $currentOrganization->id;
                         // Assign 'Person' role
                         $user->assignRole('Person');
-                $this->selectedOrganisationName = $currentOrganization->display_name ?? $currentOrganization->legal_name;
+                $this->selectedOrganizationName = $currentOrganization->display_name ?? $currentOrganization->legal_name;
                 $this->isOrganizationLocked = true;
             }
         }
 
         // Set current organization from user context
-        $this->currentOrganisation = $this->getCurrentUserOrganisation();
+        $this->currentOrganization = $this->getCurrentUserOrganization();
 
         // Set available roles based on organization category
         $this->setAvailableRolesForOrganization();
@@ -394,13 +394,13 @@ class CreatePerson extends Component
         $this->initializeAffiliations();
 
         // For non-Super Admin users, automatically add their organization affiliation
-        if (!$this->isSuperAdmin && $this->selectedOrganisationId) {
+        if (!$this->isSuperAdmin && $this->selectedOrganizationId) {
             $currentOrganization = user_current_organization();
             if ($currentOrganization) {
                 $defaultRoleType = $this->getDefaultRoleTypeForOrganization($currentOrganization);
 
                 $this->currentAffiliation = [
-                    'organisation_id' => $this->selectedOrganisationId,
+                    'organization_id' => $this->selectedOrganizationId,
                     'role_type' => $defaultRoleType,
                     'role_title' => $this->getDefaultRoleTitleForType($defaultRoleType),
                     'site' => '',
@@ -411,7 +411,7 @@ class CreatePerson extends Component
         }
 
         // Initialize current affiliation roles
-        $this->currentAffiliationRoles = $this->getAvailableRolesForOrganization($this->currentAffiliation['organisation_id'] ?? null);
+        $this->currentAffiliationRoles = $this->getAvailableRolesForOrganization($this->currentAffiliation['organization_id'] ?? null);
     }
 
     /**
@@ -446,7 +446,7 @@ class CreatePerson extends Component
     /**
      * Update available roles when organization changes in current affiliation
      */
-    public function updatedCurrentAffiliationOrganisationId($organizationId)
+    public function updatedCurrentAffiliationOrganizationId($organizationId)
     {
         $this->currentAffiliationRoles = $this->getAvailableRolesForOrganization($organizationId);
 
@@ -458,7 +458,7 @@ class CreatePerson extends Component
 
         // Set default role type if none selected
         if (!$this->currentAffiliation['role_type'] && !empty($this->currentAffiliationRoles)) {
-            $organization = Organisation::find($organizationId);
+            $organization = Organization::find($organizationId);
             if ($organization) {
                 $defaultRoleType = $this->getDefaultRoleTypeForOrganization($organization);
                 if (array_key_exists($defaultRoleType, $this->currentAffiliationRoles)) {
@@ -476,11 +476,11 @@ class CreatePerson extends Component
     {
         // Initialize current affiliation with default organization
         $defaultOrgId = $this->isSuperAdmin
-            ? $this->selectedOrganisationId
-            : ($this->currentOrganisation ? $this->currentOrganisation->id : null);
+            ? $this->selectedOrganizationId
+            : ($this->currentOrganization ? $this->currentOrganization->id : null);
 
         $this->currentAffiliation = [
-            'organisation_id' => $defaultOrgId,
+            'organization_id' => $defaultOrgId,
             'role_type' => 'STAFF',
             'role_title' => '',
             'site' => '',
@@ -560,7 +560,7 @@ class CreatePerson extends Component
             ];
         }
 
-        $organization = Organisation::find($organizationId);
+        $organization = Organization::find($organizationId);
         if (!$organization) {
             return [
                 'STAFF' => 'Staff Member',
@@ -654,7 +654,7 @@ class CreatePerson extends Component
      */
     private function setAvailableRolesForOrganization()
     {
-        if (!$this->currentOrganisation) {
+        if (!$this->currentOrganization) {
             // Default roles if no organization context
             $this->availableRoles = [
                 'STAFF' => 'Staff Member',
@@ -665,7 +665,7 @@ class CreatePerson extends Component
         }
 
         // Super organizations can see all available role types
-        if ($this->currentOrganisation->is_super) {
+        if ($this->currentOrganization->is_super) {
             $this->availableRoles = [
                 'STAFF' => 'Staff Member',
                 'STUDENT' => 'Student',
@@ -684,7 +684,7 @@ class CreatePerson extends Component
         }
 
         // Map organization categories to appropriate role types
-        $this->availableRoles = match($this->currentOrganisation->category) {
+        $this->availableRoles = match($this->currentOrganization->category) {
             'hospital' => [
                 'STAFF' => 'Staff Member',
                 'PATIENT' => 'Patient',
@@ -751,7 +751,7 @@ class CreatePerson extends Component
      */
     public function refreshOrganizationContext()
     {
-        $this->currentOrganisation = $this->getCurrentUserOrganisation();
+        $this->currentOrganization = $this->getCurrentUserOrganization();
         $this->setAvailableRolesForOrganization();
 
         // Reset role selection if current selection is no longer available
@@ -763,18 +763,18 @@ class CreatePerson extends Component
     /**
      * Load available organizations for Super Admin
      */
-    private function loadAvailableOrganisations()
+    private function loadAvailableOrganizations()
     {
-        $this->availableOrganisations = Organisation::orderBy('legal_name')->get()->toArray();
+        $this->availableOrganizations = Organization::orderBy('legal_name')->get()->toArray();
     }
 
     /**
      * Handle organization selection change for Super Admin
      */
-    public function updatedSelectedOrganisationId()
+    public function updatedSelectedOrganizationId()
     {
-        if ($this->isSuperAdmin && $this->selectedOrganisationId) {
-            $this->currentOrganisation = Organisation::find($this->selectedOrganisationId);
+        if ($this->isSuperAdmin && $this->selectedOrganizationId) {
+            $this->currentOrganization = Organization::find($this->selectedOrganizationId);
             $this->setAvailableRolesForOrganization();
 
             // Reset role selection when organization changes
@@ -1056,7 +1056,7 @@ class CreatePerson extends Component
                 'email' => $this->form['email'],
                 'password' => bcrypt($temporaryPassword),
                 'person_id' => $person->id,
-                'organisation_id' => $this->affiliations[0]['organisation_id'] ?? null,
+                'organization_id' => $this->affiliations[0]['organization_id'] ?? null,
             ]);
 
             // Assign 'Person' role to the user
@@ -1079,20 +1079,20 @@ class CreatePerson extends Component
             // Get first organization name for success message
             $firstOrgName = 'Unknown Organization';
             if (!empty($this->affiliations)) {
-                $firstOrgId = $this->affiliations[0]['organisation_id'];
+                $firstOrgId = $this->affiliations[0]['organization_id'];
                 Log::info('CreatePerson: Looking up organization for success message', [
-                    'organisation_id' => $firstOrgId
+                    'organization_id' => $firstOrgId
                 ]);
-                $firstOrg = Organisation::find($firstOrgId);
+                $firstOrg = Organization::find($firstOrgId);
                 if ($firstOrg) {
                     $firstOrgName = $firstOrg->display_name ?? $firstOrg->legal_name ?? $firstOrg->name ?? 'Unnamed Organization';
                     Log::info('CreatePerson: Found organization', [
-                        'organisation_id' => $firstOrgId,
-                        'organisation_name' => $firstOrgName
+                        'organization_id' => $firstOrgId,
+                        'Organization_name' => $firstOrgName
                     ]);
                 } else {
                     Log::warning('CreatePerson: Organization not found', [
-                        'organisation_id' => $firstOrgId
+                        'organization_id' => $firstOrgId
                     ]);
                 }
             }
@@ -1125,17 +1125,17 @@ class CreatePerson extends Component
 
         // Check for existing affiliations to prevent duplicates
         foreach ($this->affiliations as $affiliation) {
-            if ($existingPerson->hasAffiliationWith($affiliation['organisation_id'], $affiliation['role_type'])) {
-                $org = Organisation::find($affiliation['organisation_id']);
+            if ($existingPerson->hasAffiliationWith($affiliation['organization_id'], $affiliation['role_type'])) {
+                $org = Organization::find($affiliation['organization_id']);
                 $orgName = 'Unknown Organization';
                 if ($org) {
                     $orgName = $org->display_name ?? $org->legal_name ?? $org->name ?? 'Unnamed Organization';
                 }
                 Log::warning('CreatePerson: Duplicate affiliation detected for existing person', [
                     'person_id' => $existingPerson->id,
-                    'organisation_id' => $affiliation['organisation_id'],
+                    'organization_id' => $affiliation['organization_id'],
                     'role_type' => $affiliation['role_type'],
-                    'organisation_name' => $orgName
+                    'Organization_name' => $orgName
                 ]);
                 throw new \Exception("This person is already affiliated with {$orgName} as {$affiliation['role_type']}.");
             }
@@ -1155,21 +1155,21 @@ class CreatePerson extends Component
         // Get first organization name for success message
         $firstOrgName = 'Unknown Organization';
         if (!empty($this->affiliations)) {
-            $firstOrgId = $this->affiliations[0]['organisation_id'];
+            $firstOrgId = $this->affiliations[0]['organization_id'];
             Log::info('CreatePerson: Looking up organization for existing person success message', [
                 'person_id' => $existingPerson->id,
-                'organisation_id' => $firstOrgId
+                'organization_id' => $firstOrgId
             ]);
-            $firstOrg = Organisation::find($firstOrgId);
+            $firstOrg = Organization::find($firstOrgId);
             if ($firstOrg) {
                 $firstOrgName = $firstOrg->display_name ?? $firstOrg->legal_name ?? $firstOrg->name ?? 'Unnamed Organization';
                 Log::info('CreatePerson: Found organization for existing person', [
-                    'organisation_id' => $firstOrgId,
-                    'organisation_name' => $firstOrgName
+                    'organization_id' => $firstOrgId,
+                    'Organization_name' => $firstOrgName
                 ]);
             } else {
                 Log::warning('CreatePerson: Organization not found for existing person', [
-                    'organisation_id' => $firstOrgId
+                    'organization_id' => $firstOrgId
                 ]);
             }
         }
@@ -1213,15 +1213,15 @@ class CreatePerson extends Component
         }
 
         // Create national ID
-        if (!empty($this->form['national_id'])) {
-            PersonIdentifier::create([
-                'person_id' => $person->id,
-                'type' => 'national_id',
-                'identifier' => $this->form['national_id'],
-                'issuing_authority' => 'NIRA',
-                'created_by' => Auth::id(),
-            ]);
-        }
+        // if (!empty($this->form['national_id'])) {
+        //     PersonIdentifier::create([
+        //         'person_id' => $person->id,
+        //         'type' => 'national_id',
+        //         'identifier' => $this->form['national_id'],
+        //         'issuing_authority' => 'NIRA',
+        //         'created_by' => Auth::id(),
+        //     ]);
+        // }
     }
 
     /**
@@ -1265,13 +1265,13 @@ class CreatePerson extends Component
     private function createAffiliation(Person $person)
     {
         // Determine which organization to use
-        $organizationId = $this->isSuperAdmin && $this->selectedOrganisationId
-            ? $this->selectedOrganisationId
-            : $this->currentOrganisation->id;
+        $organizationId = $this->isSuperAdmin && $this->selectedOrganizationId
+            ? $this->selectedOrganizationId
+            : $this->currentOrganization->id;
 
         $affiliation = PersonAffiliation::create([
             'person_id' => $person->id,
-            'organisation_id' => $organizationId,
+            'organization_id' => $organizationId,
             'site' => $this->form['site'] ?: null,
             'role_type' => $this->form['role_type'],
             'role_title' => $this->form['role_title'] ?: null,
@@ -1303,7 +1303,7 @@ class CreatePerson extends Component
 
                 $affiliation = PersonAffiliation::create([
                     'person_id' => $person->id,
-                    'organisation_id' => $affiliationData['organisation_id'],
+                    'organization_id' => $affiliationData['organization_id'],
                     'site' => $affiliationData['site'] ?: null,
                     'role_type' => $affiliationData['role_type'],
                     'role_title' => $affiliationData['role_title'] ?: null,
@@ -1320,7 +1320,7 @@ class CreatePerson extends Component
                 Log::info('CreatePerson: Affiliation created successfully', [
                     'affiliation_id' => $affiliation->id,
                     'role_type' => $affiliationData['role_type'],
-                    'organisation_id' => $affiliationData['organisation_id']
+                    'organization_id' => $affiliationData['organization_id']
                 ]);
 
             } catch (\Exception $e) {
@@ -1703,7 +1703,7 @@ class CreatePerson extends Component
 
         // Add organization validation for Super Admin
         if ($this->isSuperAdmin) {
-            $rules['selectedOrganisationId'] = 'required|exists:organisations,id';
+            $rules['selectedOrganizationId'] = 'required|exists:Organizations,id';
         }
 
         // Add domain-specific validation rules
@@ -1726,7 +1726,7 @@ class CreatePerson extends Component
             'form.date_of_birth.before' => 'Date of birth must be before today.',
             'form.start_date.required' => 'Please select a start date.',
             'form.role_type.required' => 'Please select a role type.',
-            'selectedOrganisationId.required' => 'Please select an organization.',
+            'selectedOrganizationId.required' => 'Please select an organization.',
         ];
     }
 
@@ -1780,18 +1780,18 @@ class CreatePerson extends Component
         }
     }
 
-    private function getCurrentUserOrganisation()
+    private function getCurrentUserOrganization()
     {
         // If Super Admin has selected an organization, use that
-        if ($this->isSuperAdmin && $this->selectedOrganisationId) {
-            return Organisation::find($this->selectedOrganisationId);
+        if ($this->isSuperAdmin && $this->selectedOrganizationId) {
+            return Organization::find($this->selectedOrganizationId);
         }
 
         // Get user's primary organization from session (organization switcher)
         $currentOrgId = session('current_organization_id');
 
         if ($currentOrgId) {
-            $org = Organisation::find($currentOrgId);
+            $org = Organization::find($currentOrgId);
             if ($org) {
                 return $org;
             }
@@ -1799,12 +1799,12 @@ class CreatePerson extends Component
 
         // Fallback to user's primary organization if available
         $user = Auth::user();
-        if ($user && $user->organisation_id) {
-            return Organisation::find($user->organisation_id);
+        if ($user && $user->organization_id) {
+            return Organization::find($user->organization_id);
         }
 
         // Last fallback - get the first organization available
-        return Organisation::first();
+        return Organization::first();
     }    private function resetForm()
     {
         $this->form = [
@@ -1845,14 +1845,14 @@ class CreatePerson extends Component
         $this->validateCurrentAffiliation();
 
         // Check role-based organization restrictions
-        if (!$this->canAccessOrganization($this->currentAffiliation['organisation_id'])) {
+        if (!$this->canAccessOrganization($this->currentAffiliation['organization_id'])) {
             $this->showErrorToast('You do not have permission to create affiliations for this organization.');
             return;
         }
 
         // Check for duplicate affiliation (same org + role)
         foreach ($this->affiliations as $index => $affiliation) {
-            if ($affiliation['organisation_id'] == $this->currentAffiliation['organisation_id'] &&
+            if ($affiliation['organization_id'] == $this->currentAffiliation['organization_id'] &&
                 $affiliation['role_type'] == $this->currentAffiliation['role_type']) {
                 $this->showErrorToast('This person already has this role in this organization.');
                 return;
@@ -1915,11 +1915,11 @@ class CreatePerson extends Component
     public function resetCurrentAffiliation()
     {
         $defaultOrgId = $this->isSuperAdmin
-            ? $this->selectedOrganisationId
-            : ($this->currentOrganisation ? $this->currentOrganisation->id : null);
+            ? $this->selectedOrganizationId
+            : ($this->currentOrganization ? $this->currentOrganization->id : null);
 
         $this->currentAffiliation = [
-            'organisation_id' => $defaultOrgId,
+            'organization_id' => $defaultOrgId,
             'role_type' => 'STAFF',
             'role_title' => '',
             'site' => '',
@@ -1961,7 +1961,7 @@ class CreatePerson extends Component
 
             if ($isOrgAdmin) {
                 // Check if the organization matches user's organization
-                return $this->currentOrganisation && $this->currentOrganisation->id == $organizationId;
+                return $this->currentOrganization && $this->currentOrganization->id == $organizationId;
             }
 
             // Other roles might have different restrictions
@@ -1979,14 +1979,14 @@ class CreatePerson extends Component
     private function validateCurrentAffiliation()
     {
         $rules = [
-            'currentAffiliation.organisation_id' => 'required|exists:organisations,id',
+            'currentAffiliation.organization_id' => 'required|exists:Organizations,id',
             'currentAffiliation.role_type' => 'required|string',
             'currentAffiliation.start_date' => 'required|date',
         ];
 
         $this->validate($rules, [
-            'currentAffiliation.organisation_id.required' => 'Please select an organization.',
-            'currentAffiliation.organisation_id.exists' => 'Selected organization is invalid.',
+            'currentAffiliation.organization_id.required' => 'Please select an organization.',
+            'currentAffiliation.organization_id.exists' => 'Selected organization is invalid.',
             'currentAffiliation.role_type.required' => 'Please select a role type.',
             'currentAffiliation.start_date.required' => 'Please provide a start date.',
             'currentAffiliation.start_date.date' => 'Please provide a valid start date.',
@@ -2003,7 +2003,7 @@ class CreatePerson extends Component
         }
 
         foreach ($this->affiliations as $index => $affiliation) {
-            if (empty($affiliation['organisation_id'])) {
+            if (empty($affiliation['organization_id'])) {
                 throw new \Exception("Affiliation #" . ($index + 1) . " is missing organization selection.");
             }
 
@@ -2016,12 +2016,12 @@ class CreatePerson extends Component
             }
 
             // Validate organization exists
-            if (!Organisation::find($affiliation['organisation_id'])) {
+            if (!Organization::find($affiliation['organization_id'])) {
                 throw new \Exception("Affiliation #" . ($index + 1) . " has invalid organization.");
             }
 
             // Check role-based access permissions
-            if (!$this->canAccessOrganization($affiliation['organisation_id'])) {
+            if (!$this->canAccessOrganization($affiliation['organization_id'])) {
                 throw new \Exception("You do not have permission to create affiliations for organization in affiliation #" . ($index + 1) . ".");
             }
         }
@@ -2033,12 +2033,12 @@ class CreatePerson extends Component
     public function getAvailableOrganizations()
     {
         if ($this->isSuperAdmin) {
-            return $this->availableOrganisations;
+            return $this->availableOrganizations;
         }
 
         // Organization Admin and others can only see their organization
-        if ($this->currentOrganisation) {
-            return [['id' => $this->currentOrganisation->id, 'name' => $this->currentOrganisation->display_name ?? $this->currentOrganisation->legal_name]];
+        if ($this->currentOrganization) {
+            return [['id' => $this->currentOrganization->id, 'name' => $this->currentOrganization->display_name ?? $this->currentOrganization->legal_name]];
         }
 
         return [];

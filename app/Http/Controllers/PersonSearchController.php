@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Person;
-use App\Models\Organisation;
+use App\Models\Organization;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Maatwebsite\Excel\Facades\Excel;
@@ -57,7 +57,7 @@ class PersonSearchController extends Controller
             'searchBy' => 'nullable|string|in:name,person_id,phone,email,identifier,global',
             'classification' => 'nullable|string',
             'gender' => 'nullable|string|in:male,female,other',
-            'organisationId' => 'nullable|exists:organisations,id',
+            'OrganizationId' => 'nullable|exists:Organizations,id',
             'roleType' => 'nullable|string',
             'status' => 'nullable|string|in:active,inactive,suspended',
             'city' => 'nullable|string',
@@ -72,7 +72,7 @@ class PersonSearchController extends Controller
         // If specific persons are selected, export only those
         if (!empty($criteria['selectedPersons'])) {
             $persons = Person::whereIn('id', $criteria['selectedPersons'])
-                ->with(['phones', 'emailAddresses', 'identifiers', 'organisations'])
+                ->with(['phones', 'emailAddresses', 'identifiers', 'Organizations'])
                 ->get();
         } else {
             // Export all persons matching the search criteria
@@ -98,7 +98,7 @@ class PersonSearchController extends Controller
             'searchBy' => 'nullable|string|in:name,person_id,phone,email,identifier,global',
             'classification' => 'nullable|string',
             'gender' => 'nullable|string|in:male,female,other',
-            'organisationId' => 'nullable|exists:organisations,id',
+            'OrganizationId' => 'nullable|exists:Organizations,id',
             'roleType' => 'nullable|string',
             'status' => 'nullable|string|in:active,inactive,suspended',
             'city' => 'nullable|string',
@@ -113,7 +113,7 @@ class PersonSearchController extends Controller
         $perPage = $criteria['perPage'] ?? 15;
         
         $persons = $this->buildSearchQuery($criteria)
-            ->with(['phones', 'emailAddresses', 'identifiers', 'organisations'])
+            ->with(['phones', 'emailAddresses', 'identifiers', 'Organizations'])
             ->paginate($perPage);
 
         return response()->json([
@@ -135,7 +135,7 @@ class PersonSearchController extends Controller
     public function filterOptions(): JsonResponse
     {
         return response()->json([
-            'organisations' => Organisation::active()
+            'Organizations' => Organization::active()
                 ->orderBy('name')
                 ->get(['id', 'name']),
             
@@ -228,10 +228,10 @@ class PersonSearchController extends Controller
             $query->where('country', 'like', "%{$criteria['country']}%");
         }
 
-        // Organisation filter
-        if (!empty($criteria['organisationId'])) {
+        // Organization filter
+        if (!empty($criteria['OrganizationId'])) {
             $roleType = $criteria['roleType'] ?? null;
-            $query->byOrganisation($criteria['organisationId'], $roleType);
+            $query->byOrganization($criteria['OrganizationId'], $roleType);
         }
 
         // Age filters

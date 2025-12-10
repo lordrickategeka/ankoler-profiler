@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Organizations;
 
-use App\Models\Organisation;
+use App\Models\Organization;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -85,7 +85,7 @@ class Index extends Component {
 
     public function getOrganizationsProperty()
     {
-        return Organisation::query()
+        return Organization::query()
             ->when($this->search, function ($query) {
                 $query->search($this->search);
             })
@@ -139,7 +139,7 @@ class Index extends Component {
 
     public function deleteOrganization()
     {
-        $organization = Organisation::findOrFail($this->confirmingDeleteId);
+        $organization = Organization::findOrFail($this->confirmingDeleteId);
         $organization->delete();
 
         session()->flash('message', 'Organization deleted successfully.');

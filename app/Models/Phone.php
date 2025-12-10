@@ -13,7 +13,6 @@ class Phone extends Model
     protected $fillable = [
         'phone_id',
         'person_id',
-        'organisation_id',
         'number',
         'type',
         'is_primary',
@@ -66,11 +65,6 @@ class Phone extends Model
     public function person(): BelongsTo
     {
         return $this->belongsTo(Person::class);
-    }
-
-    public function organisation(): BelongsTo
-    {
-        return $this->belongsTo(Organisation::class);
     }
 
     /**

@@ -59,6 +59,7 @@
                 <table class="table table-zebra w-full">
                     <thead>
                         <tr>
+                            <th>Organization</th>
                             <th>Code</th>
                             <th>Name</th>
                             <th>Description</th>
@@ -72,6 +73,11 @@
                     <tbody>
                         @forelse($roleTypes as $roleType)
                             <tr>
+                                <td>
+                                    <div class="font-medium">
+                                        {{ optional($roleType->organization)->display_name ?? optional($roleType->organization)->legal_name ?? 'No Provided' }}
+                                    </div>
+                                </td>
                                 <td>
                                     <div class="font-mono font-medium">{{ $roleType->code }}</div>
                                 </td>
@@ -178,6 +184,28 @@
             <div class="modal-box">
                 <h3 class="font-bold text-lg mb-4">Create New Role Type</h3>
 
+                @php $user = auth()->user(); @endphp
+                @if($user && $user->hasRole('Super Admin'))
+                <div class="form-control w-full mb-4">
+                    <label class="label">
+                        <span class="label-text">Organization *</span>
+                    </label>
+                    <select wire:model="organization_id" class="select select-bordered w-full @error('organization_id') select-error @enderror">
+                        <option value="">Select organization</option>
+                        @foreach($organizations as $org)
+                            <option value="{{ $org->id }}">{{ $org->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('organization_id') <span class="text-error text-sm">{{ $message }}</span> @enderror
+                </div>
+                @else
+                <div class="form-control w-full mb-4">
+                    <label class="label">
+                        <span class="label-text">Organization</span>
+                    </label>
+                    <input type="text" class="input input-bordered w-full bg-gray-100" value="{{ optional($organizations->first())->display_name ?? optional($organizations->first())->legal_name ?? 'No Provided' }}" readonly>
+                </div>
+                @endif
                 <div class="form-control w-full mb-4">
                     <label class="label">
                         <span class="label-text">Role Type Code *</span>
@@ -243,6 +271,28 @@
             <div class="modal-box">
                 <h3 class="font-bold text-lg mb-4">Edit Role Type</h3>
 
+                @php $user = auth()->user(); @endphp
+                @if($user && $user->hasRole('Super Admin'))
+                <div class="form-control w-full mb-4">
+                    <label class="label">
+                        <span class="label-text">Organization *</span>
+                    </label>
+                    <select wire:model="organization_id" class="select select-bordered w-full @error('organization_id') select-error @enderror">
+                        <option value="">Select organization</option>
+                        @foreach($organizations as $org)
+                            <option value="{{ $org->id }}">{{ $org->display_name ?? $org->legal_name ?? 'No Provided' }}</option>
+                        @endforeach
+                    </select>
+                    @error('organization_id') <span class="text-error text-sm">{{ $message }}</span> @enderror
+                </div>
+                @else
+                <div class="form-control w-full mb-4">
+                    <label class="label">
+                        <span class="label-text">Organization</span>
+                    </label>
+                    <input type="text" class="input input-bordered w-full bg-gray-100" value="{{ optional($organizations->first())->name ?? 'N/A' }}" readonly>
+                </div>
+                @endif
                 <div class="form-control w-full mb-4">
                     <label class="label">
                         <span class="label-text">Role Type Code *</span>

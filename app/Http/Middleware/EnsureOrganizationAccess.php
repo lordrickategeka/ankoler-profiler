@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class EnsureorganisationAccess
+class EnsureOrganizationAccess
 {
     /**
      * Handle an incoming request.
@@ -17,20 +17,20 @@ class EnsureorganisationAccess
             return redirect()->route('login');
         }
 
-        $currentOrgId = session('current_organisation_id');
+        $currentOrgId = session('current_organization_id');
         
         if (!$currentOrgId) {
-            session()->flash('error', 'No organisation selected.');
+            session()->flash('error', 'No Organization selected.');
             return redirect()->route('dashboard');
         }
 
-        // Verify user has access to current organisation
-        if (!auth()->user()->canAccessorganisation($currentOrgId)) {
-            session()->flash('error', 'You do not have access to this organisation.');
+        // Verify user has access to current Organization
+        if (!auth()->user()->canAccessOrganization($currentOrgId)) {
+            session()->flash('error', 'You do not have access to this Organization.');
             
-            // Reset to user's primary organisation
+            // Reset to user's primary Organization
             session([
-                'current_organisation_id' => auth()->user()->organisation_id
+                'current_organization_id' => auth()->user()->organization_id
             ]);
             
             return redirect()->route('dashboard');

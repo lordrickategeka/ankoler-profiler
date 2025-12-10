@@ -127,8 +127,8 @@
                                     Affiliations</th>
                                 <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">
                                     Classifications</th>
-                                <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">
-                                    Location</th>
+                                {{-- <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">
+                                    Location</th> --}}
                                 <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">
                                     Actions</th>
                             </tr>
@@ -249,8 +249,9 @@
                                             </div>
                                         </div>
                                     </td>
+
                                     {{-- Affiliations --}}
-                                    <td class="px-1.5 py-1">
+                                    <td class="px-1.5 py-1whitespace-nowrap">
                                         <div class="text-sm text-gray-900">
                                             @php
                                                 $activeAffiliations = $person->affiliations->where('status', 'active');
@@ -264,7 +265,7 @@
                                                     </div>
                                                     <div class="flex-1">
                                                         <span
-                                                            class="font-medium">{{ $affiliation->organisation->display_name ?? $affiliation->organisation->legal_name ?? 'Not-Provided' }}</span>
+                                                            class="font-medium">{{ $affiliation->Organization->display_name ?? ($affiliation->Organization->legal_name ?? 'Not-Provided') }}</span>
                                                         @if ($affiliation->role_title)
                                                             <div class="text-xs text-gray-400">
                                                                 {{ $affiliation->role_title }}</div>
@@ -279,7 +280,9 @@
                                                     <div class="w-2 h-2 bg-gray-400 rounded-full mr-1"
                                                         title="No active affiliations"></div>
                                                     <span class="text-gray-400 italic">No active affiliations</span>
-                                                    <div class="px-1.5 py-1 whitespace-nowrap text-xs text-gray-400 italic">No role type</div>
+                                                    <div
+                                                        class="px-1.5 py-1 whitespace-nowrap text-xs text-gray-400 italic">
+                                                        No role type</div>
                                                 </div>
                                             @endforelse
 
@@ -291,7 +294,7 @@
                                             @endif
                                         </div>
                                     </td>
-                                    </td>
+
                                     <td class="px-1.5 py-1 whitespace-nowrap">
                                         @if ($person->country || $person->city)
                                             <div class="flex flex-wrap gap-1">
@@ -330,8 +333,7 @@
                                                 class="absolute right-0 mt-8 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10"
                                                 style="display: none;">
                                                 <div class="py-1">
-                                                    <button
-                                                        wire:click="viewPerson({{ $person->id }})"
+                                                    <button wire:click="viewPerson({{ $person->id }})"
                                                         @click="open = false" type="button"
                                                         class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                                                         <svg class="w-4 h-4 mr-2" fill="none"
@@ -347,7 +349,7 @@
                                                         View Profile
                                                     </button>
                                                     <a href="{{ route('persons.create', ['edit' => $person->id]) }}"
-                                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                                                        class="flex px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 items-center">
                                                         <svg class="w-4 h-4 mr-2 text-yellow-600" fill="none"
                                                             stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -443,20 +445,28 @@
 
     {{-- Person Details Modal/Section --}}
     @if ($viewPersonData)
-        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+            aria-modal="true">
             <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="$set('viewPersonData', null)"></div>
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                    wire:click="$set('viewPersonData', null)"></div>
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <div
+                    class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
                     <div class="sm:flex sm:items-start">
-                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
-                            <svg class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        <div
+                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
                         </div>
                         <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Person Details</h3>
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Person Details
+                            </h3>
                             <div class="mt-2">
                                 <div class="text-sm text-gray-500">
                                     <strong>Name:</strong> {{ $viewPersonData->full_name ?? 'N/A' }}<br>
@@ -465,13 +475,16 @@
                                     <strong>Date of Birth:</strong> {{ $viewPersonData->date_of_birth ?? 'N/A' }}<br>
                                     <strong>Gender:</strong> {{ $viewPersonData->gender ?? 'N/A' }}<br>
                                     <strong>Status:</strong> {{ $viewPersonData->status ?? 'N/A' }}<br>
-                                    <strong>Phone(s):</strong> {{ $viewPersonData->phones->pluck('number')->join(', ') ?? 'N/A' }}<br>
-                                    <strong>Email(s):</strong> {{ $viewPersonData->emailAddresses->pluck('email')->join(', ') ?? 'N/A' }}<br>
+                                    <strong>Phone(s):</strong>
+                                    {{ $viewPersonData->phones->pluck('number')->join(', ') ?? 'N/A' }}<br>
+                                    <strong>Email(s):</strong>
+                                    {{ $viewPersonData->emailAddresses->pluck('email')->join(', ') ?? 'N/A' }}<br>
                                     <strong>Affiliations:</strong>
                                     @if ($viewPersonData->affiliations->count() > 0)
                                         <ul class="list-disc ml-4">
                                             @foreach ($viewPersonData->affiliations as $aff)
-                                                <li>{{ $aff->organisation->display_name ?? $aff->organisation->legal_name ?? 'N/A' }} ({{ $aff->role_title ?? 'N/A' }})</li>
+                                                <li>{{ $aff->Organization->display_name ?? ($aff->Organization->legal_name ?? 'N/A') }}
+                                                    ({{ $aff->role_title ?? 'N/A' }})</li>
                                             @endforeach
                                         </ul>
                                     @else
@@ -480,7 +493,8 @@
                                 </div>
                             </div>
                             <div class="mt-4 flex justify-end">
-                                <button type="button" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300" wire:click="$set('viewPersonData', null)">Close</button>
+                                <button type="button" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                                    wire:click="$set('viewPersonData', null)">Close</button>
                             </div>
                         </div>
                     </div>
@@ -583,122 +597,117 @@
     @endif
 
 
-    @push('scripts')
-        <script>
-            // Listen for filters-reset event
-            window.addEventListener('filters-reset', () => {
-                // Show success toast
-                console.log('Filters reset successfully');
+    <script>
+        // Listen for filters-reset event
+        window.addEventListener('filters-reset', () => {
+            // Show success toast
+            console.log('Filters reset successfully');
+        });
+
+        // Quick reset filters function
+        function quickResetFilters() {
+            const resetBtn = document.getElementById('resetFiltersBtn');
+            const loader = document.getElementById('resetFiltersLoader');
+
+            // Disable the button and show loader
+            resetBtn.disabled = true;
+            loader.classList.remove('hidden');
+
+            // Call the Livewire method to reset filters
+            @this.resetFilters().then(() => {
+                // Re-enable the button and hide loader after reset
+                resetBtn.disabled = false;
+                loader.classList.add('hidden');
             });
+        }
 
-            // Quick reset filters function
-            function quickResetFilters() {
-                const resetBtn = document.getElementById('resetFiltersBtn');
-                const loader = document.getElementById('resetFiltersLoader');
-
-                // Disable the button and show loader
-                resetBtn.disabled = true;
-                loader.classList.remove('hidden');
-
-                // Call the Livewire method to reset filters
-                @this.resetFilters().then(() => {
-                    // Re-enable the button and hide loader after reset
-                    resetBtn.disabled = false;
-                    loader.classList.add('hidden');
-                });
+        // Clear all form inputs instantly for better UX
+        document.querySelectorAll('input[type="text"], input[type="date"], select').forEach(input => {
+            if (input.hasAttribute('wire:model.live.debounce.500ms') || input.hasAttribute('wire:model')) {
+                input.value = '';
             }
+        });
 
-            // Clear all form inputs instantly for better UX
-            document.querySelectorAll('input[type="text"], input[type="date"], select').forEach(input => {
-                if (input.hasAttribute('wire:model.live.debounce.500ms') || input.hasAttribute('wire:model')) {
-                    input.value = '';
+        // Let Livewire handle the actual reset
+        @this.resetFilters().then(() => {
+            button.disabled = false;
+            button.innerHTML = originalContent;
+        });
+    </script>
+
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            // Re-initialize Alpine components after Livewire updates
+            Livewire.hook('morph.updated', ({
+                el,
+                component
+            }) => {
+                // Re-scan for Alpine components
+                if (window.Alpine) {
+                    Alpine.initTree(el);
                 }
             });
 
-            // Let Livewire handle the actual reset
-            @this.resetFilters().then(() => {
-                button.disabled = false;
-                button.innerHTML = originalContent;
-            });
+            // Handle dropdown state persistence
+            let openDropdowns = new Set();
 
-        </script>
-    @endpush
-
-    @push('scripts')
-        <script>
-            document.addEventListener('livewire:initialized', () => {
-                // Re-initialize Alpine components after Livewire updates
-                Livewire.hook('morph.updated', ({
-                    el,
-                    component
-                }) => {
-                    // Re-scan for Alpine components
-                    if (window.Alpine) {
-                        Alpine.initTree(el);
+            Livewire.hook('morph.updating', ({
+                el,
+                toEl,
+                childrenOnly,
+                skip
+            }) => {
+                // Save open dropdown states
+                el.querySelectorAll('[x-data*="open"]').forEach((dropdown, index) => {
+                    const alpine = Alpine.$data(dropdown);
+                    if (alpine && alpine.open) {
+                        openDropdowns.add(index);
                     }
                 });
-
-                // Handle dropdown state persistence
-                let openDropdowns = new Set();
-
-                Livewire.hook('morph.updating', ({
-                    el,
-                    toEl,
-                    childrenOnly,
-                    skip
-                }) => {
-                    // Save open dropdown states
-                    el.querySelectorAll('[x-data*="open"]').forEach((dropdown, index) => {
-                        const alpine = Alpine.$data(dropdown);
-                        if (alpine && alpine.open) {
-                            openDropdowns.add(index);
-                        }
-                    });
-                });
-
-                Livewire.hook('morph.updated', ({
-                    el,
-                    component
-                }) => {
-                    // Restore dropdown states
-                    setTimeout(() => {
-                        el.querySelectorAll('[x-data*="open"]').forEach((dropdown, index) => {
-                            if (openDropdowns.has(index)) {
-                                const alpine = Alpine.$data(dropdown);
-                                if (alpine) {
-                                    alpine.open = false; // Close them to prevent issues
-                                }
-                            }
-                        });
-                        openDropdowns.clear();
-                    }, 50);
-                });
             });
 
-            // Alternative approach: Use vanilla JavaScript for dropdowns
-            function toggleDropdown(personId) {
-                const dropdown = document.querySelector(`[data-dropdown="${personId}"]`);
-                const isOpen = dropdown.style.display === 'block';
+            Livewire.hook('morph.updated', ({
+                el,
+                component
+            }) => {
+                // Restore dropdown states
+                setTimeout(() => {
+                    el.querySelectorAll('[x-data*="open"]').forEach((dropdown, index) => {
+                        if (openDropdowns.has(index)) {
+                            const alpine = Alpine.$data(dropdown);
+                            if (alpine) {
+                                alpine.open = false; // Close them to prevent issues
+                            }
+                        }
+                    });
+                    openDropdowns.clear();
+                }, 50);
+            });
+        });
 
-                // Close all dropdowns first
+        // Alternative approach: Use vanilla JavaScript for dropdowns
+        function toggleDropdown(personId) {
+            const dropdown = document.querySelector(`[data-dropdown="${personId}"]`);
+            const isOpen = dropdown.style.display === 'block';
+
+            // Close all dropdowns first
+            document.querySelectorAll('[data-dropdown]').forEach(d => {
+                d.style.display = 'none';
+            });
+
+            // Toggle the clicked one
+            if (!isOpen) {
+                dropdown.style.display = 'block';
+            }
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('[data-dropdown-trigger]')) {
                 document.querySelectorAll('[data-dropdown]').forEach(d => {
                     d.style.display = 'none';
                 });
-
-                // Toggle the clicked one
-                if (!isOpen) {
-                    dropdown.style.display = 'block';
-                }
             }
-
-            // Close dropdowns when clicking outside
-            document.addEventListener('click', function(event) {
-                if (!event.target.closest('[data-dropdown-trigger]')) {
-                    document.querySelectorAll('[data-dropdown]').forEach(d => {
-                        d.style.display = 'none';
-                    });
-                }
-            });
-        </script>
-    @endpush
+        });
+    </script>
 </div>

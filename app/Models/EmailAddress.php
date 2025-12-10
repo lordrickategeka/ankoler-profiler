@@ -13,7 +13,6 @@ class EmailAddress extends Model
     protected $fillable = [
         'email_id',
         'person_id',
-        'organisation_id',
         'email',
         'type',
         'is_primary',
@@ -77,10 +76,6 @@ class EmailAddress extends Model
         return $this->belongsTo(Person::class);
     }
 
-    public function organisation(): BelongsTo
-    {
-        return $this->belongsTo(Organisation::class);
-    }
 
     /**
      * Scope for active emails

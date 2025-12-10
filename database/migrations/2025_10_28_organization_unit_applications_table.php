@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('organization_unit_applications', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('organisation_id')->constrained('organisations')->onDelete('cascade');
+            $table->foreignId('organization_id')->constrained('organizations')->onDelete('cascade');
             $table->foreignId('unit_id')->constrained('organization_units')->onDelete('cascade');
             $table->foreignId('person_id')->constrained('persons')->onDelete('cascade');
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
@@ -21,7 +21,7 @@ return new class extends Migration
             $table->timestamp('approved_at')->nullable();
             $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
-            $table->unique(['organisation_id', 'unit_id', 'person_id'], 'unique_application');
+            $table->unique(['organization_id', 'unit_id', 'person_id'], 'unique_application');
         });
     }
 

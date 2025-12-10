@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\User;
-use App\Models\Organisation;
+use App\Models\Organization;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use App\Livewire\Organizations\Create;
@@ -51,7 +51,7 @@ class OrganizationRegistrationTest extends TestCase
             ->call('submit')
             ->assertRedirect('/organizations');
 
-        $this->assertDatabaseHas('organisations', [
+        $this->assertDatabaseHas('Organizations', [
             'legal_name' => 'Mulago National Referral Hospital',
             'category' => 'hospital',
             'code' => 'MNH001'
@@ -87,7 +87,7 @@ class OrganizationRegistrationTest extends TestCase
             ->call('submit')
             ->assertRedirect('/organizations');
 
-        $this->assertDatabaseHas('organisations', [
+        $this->assertDatabaseHas('Organizations', [
             'legal_name' => 'Makerere University',
             'category' => 'school',
             'code' => 'MAK001'

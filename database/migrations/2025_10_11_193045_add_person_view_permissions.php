@@ -15,8 +15,8 @@ return new class extends Migration
     {
         // Create the new permissions
         $permissions = [
-            'can_view_organisational_persons' => 'Can view persons from their organization',
-            'can_view_all_organisational_persons' => 'Can view persons from all organizations',
+            'can_view_Organizational_persons' => 'Can view persons from their organization',
+            'can_view_all_Organizational_persons' => 'Can view persons from all organizations',
         ];
 
         foreach ($permissions as $name => $description) {
@@ -30,8 +30,8 @@ return new class extends Migration
         $superAdminRole = Role::where('name', 'Super Admin')->first();
         if ($superAdminRole) {
             $superAdminRole->givePermissionTo([
-                'can_view_organisational_persons',
-                'can_view_all_organisational_persons'
+                'can_view_Organizational_persons',
+                'can_view_all_Organizational_persons'
             ]);
         }
 
@@ -46,7 +46,7 @@ return new class extends Migration
         foreach ($organizationRoles as $roleName) {
             $role = Role::where('name', $roleName)->first();
             if ($role) {
-                $role->givePermissionTo('can_view_organisational_persons');
+                $role->givePermissionTo('can_view_Organizational_persons');
             }
         }
     }
@@ -57,7 +57,7 @@ return new class extends Migration
     public function down(): void
     {
         // Remove the permissions
-        Permission::where('name', 'can_view_organisational_persons')->delete();
-        Permission::where('name', 'can_view_all_organisational_persons')->delete();
+        Permission::where('name', 'can_view_Organizational_persons')->delete();
+        Permission::where('name', 'can_view_all_Organizational_persons')->delete();
     }
 };

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class FilterConfiguration extends Model
 {
     protected $fillable = [
-        'organisation_id',
+        'organization_id',
         'field_name',
         'field_type',
         'field_options',
@@ -21,9 +21,9 @@ class FilterConfiguration extends Model
         'is_active' => 'boolean'
     ];
 
-    public function organisation(): BelongsTo
+    public function Organization(): BelongsTo
     {
-        return $this->belongsTo(Organisation::class);
+        return $this->belongsTo(Organization::class);
     }
 
     /**
@@ -51,11 +51,11 @@ class FilterConfiguration extends Model
     }
 
     /**
-     * Scope to get active filters for an organisation
+     * Scope to get active filters for an Organization
      */
-    public function scopeActiveForOrganisation($query, $organisationId)
+    public function scopeActiveForOrganization($query, $OrganizationId)
     {
-        return $query->where('organisation_id', $organisationId)
+        return $query->where('organization_id', $OrganizationId)
                     ->where('is_active', true)
                     ->orderBy('sort_order');
     }

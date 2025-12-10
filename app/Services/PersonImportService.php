@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Organisation;
+use App\Models\Organization;
 use Illuminate\Support\Collection;
 use League\Csv\Reader;
 use Maatwebsite\Excel\Facades\Excel;
@@ -562,7 +562,7 @@ class PersonImportService
             throw new \Exception('Organization ID is required for import');
         }
 
-        $organization = Organisation::findOrFail($organizationId);
+        $organization = Organization::findOrFail($organizationId);
 
         // Use maatwebsite/excel with our custom import class
         $import = new \App\Imports\PersonsImport(

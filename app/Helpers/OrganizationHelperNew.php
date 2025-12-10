@@ -2,7 +2,7 @@
 
 namespace App\Helpers;
 
-use App\Models\Organisation;
+use App\Models\Organization;
 use Illuminate\Support\Facades\Auth;
 
 class OrganizationHelperNew
@@ -10,59 +10,59 @@ class OrganizationHelperNew
     /**
      * Get the current organization for the authenticated user
      */
-    public static function getCurrentOrganization(): ?Organisation
+    public static function getCurrentOrganization(): ?Organization
     {
         // First try to get from session
-        $organisationId = session('current_organisation_id');
+        $OrganizationId = session('current_organization_id');
 
-        if (!$organisationId && Auth::check()) {
+        if (!$OrganizationId && Auth::check()) {
             // Fall back to user's default organization
-            $organisationId = Auth::user()->organisation_id;
+            $OrganizationId = Auth::user()->organization_id;
         }
 
-        if ($organisationId) {
-            return Organisation::find($organisationId);
+        if ($OrganizationId) {
+            return Organization::find($OrganizationId);
         }
 
         return null;
     }
 
     /**
-     * Get current organisation ID from session or user
+     * Get current Organization ID from session or user
      */
     public static function getCurrentOrganizationId(): ?int
     {
-        return session('current_organisation_id', Auth::user()->organisation_id ?? null);
+        return session('current_organization_id', Auth::user()->organization_id ?? null);
     }
 
     /**
-     * Get current organisation name
+     * Get current Organization name
      */
     public static function getCurrentOrganizationName(): string
     {
         $org = self::getCurrentOrganization();
-        return $org ? $org->name : 'No organisation';
+        return $org ? $org->name : 'No Organization';
     }
 
     /**
      * Set the current organization in session
      */
-    public static function setCurrentOrganization(int $organisationId): void
+    public static function setCurrentOrganization(int $OrganizationId): void
     {
-        $organisation = Organisation::find($organisationId);
+        $Organization = Organization::find($OrganizationId);
 
-        if ($organisation && self::canAccessOrganization($organisationId)) {
+        if ($Organization && self::canAccessOrganization($OrganizationId)) {
             session([
-                'current_organisation_id' => $organisationId,
-                'current_organisation_name' => $organisation->name
+                'current_organization_id' => $OrganizationId,
+                'current_Organization_name' => $Organization->name
             ]);
         }
     }
 
     /**
-     * Check if current user can access an organisation
+     * Check if current user can access an Organization
      */
-    public static function canAccessOrganization(int $organisationId): bool
+    public static function canAccessOrganization(int $OrganizationId): bool
     {
         if (!Auth::check()) {
             return false;
@@ -71,7 +71,7 @@ class OrganizationHelperNew
         $user = Auth::user();
 
         // Check if it's the user's default organization
-        if ($user->organisation_id === $organisationId) {
+        if ($user->organization_id === $OrganizationId) {
             return true;
         }
 
@@ -81,7 +81,7 @@ class OrganizationHelperNew
     }
 
     /**
-     * Get all organisations current user can access
+     * Get all Organizations current user can access
      */
     public static function getUserAccessibleOrganizations()
     {
@@ -94,8 +94,8 @@ class OrganizationHelperNew
         // Get user's primary organization
         $organizations = collect();
 
-        if ($user->organisation_id) {
-            $primaryOrg = Organisation::find($user->organisation_id);
+        if ($user->organization_id) {
+            $primaryOrg = Organization::find($user->organization_id);
             if ($primaryOrg) {
                 $organizations->push($primaryOrg);
             }
@@ -110,10 +110,10 @@ class OrganizationHelperNew
     /**
      * Switch to a different organization
      */
-    public static function switchOrganization(int $organisationId): bool
+    public static function switchOrganization(int $OrganizationId): bool
     {
-        if (self::canAccessOrganization($organisationId)) {
-            self::setCurrentOrganization($organisationId);
+        if (self::canAccessOrganization($OrganizationId)) {
+            self::setCurrentOrganization($OrganizationId);
             return true;
         }
 
@@ -125,6 +125,6 @@ class OrganizationHelperNew
      */
     public static function clearCurrentOrganization(): void
     {
-        session()->forget(['current_organisation_id', 'current_organisation_name']);
+        session()->forget(['current_organization_id', 'current_Organization_name']);
     }
 }

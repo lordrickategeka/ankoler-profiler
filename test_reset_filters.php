@@ -28,7 +28,7 @@ try {
     $component->filters = [
         'search' => 'test search',
         'classification' => 'STAFF',
-        'organisation_id' => '1',
+        'organization_id' => '1',
         'age_range' => '25-35',
         'gender' => 'male',
         'status' => 'active',

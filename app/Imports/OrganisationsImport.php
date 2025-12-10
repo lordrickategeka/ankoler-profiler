@@ -2,7 +2,7 @@
 
 namespace App\Imports;
 
-use App\Models\Organisation;
+use App\Models\Organization;
 use App\Models\CustomField;
 use App\Models\CustomFieldValue;
 use Illuminate\Support\Collection;
@@ -14,7 +14,7 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Concerns\Importable;
 
-class OrganisationsImport implements ToCollection, WithHeadingRow, WithValidation, WithStartRow
+class OrganizationsImport implements ToCollection, WithHeadingRow, WithValidation, WithStartRow
 {
     use Importable;
 
@@ -35,7 +35,7 @@ class OrganisationsImport implements ToCollection, WithHeadingRow, WithValidatio
             foreach ($collection as $index => $row) {
                 $rowNumber = $index + 2; // 1 header + 0-based index
                 try {
-                    Log::info("OrganisationImport: Processing row {$rowNumber}", [
+                    Log::info("OrganizationImport: Processing row {$rowNumber}", [
                         'row_data' => $row->toArray()
                     ]);
                     $result = $this->processRow($row->toArray(), $rowNumber);
@@ -54,7 +54,7 @@ class OrganisationsImport implements ToCollection, WithHeadingRow, WithValidatio
                         'message' => $e->getMessage()
                     ];
                     $this->results['summary']['failed']++;
-                    Log::error("OrganisationImport: Row {$rowNumber} failed: " . $e->getMessage(), [
+                    Log::error("OrganizationImport: Row {$rowNumber} failed: " . $e->getMessage(), [
                         'row' => $row->toArray(),
                         'trace' => $e->getTraceAsString()
                     ]);
@@ -63,7 +63,7 @@ class OrganisationsImport implements ToCollection, WithHeadingRow, WithValidatio
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("OrganisationImport: Transaction failed", [
+            Log::error("OrganizationImport: Transaction failed", [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
@@ -80,8 +80,8 @@ class OrganisationsImport implements ToCollection, WithHeadingRow, WithValidatio
     {
         return [
             'category' => 'required|string',
-            'legal_name' => 'required|string|max:255|unique:organisations,legal_name',
-            'code' => 'required|string|max:20|unique:organisations,code',
+            'legal_name' => 'required|string|max:255|unique:Organizations,legal_name',
+            'code' => 'required|string|max:20|unique:Organizations,code',
             'organization_type' => 'required|string',
             'registration_number' => ['required', 'regex:/^[0-9+\-() ]+$/'],
             'contact_email' => 'required|email',
@@ -113,7 +113,7 @@ class OrganisationsImport implements ToCollection, WithHeadingRow, WithValidatio
             }
         }
 
-        $organisation = Organisation::create($orgData);
+        $Organization = Organization::create($orgData);
 
         // Handle custom fields
         foreach ($row as $key => $value) {
@@ -128,7 +128,7 @@ class OrganisationsImport implements ToCollection, WithHeadingRow, WithValidatio
                 );
                 // Save the value for this org and field
                 CustomFieldValue::create([
-                    'organisation_id' => $organisation->id,
+                    'organization_id' => $Organization->id,
                     'custom_field_id' => $customField->id,
                     'value' => $value,
                 ]);

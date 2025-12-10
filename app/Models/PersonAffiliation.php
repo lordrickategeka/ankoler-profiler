@@ -12,7 +12,7 @@ class PersonAffiliation extends Model
     protected $fillable = [
         'affiliation_id',
         'person_id',
-        'organisation_id',
+        'organization_id',
         'site',
         'role_type',
         'role_title',
@@ -119,9 +119,9 @@ class PersonAffiliation extends Model
     //     return $this->belongsTo(Person::class);
     // }
 
-    public function organisation(): BelongsTo
+    public function Organization(): BelongsTo
     {
-        return $this->belongsTo(Organisation::class);
+        return $this->belongsTo(Organization::class);
     }
 
     /**
@@ -167,9 +167,9 @@ class PersonAffiliation extends Model
     /**
      * Scope for specific organization
      */
-    public function scopeForOrganisation($query, $organisationId)
+    public function scopeForOrganization($query, $OrganizationId)
     {
-        return $query->where('organisation_id', $organisationId);
+        return $query->where('organization_id', $OrganizationId);
     }
 
 

@@ -72,16 +72,16 @@ class TestAffiliationId extends Command
         try {
             // Find an existing person and organization
             $person = \App\Models\Person::first();
-            $organisation = \App\Models\Organisation::first();
+            $Organization = \App\Models\Organization::first();
             
-            if (!$person || !$organisation) {
-                $this->warn('Skipping creation test - no person or organisation found');
+            if (!$person || !$Organization) {
+                $this->warn('Skipping creation test - no person or Organization found');
                 return;
             }
             
             $testAffiliation = new PersonAffiliation();
             $testAffiliation->person_id = $person->id;
-            $testAffiliation->organisation_id = $organisation->id;
+            $testAffiliation->organization_id = $Organization->id;
             $testAffiliation->role_type = 'TEST_ROLE';
             $testAffiliation->start_date = now();
             $testAffiliation->status = 'active';

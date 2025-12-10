@@ -283,8 +283,8 @@ class SmsChannel implements CommunicationChannelInterface
 
         // Add organization information if available
         $affiliation = $person->affiliations->first();
-        if ($affiliation && $affiliation->organisation) {
-            $variables['organization_name'] = $affiliation->organisation->legal_name;
+        if ($affiliation && $affiliation->Organization) {
+            $variables['organization_name'] = $affiliation->Organization->legal_name;
             $variables['role_title'] = $affiliation->role_title;
         }
 

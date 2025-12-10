@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('filter_configurations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('organisation_id')->constrained()->onDelete('cascade');
+            $table->foreignId('organization_id')->constrained()->onDelete('cascade');
             $table->string('field_name');
             $table->enum('field_type', ['text', 'select', 'multiselect', 'date', 'number', 'boolean']);
             $table->json('field_options')->nullable(); // For select options, validation rules, etc.
@@ -21,7 +21,7 @@ return new class extends Migration
             $table->integer('sort_order')->default(0);
             $table->timestamps();
 
-            $table->unique(['organisation_id', 'field_name']);
+            $table->unique(['organization_id', 'field_name']);
         });
     }
 

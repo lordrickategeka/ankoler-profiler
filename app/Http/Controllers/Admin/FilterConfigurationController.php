@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\FilterConfiguration;
-use App\Models\Organisation;
+use App\Models\Organization;
 use Illuminate\Http\Request;
 
 class FilterConfigurationController extends Controller
@@ -17,7 +17,7 @@ class FilterConfigurationController extends Controller
             return redirect()->back()->with('error', 'No organization selected.');
         }
 
-        $filterConfigurations = FilterConfiguration::where('organisation_id', $currentOrganization->id)
+        $filterConfigurations = FilterConfiguration::where('organization_id', $currentOrganization->id)
             ->orderBy('sort_order')
             ->get();
 
@@ -53,7 +53,7 @@ class FilterConfigurationController extends Controller
             'sort_order' => 'integer|min:0'
         ]);
 
-        $validatedData['organisation_id'] = $currentOrganization->id;
+        $validatedData['organization_id'] = $currentOrganization->id;
 
         FilterConfiguration::create($validatedData);
 
@@ -65,7 +65,7 @@ class FilterConfigurationController extends Controller
     {
         $currentOrganization = user_current_organization();
 
-        if ($filterConfiguration->organisation_id !== $currentOrganization->id) {
+        if ($filterConfiguration->organization_id !== $currentOrganization->id) {
             return redirect()->back()->with('error', 'Access denied.');
         }
 
@@ -78,7 +78,7 @@ class FilterConfigurationController extends Controller
     {
         $currentOrganization = user_current_organization();
 
-        if ($filterConfiguration->organisation_id !== $currentOrganization->id) {
+        if ($filterConfiguration->organization_id !== $currentOrganization->id) {
             return redirect()->back()->with('error', 'Access denied.');
         }
 
@@ -100,7 +100,7 @@ class FilterConfigurationController extends Controller
     {
         $currentOrganization = user_current_organization();
 
-        if ($filterConfiguration->organisation_id !== $currentOrganization->id) {
+        if ($filterConfiguration->organization_id !== $currentOrganization->id) {
             return redirect()->back()->with('error', 'Access denied.');
         }
 
@@ -114,7 +114,7 @@ class FilterConfigurationController extends Controller
     {
         $currentOrganization = user_current_organization();
 
-        if ($filterConfiguration->organisation_id !== $currentOrganization->id) {
+        if ($filterConfiguration->organization_id !== $currentOrganization->id) {
             return redirect()->back()->with('error', 'Access denied.');
         }
 

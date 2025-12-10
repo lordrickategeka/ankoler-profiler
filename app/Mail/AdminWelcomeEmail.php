@@ -2,7 +2,7 @@
 
 namespace App\Mail;
 
-use App\Models\Organisation;
+use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -23,7 +23,7 @@ class AdminWelcomeEmail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(User $user, Organisation $organization, string $temporaryPassword)
+    public function __construct(User $user, Organization $organization, string $temporaryPassword)
     {
         $this->user = $user;
         $this->organization = $organization;

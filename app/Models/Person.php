@@ -12,18 +12,14 @@ use Illuminate\Notifications\Notifiable;
 
 class Person extends Model
 {
-    /**
-     * User relationship (links person to user record)
-     */
-    public function user()
-    {
-        return $this->hasOne(User::class, 'person_id');
-    }
     use HasFactory, Notifiable;
     protected $table = 'persons';
     protected $fillable = [
         'person_id',
         'global_identifier',
+        'organization_id',
+        'user_id',
+
         'given_name',
         'middle_name',
         'family_name',
@@ -31,9 +27,10 @@ class Person extends Model
         'gender',
         'classification',
         'address',
+        'country',
         'city',
         'district',
-        'country',
+        
         'status',
         'created_by',
         'updated_by',
@@ -107,9 +104,9 @@ class Person extends Model
         return $this->hasMany(PersonAffiliation::class);
     }
 
-    public function organisations(): BelongsToMany
+    public function Organizations(): BelongsToMany
     {
-        return $this->belongsToMany(Organisation::class, 'person_affiliations')
+        return $this->belongsToMany(Organization::class, 'person_affiliations')
             ->withPivot([
                 'affiliation_id',
                 'site',
@@ -224,10 +221,10 @@ class Person extends Model
     /**
      * Check if person has affiliation with organization
      */
-    public function hasAffiliationWith($organisationId, $roleType = null): bool
+    public function hasAffiliationWith($OrganizationId, $roleType = null): bool
     {
         $query = $this->affiliations()
-            ->where('organisation_id', $organisationId)
+            ->where('organization_id', $OrganizationId)
             ->where('status', 'active');
 
         if ($roleType) {
@@ -366,10 +363,10 @@ class Person extends Model
             $query->whereDate('created_at', '<=', $criteria['created_to']);
         }
 
-        // Organisation filter
-        if (!empty($criteria['organisation_id'])) {
+        // Organization filter
+        if (!empty($criteria['organization_id'])) {
             $query->whereHas('affiliations', function ($q) use ($criteria) {
-                $q->where('organisation_id', $criteria['organisation_id'])
+                $q->where('organization_id', $criteria['organization_id'])
                     ->where('status', 'active');
 
                 if (!empty($criteria['role_type'])) {
@@ -416,12 +413,12 @@ class Person extends Model
     }
 
     /**
-     * Scope for filtering by organisation
+     * Scope for filtering by Organization
      */
-    public function scopeByOrganisation($query, int $organisationId, string $roleType = null)
+    public function scopeByOrganization($query, int $OrganizationId, string $roleType = null)
     {
-        return $query->whereHas('affiliations', function ($q) use ($organisationId, $roleType) {
-            $q->where('organisation_id', $organisationId)
+        return $query->whereHas('affiliations', function ($q) use ($OrganizationId, $roleType) {
+            $q->where('organization_id', $OrganizationId)
                 ->where('status', 'active');
 
             if ($roleType) {
@@ -512,12 +509,12 @@ class Person extends Model
     }
 
     /**
-     * Get active affiliations with organisation details
+     * Get active affiliations with Organization details
      */
-    public function getActiveAffiliationsWithOrganisationsAttribute()
+    public function getActiveAffiliationsWithOrganizationsAttribute()
     {
         return $this->affiliations()
-            ->with('organisation')
+            ->with('Organization')
             ->where('status', 'active')
             ->get();
     }
@@ -536,7 +533,7 @@ class Person extends Model
                     $query->where('is_primary', true);
                 },
                 'identifiers',
-                'organisations' => function ($query) {
+                'Organizations' => function ($query) {
                     $query->wherePivot('status', 'active');
                 }
             ])
@@ -592,5 +589,10 @@ class Person extends Model
     public function reverseRelationships()
     {
         return $this->hasMany(PersonRelationship::class, 'related_person_id');
+    }
+
+    public function User()
+    {
+        return $this->belongsTo(Person::class, 'user_id');
     }
 }

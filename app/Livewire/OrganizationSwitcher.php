@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Models\Organisation;
+use App\Models\Organization;
 use Illuminate\Support\Facades\Auth;
 
 class OrganizationSwitcher extends Component
@@ -52,7 +52,7 @@ class OrganizationSwitcher extends Component
             return;
         }
 
-        $organizations = $user->canAccessibleOrganisations();
+        $organizations = $user->canAccessibleOrganizations();
         
         // Filter by search term if provided
         if (!empty($this->searchTerm)) {
@@ -146,12 +146,12 @@ class OrganizationSwitcher extends Component
     {
         $user = Auth::user();
         // Verify user has access
-        if (!$user->canAccessOrganisation($organizationId)) {
+        if (!$user->canAccessOrganization($organizationId)) {
             session()->flash('error', 'You do not have access to this organization.');
             return;
         }
         // Get organization details
-        $organization = Organisation::find($organizationId);
+        $organization = Organization::find($organizationId);
         if (!$organization) {
             session()->flash('error', 'Organization not found.');
             return;

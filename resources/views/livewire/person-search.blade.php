@@ -150,18 +150,18 @@
                     </div>
 
                     <div>
-                        <label for="organisationId"
-                            class="block text-sm font-medium text-gray-700 mb-1">Organisation</label>
-                        <select wire:model.live="organisationId" id="organisationId"
+                        <label for="OrganizationId"
+                            class="block text-sm font-medium text-gray-700 mb-1">Organization</label>
+                        <select wire:model.live="OrganizationId" id="OrganizationId"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">All Organisations</option>
-                            @foreach ($organisations as $organisation)
-                                <option value="{{ $organisation->id }}">{{ $organisation->name }}</option>
+                            <option value="">All Organizations</option>
+                            @foreach ($Organizations as $Organization)
+                                <option value="{{ $Organization->id }}">{{ $Organization->name }}</option>
                             @endforeach
                         </select>
                     </div>
 
-                    @if ($organisationId)
+                    @if ($OrganizationId)
                         <div>
                             <label for="roleType" class="block text-sm font-medium text-gray-700 mb-1">Role Type</label>
                             <select wire:model.live="roleType" id="roleType"
@@ -695,7 +695,7 @@
                                                 </div>
                                                 <div class="flex-1">
                                                     <span
-                                                        class="font-medium">{{ $affiliation->organisation->display_name ?? $affiliation->organisation->legal_name ?? 'Not Provided' }}</span>
+                                                        class="font-medium">{{ $affiliation->Organization->display_name ?? $affiliation->Organization->legal_name ?? 'Not Provided' }}</span>
                                                     <span class="text-gray-500">-
                                                         {{ $affiliation->role_type }}</span>
                                                     @if ($affiliation->role_title)

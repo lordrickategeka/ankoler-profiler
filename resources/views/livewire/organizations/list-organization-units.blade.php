@@ -75,9 +75,9 @@
                     </div>
                     <div class="bg-white rounded-lg shadow p-4 mb-4">
                         <div class="flex flex-col gap-2 mb-4">
-                            <div class="text-xs text-gray-500">Organisation:
+                            <div class="text-xs text-gray-500">Organization:
                                 <span class="font-semibold text-gray-800">
-                                    {{ optional($selectedUnit->organisation)->name ?? (optional(\App\Models\Organisation::find($selectedUnit->organisation_id))->name ?? 'N/A') }}
+                                    {{ optional($selectedUnit->Organization)->name ?? (optional(\App\Models\Organization::find($selectedUnit->organization_id))->name ?? 'N/A') }}
                                 </span>
                             </div>
                             <div class="flex items-center gap-4">

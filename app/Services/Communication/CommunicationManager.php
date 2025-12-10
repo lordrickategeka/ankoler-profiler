@@ -306,11 +306,11 @@ class CommunicationManager
     }
 
     /**
-     * Get organisation communication statistics
+     * Get Organization communication statistics
      */
-    public function getOrganisationStats(int $organisationId, ?string $period = 'month'): array
+    public function getOrganizationStats(int $OrganizationId, ?string $period = 'month'): array
     {
-        $query = CommunicationMessage::where('organisation_id', $organisationId);
+        $query = CommunicationMessage::where('organization_id', $OrganizationId);
 
         // Apply time filter
         match ($period) {
@@ -356,7 +356,7 @@ class CommunicationManager
         return CommunicationMessage::create([
             'message_id' => 'msg_' . time() . '_' . Str::random(10),
             'sent_by_user_id' => Auth::id(),
-            'organisation_id' => Auth::user()?->organisation_id ?? 1, // Default fallback
+            'organization_id' => Auth::user()?->organization_id ?? 1, // Default fallback
             'recipient_person_id' => $recipientPersonId,
             'recipient_identifier' => $message->recipient,
             'recipient_type' => $message->channel,
@@ -433,7 +433,7 @@ class CommunicationManager
             'full_name' => $person->full_name,
             'email' => $person->emailAddresses->where('is_primary', true)->first()?->email ?? '',
             'phone' => $person->phones->where('is_primary', true)->first()?->number ?? '',
-            'organization' => $person->currentAffiliation?->organisation?->display_name ?? '',
+            'organization' => $person->currentAffiliation?->Organization?->display_name ?? '',
         ];
     }
 

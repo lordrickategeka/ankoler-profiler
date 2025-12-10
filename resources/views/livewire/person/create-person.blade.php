@@ -7,8 +7,8 @@
                 {{ __('Create New Person') }}
             </h2>
             <p class="text-gray-600 text-sm mt-1">Step
-                {{ array_search($currentStep, ['basic_info', 'contact_address', 'document_info', 'affiliation_details']) + 1 }}
-                of 4:
+                {{ array_search($currentStep, ['basic_info', 'contact_address', 'affiliation_details']) + 1 }}
+                of 3:
                 @switch($currentStep)
                     @case('basic_info')
                         Personal Information
@@ -18,15 +18,11 @@
                         Contact & Address Details
                     @break
 
-                    @case('document_info')
-                        Document & Identifiers
+                    @case('affiliation_details')
+                        Organization Affiliations
                     @break
 
-                        @case('affiliation_details')
-                            Organization Affiliations
-                        @break
-
-                    @endswitch
+                @endswitch
             </p>
         </div>
 
@@ -48,8 +44,8 @@
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200">
                     <div class="flex overflow-x-auto">
                         @php
-                            $steps = ['basic_info', 'contact_address', 'document_info', 'affiliation_details'];
-                            $stepLabels = ['Personal', 'Contact & Address', 'Documents', 'Affiliations'];
+                            $steps = ['basic_info', 'contact_address', 'affiliation_details'];
+                            $stepLabels = ['Personal', 'Contact & Address', 'Affiliations'];
                             $currentStepIndex = array_search($currentStep, $steps);
                         @endphp
 
@@ -128,12 +124,12 @@
                                 </div>
 
                                 {{-- Organization Info Alert for non-Super Admin users --}}
-                                @if($isOrganizationLocked && $selectedOrganisationName)
+                                @if($isOrganizationLocked && $selectedOrganizationName)
                                     <div class="alert alert-info mb-4">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
-                                        <span>This person will be automatically affiliated with <strong>{{ $selectedOrganisationName }}</strong> when created.</span>
+                                        <span>This person will be automatically affiliated with <strong>{{ $selectedOrganizationName }}</strong> when created.</span>
                                     </div>
                                 @endif
 
@@ -296,7 +292,7 @@
                                         @enderror
                                     </div>
 
-                                    <div class="form-control">
+                                    {{-- <div class="form-control">
                                         <label class="label pb-1">
                                             <span class="label-text text-sm font-medium">National ID</span>
                                         </label>
@@ -305,7 +301,7 @@
                                         @error('form.national_id')
                                             <span class="text-red-600 text-xs mt-1">{{ $message }}</span>
                                         @enderror
-                                    </div>
+                                    </div> --}}
                                 </div>
 
                                 {{-- Address Information Section --}}
@@ -370,53 +366,7 @@
                             </div>
                         @endif
 
-                        {{-- Step 3: Document Information --}}
-                        @if ($currentStep === 'document_info')
-                            <div class="space-y-4">
-                                <div>
-                                    <h3 class="text-base font-medium text-gray-900 mb-2">Document & Identifiers</h3>
-                                    <p class="text-gray-600 text-sm mb-4">Provide additional identification documents
-                                        and certificates.</p>
-                                </div>
-
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div class="form-control">
-                                        <label class="label pb-1">
-                                            <span class="label-text text-sm font-medium">Passport Number</span>
-                                        </label>
-                                        <input type="text" wire:model="form.passport_number"
-                                            class="input input-bordered input-sm" placeholder="Passport number">
-                                        @error('form.passport_number')
-                                            <span class="text-red-600 text-xs mt-1">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-
-                                    <div class="form-control">
-                                        <label class="label pb-1">
-                                            <span class="label-text text-sm font-medium">Driver's License</span>
-                                        </label>
-                                        <input type="text" wire:model="form.drivers_license"
-                                            class="input input-bordered input-sm"
-                                            placeholder="Driver's license number">
-                                        @error('form.drivers_license')
-                                            <span class="text-red-600 text-xs mt-1">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-
-                                    <div class="form-control">
-                                        <label class="label pb-1">
-                                            <span class="label-text text-sm font-medium">Professional License</span>
-                                        </label>
-                                        <input type="text" wire:model="form.professional_license"
-                                            class="input input-bordered input-sm"
-                                            placeholder="Professional license number">
-                                        @error('form.professional_license')
-                                            <span class="text-red-600 text-xs mt-1">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
+                        {{-- Document & Identifiers step removed --}}
 
                         {{-- Step 4: Multiple Affiliations Management --}}
                         @if ($currentStep === 'affiliation_details' && !$showDuplicateWarning)
@@ -437,19 +387,19 @@
                                                     <div class="flex items-center gap-2 mb-1">
                                                         <span class="text-sm font-medium text-green-800">
                                                             @php
-                                                                $org = $availableOrganisations ? collect($availableOrganisations)->firstWhere('id', $affiliation['organisation_id']) : null;
+                                                                $org = $availableOrganizations ? collect($availableOrganizations)->firstWhere('id', $affiliation['organization_id']) : null;
                                                                 echo $org ? ($org['display_name'] ?? $org['legal_name']) : 'Unknown Organization';
                                                             @endphp
                                                         </span>
                                                         <span class="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full">
-                                                            {{ $this->getRoleLabelForOrganization($affiliation['role_type'], $affiliation['organisation_id']) }}
+                                                            {{ $this->getRoleLabelForOrganization($affiliation['role_type'], $affiliation['organization_id']) }}
                                                         </span>
                                                     </div>
                                                     <div class="text-xs text-green-600">
                                                         @if ($affiliation['role_title'])
                                                             Title: {{ $affiliation['role_title'] }} •
                                                         @endif
-                                                        Start: {{ \Carbon\Carbon::parse($affiliation['start_date'])->format('M d, Y') }}
+                                                        Start: {{ $affiliation['start_date'] ? \Carbon\Carbon::parse($affiliation['start_date'])->format('M d, Y') : 'Not specified' }}
                                                         @if ($affiliation['site'])
                                                             • Site: {{ $affiliation['site'] }}
                                                         @endif
@@ -486,10 +436,10 @@
                                                 <div class="text-xs text-purple-600 mb-1">
                                                     🌟 Super Admin - All organizations available
                                                 </div>
-                                                <select wire:model.live="currentAffiliation.organisation_id" class="select select-bordered select-sm">
+                                                <select wire:model.live="currentAffiliation.organization_id" class="select select-bordered select-sm">
                                                     <option value="">Select Organization</option>
-                                                    @if (isset($availableOrganisations))
-                                                        @foreach ($availableOrganisations as $org)
+                                                    @if (isset($availableOrganizations))
+                                                        @foreach ($availableOrganizations as $org)
                                                             <option value="{{ $org['id'] }}">
                                                                 {{ $org['display_name'] ?? $org['legal_name'] }}
                                                                 @if ($org['is_super'])
@@ -506,7 +456,7 @@
                                                         📍 Persons will be automatically affiliated with your organization
                                                     </div>
                                                     <input type="text"
-                                                           value="{{ $selectedOrganisationName }}"
+                                                           value="{{ $selectedOrganizationName }}"
                                                            class="input input-bordered input-sm bg-base-200"
                                                            readonly>
                                                     <div class="text-xs text-gray-500 mt-1">
@@ -517,7 +467,7 @@
                                                         Organization Admin - Restricted to your organization
                                                     </div>
                                                     @php $userOrgs = $this->getAvailableOrganizations(); @endphp
-                                                    <select wire:model.live="currentAffiliation.organisation_id" class="select select-bordered select-sm">
+                                                    <select wire:model.live="currentAffiliation.organization_id" class="select select-bordered select-sm">
                                                         <option value="">Select Organization</option>
                                                         @foreach ($userOrgs as $org)
                                                             <option value="{{ $org['id'] }}">{{ $org['name'] }}</option>
@@ -525,7 +475,7 @@
                                                     </select>
                                                 @endif
                                             @endif
-                                            @error('currentAffiliation.organisation_id')
+                                            @error('currentAffiliation.organization_id')
                                                 <span class="text-red-600 text-xs mt-1">{{ $message }}</span>
                                             @enderror
                                         </div>
@@ -539,9 +489,9 @@
                                                 <div class="text-xs text-purple-600 mb-1">
                                                     🌟 Super Admin - All role types available
                                                 </div>
-                                            @elseif($currentAffiliation['organisation_id'])
+                                            @elseif($currentAffiliation['organization_id'])
                                                 @php
-                                                    $selectedOrg = collect($availableOrganisations ?? [])->firstWhere('id', $currentAffiliation['organisation_id']);
+                                                    $selectedOrg = collect($availableOrganizations ?? [])->firstWhere('id', $currentAffiliation['organization_id']);
                                                     $orgCategory = $selectedOrg['category'] ?? 'general';
                                                 @endphp
                                                 <div class="text-xs text-blue-600 mb-1">
@@ -1013,7 +963,7 @@
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
                                                 <div>
                                                     <p><strong>Born:</strong>
-                                                        {{ $duplicate['person']->date_of_birth?->format('F j, Y') ?: 'Not specified' }}
+                                                        {{ $duplicate['person']->date_of_birth ? \Carbon\Carbon::parse($duplicate['person']->date_of_birth)->format('F j, Y') : 'Not specified' }}
                                                     </p>
                                                     <p><strong>Phone:</strong>
                                                         {{ $duplicate['person']->primaryPhone()?->number ?: 'Not specified' }}
@@ -1022,7 +972,7 @@
                                                         {{ $duplicate['person']->primaryEmail()?->email ?: 'Not specified' }}
                                                     </p>
                                                 </div>
-                                                <div>
+                                                {{-- <div>
                                                     <p><strong>National ID:</strong>
                                                         {{ $duplicate['person']->nationalId()?->identifier ?: 'Not specified' }}
                                                     </p>
@@ -1031,7 +981,7 @@
                                                     <p><strong>Match Type:</strong>
                                                         {{ ucfirst(str_replace('_', ' ', $duplicate['match_type'] ?? '')) }}
                                                     </p>
-                                                </div>
+                                                </div> --}}
                                             </div>
 
                                             <div class="mt-3">
@@ -1041,7 +991,7 @@
                                                     @forelse($duplicate['person']->activeAffiliations as $affiliation)
                                                         <div class="bg-white rounded p-3 mb-2">
                                                             <p class="font-medium">
-                                                                {{ $affiliation->organisation->name ?? 'Unknown Organization' }}
+                                                                {{ $affiliation->Organization->name ?? 'Unknown Organization' }}
                                                             </p>
                                                             <p class="text-sm text-gray-600">
                                                                 {{ $affiliation->role_type }}
@@ -1051,7 +1001,7 @@
                                                             </p>
                                                             <p class="text-sm text-gray-500">
                                                                 Started:
-                                                                {{ $affiliation->start_date->format('M j, Y') }} |
+                                                                {{ $affiliation->start_date ? \Carbon\Carbon::parse($affiliation->start_date)->format('M j, Y') : 'Not specified' }} |
                                                                 Status: {{ ucfirst($affiliation->status) }}
                                                             </p>
                                                         </div>
@@ -1081,7 +1031,7 @@
                                             </span>
                                         </button>
                                         <button wire:click="viewProfile({{ $duplicate['person']->id }})"
-                                            class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
+                                            class="bg-blue-800 text-white px-4 py-2 rounded">
                                             👤 View Full Profile First
                                         </button>
                                     </div>
@@ -1116,7 +1066,7 @@
                                     <strong>What would you like to do?</strong><br>
                                     <strong>Link to Existing:</strong> Reuse existing person record and add new
                                     affiliation to
-                                    {{ $currentOrganisation->display_name ?? ($currentOrganisation->legal_name ?? 'your organization' ?? 'your organization') }}<br>
+                                    {{ $currentOrganization->display_name ?? ($currentOrganization->legal_name ?? 'your organization' ?? 'your organization') }}<br>
                                     <strong>View Profile:</strong> See complete details before deciding<br>
                                     <strong>Create as New:</strong> This is a different person with similar details
                                 </p>
@@ -1213,7 +1163,7 @@
                     </svg>`;
             case 'error':
                 return `<svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                     </svg>`;
             case 'info':
                 return `<svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">

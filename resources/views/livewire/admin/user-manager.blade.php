@@ -100,11 +100,11 @@
                                     @endif
                                 </td>
                                 <td>
-                                    @if ($user->organisation)
+                                    @if ($user->Organization)
                                         <div class="font-medium">
-                                            {{ $user->organisation->display_name ?? $user->organisation->legal_name }}
+                                            {{ $user->Organization->display_name ?? $user->Organization->legal_name }}
                                         </div>
-                                        <div class="text-sm text-gray-500">{{ $user->organisation->code }}</div>
+                                        <div class="text-sm text-gray-500">{{ $user->Organization->code }}</div>
                                     @else
                                         <div class="text-gray-400 italic">No organization</div>
                                     @endif

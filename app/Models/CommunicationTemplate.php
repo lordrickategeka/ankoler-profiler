@@ -14,7 +14,7 @@ class CommunicationTemplate extends Model
         'name',
         'description',
         'user_id',
-        'organisation_id',
+        'organization_id',
         'subject',
         'content',
         'category',
@@ -39,9 +39,9 @@ class CommunicationTemplate extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function organisation(): BelongsTo
+    public function Organization(): BelongsTo
     {
-        return $this->belongsTo(Organisation::class);
+        return $this->belongsTo(Organization::class);
     }
 
     public function render(Person $person, array $extraVariables = []): array
@@ -82,7 +82,7 @@ class CommunicationTemplate extends Model
         $affiliation = $person->affiliations->first();
         if ($affiliation) {
             $variables['role_title'] = $affiliation->role_title;
-            $variables['organisation_name'] = $affiliation->organisation->legal_name ?? '';
+            $variables['Organization_name'] = $affiliation->Organization->legal_name ?? '';
         }
 
         $primaryPhone = $person->primaryPhone();
@@ -114,12 +114,12 @@ class CommunicationTemplate extends Model
         return $query->where('is_active', true);
     }
 
-    public function scopeAccessibleBy($query, $userId, $organisationId)
+    public function scopeAccessibleBy($query, $userId, $OrganizationId)
     {
-        return $query->where(function ($q) use ($userId, $organisationId) {
+        return $query->where(function ($q) use ($userId, $OrganizationId) {
             $q->where('user_id', $userId)
-              ->orWhere(function ($q2) use ($organisationId) {
-                  $q2->where('organisation_id', $organisationId)
+              ->orWhere(function ($q2) use ($OrganizationId) {
+                  $q2->where('organization_id', $OrganizationId)
                      ->where('is_shared', true);
               });
         });

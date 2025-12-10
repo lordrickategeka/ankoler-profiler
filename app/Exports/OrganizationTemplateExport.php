@@ -8,7 +8,7 @@ use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class OrganisationTemplateExport implements FromArray, WithStyles, WithColumnFormatting
+class OrganizationTemplateExport implements FromArray, WithStyles, WithColumnFormatting
 {
     protected $data;
     protected $headers;

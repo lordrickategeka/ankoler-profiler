@@ -51,7 +51,7 @@ class CommunicationPermissionSeeder extends Seeder
                 'send-bulk-communications',
                 'view-communication-analytics'
             ],
-            'Organisation Admin' => [
+            'Organization Admin' => [
                 'view-communications',
                 'send-communications',
                 'send-bulk-communications',

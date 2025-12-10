@@ -6,7 +6,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Validate;
 use App\Models\Person;
-use App\Models\Organisation;
+use App\Models\Organization;
 use App\Models\CommunicationFilterProfile;
 use App\Models\CommunicationTemplate;
 use App\Services\Communication\CommunicationManager;
@@ -270,7 +270,7 @@ class SendMessage extends Component
             } else {
                 // For other users, limit to current organization
                 $query->whereHas('affiliations', function ($q) use ($organization) {
-                    $q->where('organisation_id', $organization->id);
+                    $q->where('organization_id', $organization->id);
                 });
             }
 
@@ -278,7 +278,7 @@ class SendMessage extends Component
                 $query->where('given_name', 'like', '%' . $this->person_search . '%')
                     ->orWhere('family_name', 'like', '%' . $this->person_search . '%');
             })
-                ->with(['emailAddresses', 'phones', 'affiliations.organisation'])
+                ->with(['emailAddresses', 'phones', 'affiliations.Organization'])
                 ->limit(15) // Increased limit for Super Admin who might see more results
                 ->get();
 
@@ -291,7 +291,7 @@ class SendMessage extends Component
                     'email_addresses' => $person->emailAddresses->toArray(),
                     'phones' => $person->phones->toArray(),
                     'affiliations' => $person->affiliations->toArray(),
-                    'organization_name' => $primaryAffiliation ? $primaryAffiliation->organisation->legal_name ?? $primaryAffiliation->organisation->name ?? 'Unknown Organization' : 'No Organization'
+                    'organization_name' => $primaryAffiliation ? $primaryAffiliation->Organization->legal_name ?? $primaryAffiliation->Organization->name ?? 'Unknown Organization' : 'No Organization'
                 ];
             })->toArray();
         } catch (Exception $e) {
@@ -322,7 +322,7 @@ class SendMessage extends Component
                 // Other users see only their organization's persons
                 $organization = OrganizationHelper::getCurrentOrganization();
                 $this->filter_preview_count = Person::whereHas('affiliations', function ($query) use ($organization) {
-                    $query->where('organisation_id', $organization->id);
+                    $query->where('organization_id', $organization->id);
                 })->count();
             }
         } catch (Exception $e) {
@@ -377,7 +377,7 @@ class SendMessage extends Component
             $organization = OrganizationHelper::getCurrentOrganization();
 
             $this->available_templates = CommunicationTemplate::where(function ($query) use ($organization) {
-                $query->where('organisation_id', $organization->id)
+                $query->where('organization_id', $organization->id)
                     ->orWhere('is_global', true);
             })
                 ->where('is_active', true)
@@ -554,7 +554,7 @@ class SendMessage extends Component
                     // Other users get persons from their organization only
                     $organization = OrganizationHelper::getCurrentOrganization();
                     $persons = Person::whereHas('affiliations', function ($query) use ($organization) {
-                        $query->where('organisation_id', $organization->id);
+                        $query->where('organization_id', $organization->id);
                     })
                         ->with(['emailAddresses', 'phones'])
                         ->get();
@@ -579,7 +579,7 @@ class SendMessage extends Component
                 if (!$this->isSuperAdmin()) {
                     $organization = OrganizationHelper::getCurrentOrganization();
                     $query->whereHas('affiliations', function ($q) use ($organization) {
-                        $q->where('organisation_id', $organization->id);
+                        $q->where('organization_id', $organization->id);
                     });
                 }
 

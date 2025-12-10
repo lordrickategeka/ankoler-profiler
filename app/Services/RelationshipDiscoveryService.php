@@ -312,7 +312,7 @@ class RelationshipDiscoveryService
                 s.person_id as student_id,
                 a.person_id as potential_parent_id
             FROM person_affiliations s
-            JOIN person_affiliations a ON s.organisation_id = a.organisation_id
+            JOIN person_affiliations a ON s.organization_id = a.organization_id
             JOIN persons sp ON s.person_id = sp.id
             JOIN persons ap ON a.person_id = ap.id
             WHERE s.role_type = 'STUDENT'
@@ -368,7 +368,7 @@ class RelationshipDiscoveryService
         $multiAffiliatedPersons = PersonAffiliation::query()
             ->select('person_id')
             ->groupBy('person_id')
-            ->havingRaw('COUNT(DISTINCT organisation_id) > 1')
+            ->havingRaw('COUNT(DISTINCT organization_id) > 1')
             ->pluck('person_id');
 
         foreach ($multiAffiliatedPersons as $personId) {
@@ -519,8 +519,8 @@ class RelationshipDiscoveryService
         }
 
         // Organization type compatibility
-        $primaryOrgType = $primary->organisation->category ?? '';
-        $secondaryOrgType = $secondary->organisation->category ?? '';
+        $primaryOrgType = $primary->Organization->category ?? '';
+        $secondaryOrgType = $secondary->Organization->category ?? '';
 
         $compatibleTypes = [
             ['hospital', 'school'],

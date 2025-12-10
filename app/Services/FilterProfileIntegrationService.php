@@ -40,9 +40,9 @@ class FilterProfileIntegrationService
             $converted['age_range'] = $ageFrom . '-' . $ageTo;
         }
         
-        // Organisation and role type
-        if (!empty($searchFilters['organisationId'])) {
-            $converted['organisation_id'] = $searchFilters['organisationId'];
+        // Organization and role type
+        if (!empty($searchFilters['OrganizationId'])) {
+            $converted['organization_id'] = $searchFilters['OrganizationId'];
         }
         
         if (!empty($searchFilters['roleType'])) {
@@ -67,7 +67,7 @@ class FilterProfileIntegrationService
             'searchBy' => 'global',
             'classification' => '',
             'gender' => '',
-            'organisationId' => '',
+            'OrganizationId' => '',
             'roleType' => '',
             'status' => 'active',
             'city' => '',
@@ -86,7 +86,7 @@ class FilterProfileIntegrationService
             'district' => 'district',
             'country' => 'country',
             'classification' => 'classification',
-            'organisation_id' => 'organisationId',
+            'organization_id' => 'OrganizationId',
             'role_type' => 'roleType',
             'search_type' => 'searchBy',
         ];
@@ -172,9 +172,9 @@ class FilterProfileIntegrationService
                     });
                     break;
                     
-                case 'organisation_id':
+                case 'organization_id':
                     $query->whereHas('affiliations', function($q) use ($value) {
-                        $q->where('organisation_id', $value);
+                        $q->where('organization_id', $value);
                     });
                     break;
             }
@@ -191,7 +191,7 @@ class FilterProfileIntegrationService
         try {
             if ($organizationId) {
                 $query = Person::whereHas('affiliations', function ($q) use ($organizationId) {
-                    $q->where('organisation_id', $organizationId);
+                    $q->where('organization_id', $organizationId);
                 });
             } else {
                 $query = Person::query();
@@ -223,8 +223,8 @@ class FilterProfileIntegrationService
         }
         
         // Validate organization exists if provided
-        if (!empty($criteria['organisation_id'])) {
-            if (!\App\Models\Organisation::find($criteria['organisation_id'])) {
+        if (!empty($criteria['organization_id'])) {
+            if (!\App\Models\Organization::find($criteria['organization_id'])) {
                 $errors[] = 'Selected organization does not exist.';
             }
         }
@@ -254,7 +254,7 @@ class FilterProfileIntegrationService
                 'name' => $name,
                 'description' => $description,
                 'user_id' => Auth::id(),
-                'organisation_id' => $organization->id,
+                'organization_id' => $organization->id,
                 'filter_criteria' => $convertedCriteria,
                 'is_shared' => false,
                 'is_active' => true,
@@ -273,7 +273,7 @@ class FilterProfileIntegrationService
         $query = CommunicationFilterProfile::where('is_active', true);
         
         if ($organizationId) {
-            $query->where('organisation_id', $organizationId);
+            $query->where('organization_id', $organizationId);
         }
         
         return $query->select('filter_criteria')

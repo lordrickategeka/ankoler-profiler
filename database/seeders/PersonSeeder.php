@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Person;
-use App\Models\Organisation;
+use App\Models\Organization;
 use App\Models\Phone;
 use App\Models\EmailAddress;
 use App\Models\PersonIdentifier;
@@ -21,8 +21,8 @@ class PersonSeeder extends Seeder
         $this->command->info('Creating persons with affiliations across all organizations...');
 
         // Get all existing organizations
-        $organizations = Organisation::all();
-        
+        $organizations = Organization::all();
+
         if ($organizations->isEmpty()) {
             $this->command->warn('No organizations found. Please run organization seeders first.');
             return;
@@ -37,7 +37,7 @@ class PersonSeeder extends Seeder
 
         foreach ($organizations as $organization) {
             $this->command->info("\nCreating persons for {$organization->legal_name} ({$organization->category})...");
-            
+
             // Create different numbers of persons based on organization type
             $personCount = match($organization->category) {
                 'hospital' => 8,  // Mix of patients, doctors, nurses, staff
@@ -51,11 +51,11 @@ class PersonSeeder extends Seeder
             for ($i = 0; $i < $personCount; $i++) {
                 // Create person with organization-specific traits
                 $person = $this->createPersonForOrganization($organization);
-                
+
                 // Create contact information (80% chance of phone, 60% chance of email)
                 if (rand(1, 10) <= 8) {
                     Phone::factory()->create(['person_id' => $person->id]);
-                    
+
                     // 30% chance of secondary phone
                     if (rand(1, 10) <= 3) {
                         Phone::factory()->secondary()->create(['person_id' => $person->id]);
@@ -87,7 +87,7 @@ class PersonSeeder extends Seeder
                 $affiliation = $this->createAffiliationForOrganization($person, $organization);
 
                 $totalPersons++;
-                
+
                 $this->command->line("  Created: {$person->given_name} {$person->family_name} - {$affiliation->role_title}");
             }
         }
@@ -104,22 +104,44 @@ class PersonSeeder extends Seeder
     /**
      * Create a person tailored for specific organization type
      */
-    private function createPersonForOrganization(Organisation $organization): Person
+    private function createPersonForOrganization(Organization $organization): Person
     {
+        // Create a user for the person first
+        $user = \App\Models\User::factory()->create();
+
+        // Create the person with both organization_id and user_id
         return match($organization->category) {
-            'hospital' => Person::factory()->forHospital()->create(),
-            'school' => Person::factory()->forSchool()->create(),
-            'sacco' => Person::factory()->forSacco()->create(),
-            'parish' => Person::factory()->forParish()->create(),
-            'corporate' => Person::factory()->forCorporate()->create(),
-            default => Person::factory()->create()
+            'hospital' => Person::factory()->forHospital()->create([
+                'organization_id' => $organization->id,
+                'user_id' => $user->id
+            ]),
+            'school' => Person::factory()->forSchool()->create([
+                'organization_id' => $organization->id,
+                'user_id' => $user->id
+            ]),
+            'sacco' => Person::factory()->forSacco()->create([
+                'organization_id' => $organization->id,
+                'user_id' => $user->id
+            ]),
+            'parish' => Person::factory()->forParish()->create([
+                'organization_id' => $organization->id,
+                'user_id' => $user->id
+            ]),
+            'corporate' => Person::factory()->forCorporate()->create([
+                'organization_id' => $organization->id,
+                'user_id' => $user->id
+            ]),
+            default => Person::factory()->create([
+                'organization_id' => $organization->id,
+                'user_id' => $user->id
+            ])
         };
     }
 
     /**
      * Create an affiliation tailored for specific organization
      */
-    private function createAffiliationForOrganization(Person $person, Organisation $organization): PersonAffiliation
+    private function createAffiliationForOrganization(Person $person, Organization $organization): PersonAffiliation
     {
         return match($organization->category) {
             'hospital' => PersonAffiliation::factory()->forHospital($organization)->create(['person_id' => $person->id]),
@@ -129,7 +151,7 @@ class PersonSeeder extends Seeder
             'corporate' => PersonAffiliation::factory()->forCorporate($organization)->create(['person_id' => $person->id]),
             default => PersonAffiliation::factory()->create([
                 'person_id' => $person->id,
-                'organisation_id' => $organization->id
+                'organization_id' => $organization->id
             ])
         };
     }

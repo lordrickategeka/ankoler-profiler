@@ -3,8 +3,8 @@
 namespace App\Livewire\Organizations;
 
 
-use App\Models\Organisation;
-use App\Models\OrganisationSite;
+use App\Models\Organization;
+use App\Models\OrganizationSite;
 use App\Mail\AdminWelcomeEmail;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -105,7 +105,7 @@ class Create extends Component
                 'size' => $this->importFile ? $this->importFile->getSize() : null,
                 'mime' => $this->importFile ? $this->importFile->getMimeType() : null,
             ]);
-            $import = new \App\Imports\OrganisationsImport();
+            $import = new \App\Imports\OrganizationsImport();
             \Maatwebsite\Excel\Facades\Excel::import($import, $this->importFile);
             $summary = $import->results['summary'];
             $details = $import->results['details'];
@@ -143,11 +143,11 @@ class Create extends Component
         'category' => 'required|in:hospital,school,sacco,parish,corporate,government,ngo,other',
 
         // Step 2
-        'legal_name' => 'required|string|max:255|unique:organisations,legal_name',
-        'code' => 'required|string|max:20|unique:organisations,code',
+        'legal_name' => 'required|string|max:255|unique:Organizations,legal_name',
+        'code' => 'required|string|max:20|unique:Organizations,code',
         'organization_type' => 'required|in:HOLDING,SUBSIDIARY,STANDALONE',
-        'registration_number' => 'required|string|unique:organisations,registration_number',
-        'contact_email' => 'required|email|unique:organisations,contact_email',
+        'registration_number' => 'required|string|unique:Organizations,registration_number',
+        'contact_email' => 'required|email|unique:Organizations,contact_email',
         'contact_phone' => 'required|string',
         'date_established' => 'required|date|before_or_equal:today',
 
@@ -577,7 +577,7 @@ class Create extends Component
                     break;
             }
 
-            $organization = Organisation::create($organizationData);
+            $organization = Organization::create($organizationData);
 
             $adminUser = null;
             if ($this->admin_assignment_type !== 'defer') {
@@ -685,7 +685,7 @@ class Create extends Component
             'id' => Str::uuid(),
             'affiliation_id' => 'AFF-' . strtoupper(Str::random(6)),
             'person_id' => $person->id,
-            'organisation_id' => $organization->id,
+            'organization_id' => $organization->id,
             'role_type' => 'SYSTEM_ADMIN', // Using role_type field as string value
             'role_title' => $adminData['title'],
             'status' => 'ACTIVE',
@@ -698,13 +698,13 @@ class Create extends Component
             'name' => $adminData['name'],
             'email' => $adminData['email'],
             'password' => Hash::make($password),
-            'organisation_id' => $organization->id,
+            'organization_id' => $organization->id,
             'person_id' => $person->id,
             'email_verified_at' => now(),
         ]);
 
         // Assign system roles
-        $user->assignRole('Organisation Admin');
+        $user->assignRole('Organization Admin');
 
         // Store password temporarily for notification (in production, use secure method)
         session()->put('admin_temp_password', $password);
@@ -809,7 +809,7 @@ class Create extends Component
             'parish' => [
                 'label' => 'Parish / Religious Organization',
                 'icon' => 'M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M10.5 3L12 2l1.5 1H21v6H3V3h7.5z',
-                'description' => 'Religious organizations including parishes, organisations, and temples'
+                'description' => 'Religious organizations including parishes, Organizations, and temples'
             ],
             'corporate' => [
                 'label' => 'Corporate / Business',

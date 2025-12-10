@@ -107,9 +107,9 @@ class CrossOrgRelationship extends Model
 
     public function scopeForOrganization(Builder $query, int $orgId): Builder
     {
-        return $query->whereHas('primaryAffiliation.organisation', function ($q) use ($orgId) {
+        return $query->whereHas('primaryAffiliation.Organization', function ($q) use ($orgId) {
             $q->where('id', $orgId);
-        })->orWhereHas('secondaryAffiliation.organisation', function ($q) use ($orgId) {
+        })->orWhereHas('secondaryAffiliation.Organization', function ($q) use ($orgId) {
             $q->where('id', $orgId);
         });
     }
@@ -178,8 +178,8 @@ class CrossOrgRelationship extends Model
             return 'Unknown relationship';
         }
 
-        $primaryOrg = $primary->organisation->legal_name ?? 'Unknown Org';
-        $secondaryOrg = $secondary->organisation->legal_name ?? 'Unknown Org';
+        $primaryOrg = $primary->Organization->legal_name ?? 'Unknown Org';
+        $secondaryOrg = $secondary->Organization->legal_name ?? 'Unknown Org';
 
         return sprintf(
             '%s at %s and %s at %s',
@@ -251,8 +251,8 @@ class CrossOrgRelationship extends Model
 
         $primaryRole = strtolower($primary->role_type);
         $secondaryRole = strtolower($secondary->role_type);
-        $primaryOrgType = $primary->organisation->category ?? 'unknown';
-        $secondaryOrgType = $secondary->organisation->category ?? 'unknown';
+        $primaryOrgType = $primary->Organization->category ?? 'unknown';
+        $secondaryOrgType = $secondary->Organization->category ?? 'unknown';
 
         return sprintf(
             '%s_at_%s_%s_at_%s',
@@ -270,7 +270,7 @@ class CrossOrgRelationship extends Model
             ->verified()
             ->orderByDesc('impact_score')
             ->limit($limit)
-            ->with(['person', 'primaryAffiliation.organisation', 'secondaryAffiliation.organisation'])
+            ->with(['person', 'primaryAffiliation.Organization', 'secondaryAffiliation.Organization'])
             ->get();
     }
 
@@ -278,10 +278,10 @@ class CrossOrgRelationship extends Model
     {
         $query = self::active()
             ->whereHas('primaryAffiliation', function ($q) use ($orgId) {
-                $q->where('organisation_id', $orgId);
+                $q->where('organization_id', $orgId);
             })
             ->orWhereHas('secondaryAffiliation', function ($q) use ($orgId) {
-                $q->where('organisation_id', $orgId);
+                $q->where('organization_id', $orgId);
             });
 
         return [

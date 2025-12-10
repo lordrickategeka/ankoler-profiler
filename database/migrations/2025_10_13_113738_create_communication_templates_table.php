@@ -18,7 +18,7 @@ return new class extends Migration
 
             // Ownership and organization context
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('organisation_id')->constrained('organisations')->onDelete('cascade');
+            $table->foreignId('organization_id')->constrained('organizations')->onDelete('cascade');
 
             // Template content
             $table->string('subject')->nullable(); // For email
@@ -38,9 +38,9 @@ return new class extends Migration
             $table->timestamps();
 
             // Indexes
-            $table->index(['user_id', 'organisation_id']);
-            $table->index(['organisation_id', 'category']);
-            $table->index(['organisation_id', 'is_shared']);
+            $table->index(['user_id', 'organization_id']);
+            $table->index(['organization_id', 'category']);
+            $table->index(['organization_id', 'is_shared']);
         });
     }
 

@@ -14,7 +14,7 @@ class OrganizationUnitsSeeder extends Seeder
     {
         $units = [
             [
-                'organisation_id' => 1,
+                'organization_id' => 1,
                 'name' => 'Youth Wing',
                 'code' => 'YW-001',
                 'description' => 'Youth ministry and activities',
@@ -60,7 +60,7 @@ class OrganizationUnitsSeeder extends Seeder
                 'unit_roles' => json_encode(['Leader', 'Member', 'Mentor']),
             ],
             [
-                'organisation_id' => 1,
+                'organization_id' => 1,
                 'name' => 'Mothers’ Union',
                 'code' => 'MU-001',
                 'description' => 'Mothers’ Union and women activities',
@@ -106,7 +106,7 @@ class OrganizationUnitsSeeder extends Seeder
                 'unit_roles' => json_encode(['Leader', 'Member', 'Supporter']),
             ],
             [
-                'organisation_id' => 1,
+                'organization_id' => 1,
                 'name' => 'Media Ministry',
                 'code' => 'MM-001',
                 'description' => 'Media and communications',

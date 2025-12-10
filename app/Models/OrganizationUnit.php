@@ -12,7 +12,7 @@ class OrganizationUnit extends Model
     protected $table = 'organization_units';
 
     protected $fillable = [
-        'organisation_id',
+        'organization_id',
         'name',
         'code',
         'description',

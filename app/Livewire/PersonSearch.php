@@ -6,7 +6,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Person;
 use App\Models\CommunicationFilterProfile;
-use App\Models\Organisation;
+use App\Models\Organization;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use App\Helpers\OrganizationHelperNew as OrganizationHelper;
@@ -25,7 +25,7 @@ class PersonSearch extends Component
     // Advanced filters
     public $classification = '';
     public $gender = '';
-    public $organisationId = '';
+    public $OrganizationId = '';
     public $roleType = '';
     public $city = '';
     public $district = '';
@@ -55,7 +55,7 @@ class PersonSearch extends Component
     public $showSaveFilterModal = false;
 
     // Data
-    public $organisations = [];
+    public $Organizations = [];
     public $classifications = [];
     public $roleTypes = [];
 
@@ -67,7 +67,7 @@ class PersonSearch extends Component
         'searchBy' => ['except' => 'global'],
         'classification' => ['except' => ''],
         'gender' => ['except' => ''],
-        'organisationId' => ['except' => ''],
+        'OrganizationId' => ['except' => ''],
         'status' => ['except' => 'active'],
         'viewMode' => ['except' => 'grid'],
         'page' => ['except' => 1],
@@ -82,15 +82,15 @@ class PersonSearch extends Component
     public function mount()
     {
         $this->resetPage();
-        $this->loadOrganisations();
+        $this->loadOrganizations();
         $this->loadClassifications();
         $this->loadRoleTypes();
         $this->loadAvailableProfiles();
     }
 
-    public function loadOrganisations()
+    public function loadOrganizations()
     {
-        $this->organisations = Organisation::active()->orderBy('legal_name')->get();
+        $this->Organizations = Organization::active()->orderBy('legal_name')->get();
     }
 
     public function loadClassifications()
@@ -133,7 +133,7 @@ class PersonSearch extends Component
             $q->where('user_id', Auth::id())
               ->orWhere('is_shared', true);
         })
-        ->where('organisation_id', $organization->id)
+        ->where('organization_id', $organization->id)
         ->where('is_active', true);
 
         if ($this->profileSearch) {
@@ -171,7 +171,7 @@ class PersonSearch extends Component
         return !empty($this->search) ||
                !empty($this->classification) ||
                !empty($this->gender) ||
-               !empty($this->organisationId) ||
+               !empty($this->OrganizationId) ||
                $this->status !== 'active' ||
                !empty($this->city) ||
                !empty($this->district) ||
@@ -188,10 +188,10 @@ class PersonSearch extends Component
         if (!empty($this->searchBy) && $this->searchBy !== 'global') $filters['search_by'] = $this->searchBy;
         if (!empty($this->classification)) $filters['classification'] = $this->classification;
         if (!empty($this->gender)) $filters['gender'] = $this->gender;
-        if (!empty($this->organisationId)) {
-            $org = Organisation::find($this->organisationId);
-            $filters['organisation_id'] = $this->organisationId;
-            if ($org) $filters['organisation_name'] = $org->legal_name ?? $org->name;
+        if (!empty($this->OrganizationId)) {
+            $org = Organization::find($this->OrganizationId);
+            $filters['organization_id'] = $this->OrganizationId;
+            if ($org) $filters['Organization_name'] = $org->legal_name ?? $org->name;
         }
         if (!empty($this->roleType)) $filters['role_type'] = $this->roleType;
         if ($this->status !== 'active') $filters['status'] = $this->status;
@@ -257,8 +257,8 @@ class PersonSearch extends Component
             $nameParts[] = ucwords(str_replace('_', ' ', $currentFilters['role_type']));
         }
 
-        if (isset($currentFilters['organisation_name'])) {
-            $nameParts[] = 'at ' . $currentFilters['organisation_name'];
+        if (isset($currentFilters['Organization_name'])) {
+            $nameParts[] = 'at ' . $currentFilters['Organization_name'];
         }
 
         if (isset($currentFilters['city'])) {
@@ -294,7 +294,7 @@ class PersonSearch extends Component
 
         try {
             $profile = CommunicationFilterProfile::create([
-                'organisation_id' => $organization->id,
+                'organization_id' => $organization->id,
                 'user_id' => Auth::id(),
                 'name' => $this->filterProfileName,
                 'description' => $this->filterProfileDescription,
@@ -339,7 +339,7 @@ class PersonSearch extends Component
             $this->status = $criteria['status'] ?? 'active';
             $this->classification = $criteria['classification'] ?? '';
             $this->gender = $criteria['gender'] ?? '';
-            $this->organisationId = $criteria['organisation_id'] ?? '';
+            $this->OrganizationId = $criteria['organization_id'] ?? '';
             $this->roleType = $criteria['role_type'] ?? '';
             $this->city = $criteria['city'] ?? '';
             $this->district = $criteria['district'] ?? '';
@@ -376,7 +376,7 @@ class PersonSearch extends Component
         $organization = OrganizationHelper::getCurrentOrganization();
 
         $profile = CommunicationFilterProfile::where('id', $profileId)
-            ->where('organisation_id', $organization->id)
+            ->where('organization_id', $organization->id)
             ->where('user_id', Auth::id())
             ->first();
 
@@ -420,7 +420,7 @@ class PersonSearch extends Component
                 'name' => $this->filterProfileName,
                 'description' => $this->filterProfileDescription,
                 'user_id' => Auth::id(),
-                'organisation_id' => $organization->id,
+                'organization_id' => $organization->id,
                 'filter_criteria' => $this->getCurrentFiltersArray(),
                 'is_shared' => $this->isSharedProfile,
                 'is_active' => true,
@@ -464,7 +464,7 @@ class PersonSearch extends Component
         $this->loadedProfileId = null;
     }
 
-    public function updatingOrganisationId()
+    public function updatingOrganizationId()
     {
         $this->resetPage();
         $this->loadedProfileId = null;
@@ -487,7 +487,7 @@ class PersonSearch extends Component
             'search',
             'classification',
             'gender',
-            'organisationId',
+            'OrganizationId',
             'roleType',
             'city',
             'district',
@@ -623,10 +623,10 @@ class PersonSearch extends Component
             $query->where('country', 'like', "%{$this->country}%");
         }
 
-        // Organisation filter
-        if (!empty($this->organisationId)) {
+        // Organization filter
+        if (!empty($this->OrganizationId)) {
             $query->whereHas('affiliations', function ($q) {
-                $q->where('organisation_id', $this->organisationId)
+                $q->where('organization_id', $this->OrganizationId)
                   ->where('status', 'active');
 
                 if (!empty($this->roleType)) {
@@ -658,9 +658,9 @@ class PersonSearch extends Component
         return $this->getPersonsQuery()->paginate($this->perPage);
     }
 
-    public function getOrganisationsProperty()
+    public function getOrganizationsProperty()
     {
-        return Organisation::active()->orderBy('legal_name')->get();
+        return Organization::active()->orderBy('legal_name')->get();
     }
 
     public function getClassificationsProperty()
@@ -777,7 +777,7 @@ public function getRelationshipCountProperty()
     {
         return view('livewire.person-search', [
             'persons' => $this->persons,
-            'organisations' => $this->organisations,
+            'Organizations' => $this->Organizations,
             'classifications' => $this->classifications,
             'roleTypes' => $this->roleTypes,
             'hasActiveFilters' => $this->hasActiveFilters,

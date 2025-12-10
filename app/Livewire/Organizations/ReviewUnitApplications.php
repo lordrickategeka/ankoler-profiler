@@ -31,7 +31,7 @@ class ReviewUnitApplications extends Component
             // Create PersonAffiliation
             \App\Models\PersonAffiliation::create([
                 'person_id' => $application->person_id,
-                'organisation_id' => $application->organisation_id,
+                'organization_id' => $application->organization_id,
                 'role_type' => 'MEMBER',
                 'status' => 'active',
                 'domain_record_type' => 'unit',
@@ -79,7 +79,7 @@ class ReviewUnitApplications extends Component
         foreach ($applications as $application) {
             \App\Models\PersonAffiliation::create([
                 'person_id' => $application->person_id,
-                'organisation_id' => $application->organisation_id,
+                'organization_id' => $application->organization_id,
                 'role_type' => 'MEMBER',
                 'status' => 'active',
                 'domain_record_type' => 'unit',
@@ -119,11 +119,11 @@ class ReviewUnitApplications extends Component
     public function render()
     {
         $user = \Illuminate\Support\Facades\Auth::user();
-        $orgId = $user && $user->organisation_id ? $user->organisation_id : null;
+        $orgId = $user && $user->organization_id ? $user->organization_id : null;
         $query = DB::table('organization_unit_applications')
             ->where('status', 'pending');
         if ($orgId) {
-            $query->where('organisation_id', $orgId);
+            $query->where('organization_id', $orgId);
         }
         $applications = $query->get();
         return view('livewire.organizations.review-unit-applications', [
