@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('Organization_jobs', function (Blueprint $table) {
+        Schema::create('organization_jobs', function (Blueprint $table) {
            $table->id();
             $table->unsignedBigInteger('organization_id')->nullable()->index();
             $table->unsignedBigInteger('category_id')->nullable()->index();
@@ -30,7 +30,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Foreign keys
-            $table->foreign('organization_id')->references('id')->on('Organizations')->onDelete('set null');
+            $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('set null');
             $table->foreign('category_id')->references('id')->on('job_categories')->onDelete('set null');
             $table->foreign('posted_by')->references('id')->on('users')->onDelete('set null');
 

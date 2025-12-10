@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('value')->nullable();
             $table->timestamps();
 
-            $table->foreign('organization_id')->references('id')->on('Organizations')->onDelete('cascade');
+            $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
             $table->foreign('custom_field_id')->references('id')->on('custom_fields')->onDelete('cascade');
             $table->index(['organization_id', 'custom_field_id']);
         });
