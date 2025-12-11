@@ -104,6 +104,6 @@ class ImportOrganizations extends Component
 
     public function render()
     {
-        return view('livewire.organizations.import-Organizations');
+        return view('livewire.organizations.import-organizations');
     }
 }
