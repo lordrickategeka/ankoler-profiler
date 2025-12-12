@@ -1,11 +1,9 @@
 <?php
 
-namespace App\Http\Livewire\Organizations;
+namespace App\Livewire\Organizations;
 
 use Livewire\Component;
 use Livewire\WithFileUploads;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\OrganizationTemplateExport;
 use App\Models\CustomField;
