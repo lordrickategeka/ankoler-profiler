@@ -133,21 +133,14 @@ class PersonSelfRegistrationComponent extends Component
             $user->assignRole('Organization Admin');
             Log::info('Role assigned', ['user_id' => $user->id]);
 
-            // Send email verification notification
+            // Send email verification notification first
             $user->sendEmailVerificationNotification();
             Log::info('Verification notification sent', ['user_id' => $user->id]);
 
             DB::commit();
             Log::info('DB commit successful', ['user_id' => $user->id, 'person_id' => $person->id]);
 
-            // Try to send mail after commit
-            try {
-                Mail::to($user->email)->send(new \App\Mail\AdminWelcomeEmail($user, $Organization, $temporaryPassword));
-            } catch (\Exception $e) {
-                Log::error('Welcome email send error', ['user_id' => $user->id, 'error' => $e->getMessage()]);
-                session()->flash('error', 'Verification email could not be sent. Please check your email address.');
-                return;
-            }
+            // Only send welcome email after user verifies their email (handled elsewhere, not here)
 
             session()->flash('success', 'Registration successful! Please check your email to verify your account.');
             return redirect()->route('login');

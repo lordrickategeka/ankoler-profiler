@@ -3,6 +3,17 @@
 
         <div class="flex justify-between items-center mb-4">
             <div class="flex items-center space-x-4">
+                <!-- Search Input -->
+                <div class="relative mr-4">
+                    <input
+                        type="text"
+                        class="input input-bordered w-full border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Search persons..."
+                            wire:model.live.debounce.500ms="filters.search"
+                        autocomplete="off"
+                    />
+
+                </div>
                 <div class="flex items-center">
                     <div wire:loading wire:target="filters,dynamicFilters,updatedFilters,updatedDynamicFilters"
                         class="flex items-center">
@@ -12,19 +23,6 @@
                         </p>
                     </div>
 
-                    <div wire:loading.remove wire:target="filters,dynamicFilters,updatedFilters,updatedDynamicFilters"
-                        class="flex items-center">
-                        @if ($persons->count() > 0)
-                            <div class="w-3 h-3 bg-green-500 rounded-full mr-2" title="Results found"></div>
-                            <p class="text-gray-600">
-                                Showing <span class="font-semibold text-gray-900">{{ $persons->count() }}</span>
-                                of <span class="font-semibold text-gray-900">{{ $persons->total() }}</span> persons
-                            </p>
-                        @else
-                            <div class="w-3 h-3 bg-red-500 rounded-full mr-2" title="No results"></div>
-                            <p class="text-gray-600">No persons found</p>
-                        @endif
-                    </div>
                 </div>
 
                 <div wire:loading.remove wire:target="filters,dynamicFilters" class="text-xs text-gray-400">

@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
+use App\Services\SearchFilterService;
+
 class PersonList extends Component
 {
     use WithPagination;
@@ -312,9 +314,10 @@ class PersonList extends Component
                 unset($this->filters['organization_id']);
             }
 
-            // Merge and clean filters
-            $allFilters = array_merge($this->filters, $this->dynamicFilters);
-            $allFilters = array_filter($allFilters, function ($value) {
+            // Merge filters, but always include search (even if empty)
+            $allFilters = array_merge(['search' => $this->filters['search']], $this->filters, $this->dynamicFilters);
+            $allFilters = array_filter($allFilters, function ($value, $key) {
+                if ($key === 'search') return true; // Always include search
                 if (is_array($value)) {
                     if (isset($value['start']) && isset($value['end'])) {
                         return !empty($value['start']) || !empty($value['end']);
@@ -322,11 +325,19 @@ class PersonList extends Component
                     return !empty(array_filter($value));
                 }
                 return $value !== '' && $value !== null;
-            });
+            }, ARRAY_FILTER_USE_BOTH);
 
-            // Initialize filter service
-            $filterService = new PersonFilterService($canViewAllPersons ? null : $currentOrganization);
-            $persons = $filterService->applyFilters($allFilters)->paginate(10);
+            // Use SearchFilterService instead of PersonFilterService
+            $searchable = ['given_name', 'family_name', 'middle_name', 'person_id'];
+            $service = new SearchFilterService(Person::class, $searchable);
+            $service->applySearch($allFilters['search'] ?? '');
+
+            // Remove 'search' from filters before applying the rest
+            $filtersForService = $allFilters;
+            unset($filtersForService['search']);
+            $service->applyFilters($filtersForService);
+
+            $persons = $service->paginate(10);
             $persons->withPath(request()->url());
 
         } catch (\Exception $e) {

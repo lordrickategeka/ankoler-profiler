@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Organizations;
 
-
 use App\Models\Organization;
 use App\Models\OrganizationSite;
 use App\Mail\AdminWelcomeEmail;
@@ -13,7 +12,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-
 
 class Create extends Component
 {
