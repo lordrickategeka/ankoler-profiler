@@ -13,7 +13,7 @@ use App\Models\CustomField;
 
 use App\Exports\OrganizationTemplateExport;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Http\Livewire\Organizations\ImportOrganizations;
+use App\Livewire\Organizations\ImportOrganizations;
 
 // Custom organization template export (POST)
 Route::post('/organizations/export-template', function (\Illuminate\Http\Request $request) {

@@ -4,10 +4,8 @@
         <h2 class="text-center text-2xl font-semibold text-gray-800 mb-2">Let’s get you started</h2>
         <p class="text-center text-gray-500 mb-6 text-sm">Enter the details to get going</p>
         <!-- Single Form: All Fields -->
-        <!-- FORM -->
-        <form wire:submit.prevent="submit" class="grid grid-cols-1 md:grid-cols-2 gap-4" id="selfRegForm" novalidate>
-            {{-- Error Summary Section --}}
-            @if ($errors->any())
+
+         @if ($errors->any())
                 <div class="md:col-span-2 alert alert-error mb-6">
                     <h3 class="text-sm font-medium mb-2">Please correct the following {{ $errors->count() > 1 ? 'errors' : 'error' }}:</h3>
                     <ul class="list-disc list-inside text-sm">
@@ -17,6 +15,9 @@
                     </ul>
                 </div>
             @endif
+        <!-- FORM -->
+        <form wire:submit.prevent="submit" class="grid grid-cols-1 md:grid-cols-2 gap-4" id="selfRegForm" novalidate>
+            {{-- Error Summary Section --}}
             <div>
                 <label class="block text-gray-600 font-medium mb-1 text-sm">First Name*</label>
                 <input type="text" wire:model="form.given_name" class="input input-bordered input-sm w-full" placeholder="Enter your first name" required minlength="2" maxlength="255" oninvalid="this.setCustomValidity('First name is required')" oninput="this.setCustomValidity('')">
