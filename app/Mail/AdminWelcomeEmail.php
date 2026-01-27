@@ -23,7 +23,7 @@ class AdminWelcomeEmail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(User $user, Organization $organization, string $temporaryPassword)
+    public function __construct(User $user, Organization $organization, ?string $temporaryPassword = null)
     {
         $this->user = $user;
         $this->organization = $organization;

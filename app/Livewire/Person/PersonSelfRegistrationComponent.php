@@ -14,6 +14,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -93,6 +95,14 @@ class PersonSelfRegistrationComponent extends Component
                 'email' => $this->form['email'],
                 'password' => bcrypt($temporaryPassword),
             ]);
+            // Store the temporary password encrypted in cache so it can be included in the welcome email
+            try {
+                if (!empty($temporaryPassword)) {
+                    Cache::put('temp_password_user_' . $user->id, Crypt::encryptString($temporaryPassword), now()->addDays(7));
+                }
+            } catch (\Exception $e) {
+                Log::warning('Failed to cache temporary password for user', ['user_id' => $user->id, 'error' => $e->getMessage()]);
+            }
             Log::info('User created', ['user_id' => $user->id]);
 
             // Create Person with user_id

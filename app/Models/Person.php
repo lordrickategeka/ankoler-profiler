@@ -30,7 +30,7 @@ class Person extends Model
         'country',
         'city',
         'district',
-        
+
         'status',
         'created_by',
         'updated_by',
@@ -593,6 +593,25 @@ class Person extends Model
 
     public function User()
     {
-        return $this->belongsTo(Person::class, 'user_id');
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
+    }
+
+    protected static function booted()
+    {
+        static::deleting(function ($person) {
+            // If a User is linked via user_id, delete that User as well.
+            try {
+                if ($person->user_id) {
+                    $user = \App\Models\User::find($person->user_id);
+                    if ($user) {
+                        // Delete user via Eloquent to ensure related cleanup
+                        $user->delete();
+                    }
+                }
+            } catch (\Exception $e) {
+                // Log and continue - do not block person deletion
+                \Illuminate\Support\Facades\Log::error('Error deleting linked user for person ' . ($person->id ?? 'unknown') . ': ' . $e->getMessage());
+            }
+        });
     }
 }

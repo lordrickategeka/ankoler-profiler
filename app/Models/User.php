@@ -79,7 +79,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function person()
     {
-        return $this->belongsTo(Person::class, 'person_id');
+        return $this->hasOne(\App\Models\Person::class, 'user_id');
     }
 
     /**
