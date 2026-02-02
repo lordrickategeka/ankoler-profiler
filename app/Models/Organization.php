@@ -24,7 +24,7 @@ class Organization extends Model
         'parent_organization_id',
         'registration_number',
         'tax_identification_number',
-        'country_of_registration',
+        'country',
         'date_established',
         'logo_path',
         'website_url',
@@ -35,8 +35,7 @@ class Organization extends Model
         'category',
 
         // Address
-        'address_line_1',
-        'address_line_2',
+        'address',
         'city',
         'district',
         'postal_code',
@@ -44,66 +43,10 @@ class Organization extends Model
         'latitude',
         'longitude',
 
-        // Regulatory & Compliance
-        'regulatory_body',
-        'license_number',
-        'license_issue_date',
-        'license_expiry_date',
-        'accreditation_status',
-        'compliance_certifications',
-
-        // Contact Persons
         'primary_contact_name',
-        'primary_contact_title',
         'primary_contact_email',
         'primary_contact_phone',
-        'secondary_contact_name',
-        'secondary_contact_email',
-        'secondary_contact_phone',
 
-        // Financial Information
-        'bank_name',
-        'bank_account_number',
-        'bank_branch',
-        'swift_bic_code',
-        'default_currency',
-        'fiscal_year_start_month',
-
-        // System Configuration
-        'timezone',
-        'default_language',
-        'working_days',
-        'operating_hours_start',
-        'operating_hours_end',
-
-        // Category-specific details
-        'hospital_details',
-        'school_details',
-        'sacco_details',
-        'parish_details',
-        'corporate_details',
-
-        // Multi-site support
-        'is_multi_site',
-        'is_head_office',
-
-        // Integration & System Settings
-        'integration_settings',
-
-        // Subscription & Billing
-        'subscription_plan',
-        'billing_cycle',
-        'subscription_start_date',
-        'subscription_end_date',
-        'is_trial',
-        'trial_days_remaining',
-
-        // Documents & Metadata
-        'documents',
-        'metadata',
-        'verified_at',
-        'verified_by',
-        'verification_notes',
         'is_super',
     ];
 
@@ -114,29 +57,13 @@ class Organization extends Model
         'subscription_start_date' => 'date',
         'subscription_end_date' => 'date',
         'verified_at' => 'datetime',
-        'operating_hours_start' => 'datetime:H:i',
-        'operating_hours_end' => 'datetime:H:i',
         'latitude' => 'decimal:7',
         'longitude' => 'decimal:7',
         'is_active' => 'boolean',
         'is_multi_site' => 'boolean',
         'is_head_office' => 'boolean',
         'is_super' => 'boolean',
-        'is_trial' => 'boolean',
-        'trial_days_remaining' => 'integer',
-        'fiscal_year_start_month' => 'integer',
 
-        // JSON fields
-        'compliance_certifications' => 'array',
-        'working_days' => 'array',
-        'hospital_details' => 'array',
-        'school_details' => 'array',
-        'sacco_details' => 'array',
-        'parish_details' => 'array',
-        'corporate_details' => 'array',
-        'integration_settings' => 'array',
-        'documents' => 'array',
-        'metadata' => 'array',
     ];
 
     protected $dates = [

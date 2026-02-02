@@ -5,6 +5,9 @@
             <h2 class="text-2xl font-bold text-gray-900">User Management</h2>
             <p class="text-gray-600">Manage system users and their role assignments</p>
         </div>
+        <div>
+            <button wire:click="bulkDelete" class="btn btn-error">Delete Selected</button>
+        </div>
     </div>
 
     <!-- Success/Error Messages -->
@@ -55,6 +58,12 @@
                 <table class="table table-zebra w-full">
                     <thead>
                         <tr>
+                            <th>
+                                <label>
+                                    <input type="checkbox" wire:model="selectAll" class="checkbox"
+                                        title="Select All">
+                                </label>
+                            </th>
                             <th>User</th>
                             <th>Email</th>
                             <th>Organization</th>
@@ -67,6 +76,12 @@
                     <tbody>
                         @forelse($users as $user)
                             <tr>
+                                <td>
+                                    <label>
+                                        <input type="checkbox" wire:model="selectedUsers" value="{{ $user->id }}"
+                                            class="checkbox" title="Select User">
+                                    </label>
+                                </td>
                                 <td>
                                     <div class="flex items-center gap-3">
                                         <div class="avatar">
@@ -180,7 +195,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center py-8">
+                                <td colspan="8" class="text-center py-8">
                                     <div class="text-gray-500">
                                         <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none"
                                             stroke="currentColor" viewBox="0 0 24 24">

@@ -142,7 +142,8 @@
                                     LOCATION</th>
                                 <th
                                     class="px-1.5 py-0.5 text-left font-small text-gray-500 uppercase tracking-wider w-64">
-                                    CONTACT</th>
+                                    PRIMARY
+                                    CONTACT </th>
                                 <th
                                     class="px-1.5 py-0.5 text-left font-small text-gray-500 uppercase tracking-wider w-32">
                                     <button wire:click="sortBy('is_active')"
@@ -187,7 +188,7 @@
                                                 <div
                                                     class="h-10 w-10 rounded-full bg-accent/10 flex items-center justify-center">
                                                     <span class="text-accent font-medium text-sm">
-                                                        {{ substr($organization->name, 0, 2) }}
+                                                        {{ substr($organization->legal_name, 0, 2) }}
                                                     </span>
                                                 </div>
                                             </div>
@@ -195,13 +196,10 @@
                                                 <div class="text-sm font-medium text-gray-900">
                                                     <a href="{{ route('organizations.show', $organization->id) }}"
                                                         class="hover:text-primary-focus hover:underline transition-colors">
-                                                        {{ $organization->name }}
+                                                        {{ $organization->legal_name }}
                                                     </a>
                                                 </div>
-                                                @if ($organization->display_name && $organization->display_name !== $organization->legal_name)
-                                                    <div class="text-sm text-gray-500 truncate">
-                                                        {{ $organization->display_name }}</div>
-                                                @endif
+
                                                 @if ($organization->code)
                                                     <div class="text-xs text-gray-400">Code: {{ $organization->code }}
                                                     </div>
@@ -212,14 +210,14 @@
                                     <td class="px-1.5 py-1 whitespace-nowrap">
                                         <span
                                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                            {{ $organization->category_display }}
+                                            {{ $organization->category }}
                                         </span>
                                     </td>
                                     <td class="px-1.5 py-1">
                                         <div class="text-sm text-gray-900">
                                             <div class="font-medium">{{ $organization->city }}</div>
                                             @if ($organization->district)
-                                                <div class="text-gray-500">{{ $organization->district }}</div>
+                                                <div class="text-gray-500">{{ $organization->district ?: 'Mbarara' }}</div>
                                             @endif
                                         </div>
                                     </td>

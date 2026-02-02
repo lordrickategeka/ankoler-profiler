@@ -56,9 +56,6 @@ class PersonFilterService
             case 'status':
                 $this->applyStatusFilter($value);
                 break;
-            case 'custom_fields':
-                $this->applyCustomFieldsFilter($value);
-                break;
             case 'date_range':
                 $this->applyDateRangeFilter($value);
                 break;
@@ -123,13 +120,6 @@ class PersonFilterService
         $this->query->whereHas('affiliations', function($q) use ($status) {
             $q->where('status', $status);
         });
-    }
-
-    protected function applyCustomFieldsFilter($customFields): void
-    {
-        foreach ($customFields as $field => $value) {
-            $this->query->whereJsonContains('custom_fields->' . $field, $value);
-        }
     }
 
     protected function applyDateRangeFilter($dateRange): void

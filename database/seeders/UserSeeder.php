@@ -22,9 +22,9 @@ class UserSeeder extends Seeder
 
         // Create or update the Super Admin user
         $user = User::updateOrCreate(
-            ['email' => 'admin@gmail.com'], // unique constraint
+            ['email' => 'ategeka.lordrick@bcc.co.ug'], // unique constraint
             [
-                'name' => 'Super Admin',
+                'name' => 'Lordrick Ategeka -BBC -ADMIN',
                 'email_verified_at' => now(),
                 'password' => Hash::make('qwertyui'), // use a strong password in production
             ]

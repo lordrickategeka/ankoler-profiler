@@ -42,36 +42,16 @@ class ImportOrganizations extends Component
         foreach ($importedRows as $row) {
             $data = array_combine($headers, $row);
             $standardFields = [];
-            $customFields = [];
             foreach ($data as $key => $value) {
                 if (in_array($key, (new Organization)->getFillable())) {
                     $standardFields[$key] = $value;
-                } else {
-                    $customFields[$key] = $value;
                 }
             }
             $org = new Organization($standardFields);
             $org->save();
-            // Save custom fields for this Organization
-            foreach ($customFields as $field => $value) {
-                CustomField::create([
-                    'model_type' => Organization::class,
-                    'model_id' => $org->id,
-                    'field_name' => $field,
-                    'field_label' => ucfirst(str_replace('_', ' ', $field)),
-                    'field_type' => 'string',
-                    'field_value' => $value,
-                    'field_options' => null,
-                    'is_required' => false,
-                    'validation_rules' => null,
-                    'group' => null,
-                    'order' => null,
-                    'description' => null,
-                ]);
-            }
         }
 
-        $this->message = 'File imported successfully with custom fields.';
+        $this->message = 'File imported successfully.';
     }
 
     public function exportCustomTemplate($fields)

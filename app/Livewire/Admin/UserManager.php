@@ -22,6 +22,8 @@ class UserManager extends Component
     public $userId;
     public $selectedRoles = [];
     public $selectedOrganization = null;
+    public $selectedUsers = []; // Array to store selected user IDs
+    public $selectAll = false; // Flag to handle select all functionality
 
     public function render()
     {
@@ -70,6 +72,30 @@ class UserManager extends Component
     public function updatedOrganizationFilter()
     {
         $this->resetPage();
+    }
+
+    public function updatedSelectAll($value)
+    {
+        if ($value) {
+            $this->selectedUsers = User::where(function($query) {
+                if ($this->search) {
+                    $query->where('name', 'like', '%' . $this->search . '%')
+                          ->orWhere('email', 'like', '%' . $this->search . '%');
+                }
+
+                if ($this->roleFilter !== 'all') {
+                    $query->whereHas('roles', function($q) {
+                        $q->where('name', $this->roleFilter);
+                    });
+                }
+
+                if ($this->organizationFilter !== 'all') {
+                    $query->where('organization_id', $this->organizationFilter);
+                }
+            })->pluck('id')->toArray();
+        } else {
+            $this->selectedUsers = [];
+        }
     }
 
     public function openRolesModal($userId)
@@ -138,6 +164,21 @@ class UserManager extends Component
         session()->flash('message', 'User deleted successfully!');
     }
 
+    public function bulkDelete()
+    {
+        if (empty($this->selectedUsers)) {
+            session()->flash('error', 'No users selected for deletion.');
+            return;
+        }
+
+        User::whereIn('id', $this->selectedUsers)->delete();
+
+        $this->selectedUsers = [];
+        $this->selectAll = false;
+
+        session()->flash('message', 'Selected users deleted successfully!');
+    }
+
     public function toggleUserStatus($userId)
     {
         $user = User::findOrFail($userId);
@@ -166,6 +207,8 @@ class UserManager extends Component
         $this->userId = null;
         $this->selectedRoles = [];
         $this->selectedOrganization = null;
+        $this->selectedUsers = [];
+        $this->selectAll = false;
         $this->resetErrorBag();
     }
 }
