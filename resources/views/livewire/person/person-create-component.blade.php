@@ -43,10 +43,8 @@
                         </label>
                         <select wire:model.defer="form.gender" class="select select-bordered w-full">
                             <option value="">Select Gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="other">Other</option>
-                            <option value="prefer_not_to_say">Prefer Not to Say</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
                         </select>
                         @error('form.gender') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
                     </div>
@@ -109,53 +107,35 @@
                             @error('form.country') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
                         </div>
                     </div>
-                </div>
 
-                <!-- Affiliation Details -->
-                <div class="mt-6">
-                    <h3 class="text-lg font-medium text-gray-800 mb-4">Affiliation Details</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="form-control">
-                            <label class="label pb-1">
-                                <span class="label-text text-sm font-medium">Project <span class="text-red-500">*</span></span>
-                            </label>
-                            <select wire:model.defer="currentAffiliation.organization_id" class="select select-bordered w-full">
-                                <option value="">Select Organization</option>
-                                @foreach ($availableOrganizations as $org)
-                                    <option value="{{ $org['id'] }}">{{ $org['display_name'] ?? $org['legal_name'] }}</option>
-                                @endforeach
-                            </select>
-                            @error('currentAffiliation.organization_id') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
-                        </div>
+                    <!-- Organization Information -->
+                    <div class="form-control">
+                        <label class="label pb-1">
+                            <span class="label-text text-sm font-medium">Organization</span>
+                        </label>
+                        <select wire:model.defer="form.organization_id" class="select select-bordered w-full">
+                            <option value="">Select Organization</option>
+                            @foreach ($availableOrganizations as $organization)
+                                <option value="{{ $organization['id'] }}">{{ $organization['legal_name'] }}</option>
+                            @endforeach
+                        </select>
+                        @error('form.organization_id') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                    </div>
 
-                        <div class="form-control">
-                            <label class="label pb-1">
-                                <span class="label-text text-sm font-medium">Role Type <span class="text-red-500">*</span></span>
-                            </label>
-                            <select wire:model.defer="currentAffiliation.role_type" class="select select-bordered w-full">
-                                <option value="">Select Role Type</option>
-                                @foreach ($currentAffiliationRoles as $key => $label)
-                                    <option value="{{ $key }}">{{ $label }}</option>
-                                @endforeach
-                            </select>
-                            @error('currentAffiliation.role_type') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
-                        </div>
+                    <div class="form-control">
+                        <label class="label pb-1">
+                            <span class="label-text text-sm font-medium">Role Type</span>
+                        </label>
+                        <input type="text" wire:model.defer="form.role_type" class="input input-bordered w-full" placeholder="Enter role type">
+                        @error('form.role_type') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                    </div>
 
-                        <div class="form-control">
-                            <label class="label pb-1">
-                                <span class="label-text text-sm font-medium">Role Title</span>
-                            </label>
-                            <input type="text" wire:model.defer="currentAffiliation.role_title" class="input input-bordered w-full" placeholder="e.g., Senior Nurse, Manager">
-                            @error('currentAffiliation.role_title') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div class="form-control">
-                            <label class="label pb-1">
-                                <span class="label-text text-sm font-medium">Start Date</span>
-                            </label>
-                            <input type="date" wire:model.defer="currentAffiliation.start_date" class="input input-bordered w-full">
-                            @error('currentAffiliation.start_date') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
-                        </div>
+                    <div class="form-control">
+                        <label class="label pb-1">
+                            <span class="label-text text-sm font-medium">Role Title</span>
+                        </label>
+                        <input type="text" wire:model.defer="form.role_title" class="input input-bordered w-full" placeholder="Enter role title">
+                        @error('form.role_title') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
                     </div>
                 </div>
 

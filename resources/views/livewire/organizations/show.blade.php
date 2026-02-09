@@ -6,7 +6,7 @@
                     <div
                         class="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg">
                         <span class="text-xl font-bold text-white">
-                            {{ substr($organization->name, 0, 1) }}
+                            {{ substr($organization->legal_name, 0, 1) }}
                         </span>
                     </div>
                     <div>
@@ -14,7 +14,7 @@
                             {{ $organization->name }}
                         </h2>
                         <div class="flex items-center gap-3 mt-1">
-                            <p class="text-gray-600 text-sm">Organization Status:</p>
+                            <p class="text-gray-600 text-sm">Project Status:</p>
                             <div class="flex items-center gap-2">
                                 @if ($organization->is_active)
                                     <div class="w-2 h-2 bg-success rounded-full"></div>
@@ -39,7 +39,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
-                        Back to Organizations
+                        Back to Projects List
                     </a>
 
                     <button class="btn btn-primary btn-sm shadow-lg hover:shadow-xl transition-all duration-200"
@@ -48,7 +48,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
-                        Edit Organization
+                        Edit Project
                     </button>
                 </div>
             </div>
@@ -56,7 +56,7 @@
     </x-slot>
 
     <div class="py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl sm:px-6 lg:px-8">
             {{-- Hero Section --}}
             {{-- <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
                 <div class="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-8">
@@ -389,9 +389,10 @@
                                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                                     <path
                                                         d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                                                </svg>
-                                                {{ $organization->contact_phone }}
-                                            </a>
+                                                    </svg>
+                                                    {{ $organization->contact_phone }}
+                                                </a>
+                                            </div>
                                         </div>
                                     @endif
                                 </div>
@@ -466,7 +467,29 @@
                                 <div class="group">
                                     <label class="block text-sm font-semibold text-gray-500 mb-2">Category</label>
                                     <p class="text-gray-900 font-medium group-hover:text-primary transition-colors">
-                                        {{ $organization->category_display }}</p>
+                                        {{ $organization->category ?? 'Not specified' }}</p>
+                                </div>
+
+                                <div class="group">
+                                    <label class="block text-sm font-semibold text-gray-500 mb-2">Address</label>
+                                    <p class="text-gray-900 font-medium group-hover:text-primary transition-colors">
+                                        {{ $organization->address_line_1 ?? 'Not provided' }}</p>
+                                </div>
+                                <div class="group">
+                                    <label class="block text-sm font-semibold text-gray-500 mb-2">City</label>
+                                    <p class="text-gray-900 font-medium group-hover:text-primary transition-colors">
+                                        {{ $organization->city ?? 'Not provided' }}</p>
+                                </div>
+                                <div class="group">
+                                    <label class="block text-sm font-semibold text-gray-500 mb-2">Country</label>
+                                    <p class="text-gray-900 font-medium group-hover:text-primary transition-colors">
+                                        {{ $organization->country ?? 'Not provided' }}</p>
+                                </div>
+                                <div class="group">
+                                    <label class="block text-sm font-semibold text-gray-500 mb-2">Date Established</label>
+                                    <p class="text-gray-900 font-medium group-hover:text-primary transition-colors">
+                                        {{ $organization->date_established ? $organization->date_established->format('F j, Y') : 'Not provided' }}
+                                    </p>
                                 </div>
 
                                 <div class="group">
@@ -476,9 +499,9 @@
                                             <path fill-rule="evenodd"
                                                 d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
                                                 clip-rule="evenodd" />
-                                        </svg>
-                                        <p class="text-gray-900 font-medium">
-                                            {{ $organization->created_at->format('F j, Y g:i A') }}</p>
+                                            </svg>
+                                            <p class="text-gray-900 font-medium">
+                                                {{ $organization->created_at->format('F j, Y g:i A') }}</p>
                                     </div>
                                 </div>
 
@@ -489,9 +512,9 @@
                                             <path fill-rule="evenodd"
                                                 d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
                                                 clip-rule="evenodd" />
-                                        </svg>
-                                        <p class="text-gray-900 font-medium">
-                                            {{ $organization->updated_at->format('F j, Y g:i A') }}</p>
+                                            </svg>
+                                            <p class="text-gray-900 font-medium">
+                                                {{ $organization->updated_at->format('F j, Y g:i A') }}</p>
                                     </div>
                                 </div>
                             </div>

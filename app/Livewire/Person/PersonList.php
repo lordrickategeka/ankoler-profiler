@@ -338,7 +338,7 @@ class PersonList extends Component
             $service->applyFilters($filtersForService);
 
             $persons = $service->paginate(10);
-            $persons->withPath(request()->url());
+            // $persons->withPath(request()->url());
 
         } catch (\Exception $e) {
             Log::error('Error applying filters: ' . $e->getMessage(), [
@@ -379,7 +379,7 @@ class PersonList extends Component
                 'statusOptions' => ['active', 'inactive', 'suspended'],
                 'ageRanges' => ['18-25', '26-35', '36-45', '46-55', '56-65', '65+'],
                 'organizations' => $canViewAllPersons ?
-                    \App\Models\Organization::select('id', 'legal_name', 'display_name')
+                    \App\Models\Organization::select('id', 'legal_name')
                         ->where('is_active', true)
                         ->orderBy('legal_name')
                         ->get() :

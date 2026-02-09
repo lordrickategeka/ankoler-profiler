@@ -263,7 +263,7 @@
                                                     </div>
                                                     <div class="flex-1">
                                                         <span
-                                                            class="font-medium">{{ $affiliation->Organization->display_name ?? ($affiliation->Organization->legal_name ?? 'Not-Provided') }}</span>
+                                                            class="font-medium">{{ ($affiliation->Organization->legal_name ?? 'Not-Provided') }}</span>
                                                         @if ($affiliation->role_title)
                                                             <div class="text-xs text-gray-400">
                                                                 {{ $affiliation->role_title }}</div>

@@ -330,7 +330,7 @@ class CreatePerson extends Component
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            $this->showErrorToast('🚨 Test error logged successfully: ' . $e->getMessage());
+            $this->showErrorToast('Test error logged successfully: ' . $e->getMessage());
         }
     }
 
@@ -436,7 +436,7 @@ class CreatePerson extends Component
         return match($roleType) {
             'STAFF' => 'Staff Member',
             'MEMBER' => 'Member',
-            'PARISHIONER' => 'Parish Member',
+            'PARISHIONER' => 'Parishioner',
             'STUDENT' => 'Student',
             'PATIENT' => 'Patient',
             default => 'Staff Member'
@@ -983,12 +983,12 @@ class CreatePerson extends Component
                     $this->showDuplicateWarning = true;
                     $this->currentStep = 'basic_info';
                     $this->isLoading = false;
-                    $this->showErrorToast('⚠️ High confidence duplicates found - please review');
+                    $this->showErrorToast('High confidence duplicates found - please review');
                     return;
                 }
             }
 
-            $this->showInfoToast('💾 Creating person record...');
+            $this->showInfoToast('Creating person record...');
 
             DB::transaction(function () {
                 if ($this->duplicateAction === 'link' && $this->selectedDuplicate) {
@@ -1020,14 +1020,14 @@ class CreatePerson extends Component
         try {
             Log::info('CreatePerson: Starting person creation', ['form_data' => $this->form]);
 
-
             // Generate a temporary password
             $temporaryPassword = substr(str_shuffle('abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789!@#$%'), 0, 10);
+            Log::info('CreatePerson: Generated temporary password', ['temporary_password' => $temporaryPassword]);
 
             // Generate person_id using IdGenerator helper
             $personId = \App\Helpers\IdGenerator::generatePersonId();
             $person_global_identifier = \App\Helpers\IdGenerator::generateGlobalIdentifier();
-
+            Log::info('CreatePerson: Generated IDs', ['person_id' => $personId, 'global_identifier' => $person_global_identifier]);
 
             // Create person (without password field)
             $person = Person::create([
@@ -1048,6 +1048,11 @@ class CreatePerson extends Component
                 'password' => $temporaryPassword,
             ]);
 
+            if (!$person) {
+                Log::error('CreatePerson: Failed to create person');
+                throw new \Exception('Failed to create person');
+            }
+
             Log::info('CreatePerson: Person created successfully', ['person_id' => $person->id]);
 
             // Create a User for this person
@@ -1059,20 +1064,25 @@ class CreatePerson extends Component
                 'organization_id' => $this->affiliations[0]['organization_id'] ?? null,
             ]);
 
+            if (!$user) {
+                Log::error('CreatePerson: Failed to create user for person', ['person_id' => $person->id]);
+                throw new \Exception('Failed to create user for person');
+            }
+
+            Log::info('CreatePerson: User created for person', ['user_id' => $user->id, 'person_id' => $person->id]);
+
             // Assign 'Person' role to the user
             if ($user) {
                 $user->assignRole('Person');
                 Log::info('CreatePerson: Assigned Person role to user', ['user_id' => $user->id]);
             }
-            Log::info('CreatePerson: User created for person', ['user_id' => $user->id, 'person_id' => $person->id]);
-
-            // Send notification to person about profiling, with temp password (email will go to the email address provided)
 
             $this->createContactInformation($person);
             Log::info('CreatePerson: Contact information created');
 
             $this->createMultipleAffiliations($person);
             Log::info('CreatePerson: All affiliations created');
+
             \App\Services\NotificationService::notifyProfiled($person, $temporaryPassword);
             Log::info('CreatePerson: Notification sent to person about profiling');
 
@@ -1098,19 +1108,14 @@ class CreatePerson extends Component
             }
 
             $affiliationCount = count($this->affiliations);
-            $affiliationText = $affiliationCount > 1 ? "{$affiliationCount} affiliations" : "1 affiliation";
+            Log::info('CreatePerson: Person created with affiliations', ['affiliation_count' => $affiliationCount]);
 
-            // Store success message in session for display on person list page
-            session()->flash('success', "✅ {$person->full_name} successfully registered with {$affiliationText} at {$firstOrgName}" . ($affiliationCount > 1 ? ' and others' : '') . "!");
-
-            // Redirect to person list page
-            return $this->redirect('/persons/all', navigate: true);
+            Log::info('CreatePerson: createNewPerson function completed successfully');
 
         } catch (\Exception $e) {
-            Log::error('CreatePerson: Error in createNewPerson', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'form_data' => $this->form
+            Log::error('CreatePerson: Error during person creation', [
+                'error_message' => $e->getMessage(),
+                'stack_trace' => $e->getTraceAsString()
             ]);
             throw $e;
         }

@@ -3,9 +3,9 @@
         <div class="flex items-center justify-between">
             <div>
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                    {{ __('Organizations') }}
+                    {{ __('Projects') }}
                 </h2>
-                <p class="text-gray-600 text-sm mt-1">Manage organizational hierarchy and structures oop</p>
+                <p class="text-gray-600 text-sm mt-1">Manage Project hierarchy and structures oop</p>
             </div>
 
             @can('create-organizations')
@@ -113,7 +113,7 @@
                                     class="px-1.5 py-0.5 text-left font-medium text-gray-500 uppercase tracking-wider w-80">
                                     <button wire:click="sortBy('legal_name')"
                                         class="flex items-center gap-1 font-medium text-gray-500 hover:text-gray-700 uppercase text-[10px]">
-                                        ORGANIZATION
+                                        PROJECTS
                                         @if ($sortField === 'legal_name')
                                             <svg class="w-2.5 h-2.5 {{ $sortDirection === 'asc' ? 'rotate-0' : 'rotate-180' }}"
                                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">

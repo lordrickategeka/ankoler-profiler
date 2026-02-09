@@ -4,27 +4,43 @@ namespace App\Livewire\Person;
 
 use App\Models\EmailAddress;
 use Livewire\Component;
-use Livewire\WithFileUploads;
 use App\Models\Person;
 use App\Models\Organization;
 use App\Models\PersonAffiliation;
-use App\Models\PersonIdentifier;
 use App\Models\Phone;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
+
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 
-class PersonSelfRegistrationComponent extends Component
+class PersonsComponent extends Component
 {
-    // Step navigation removed
-    use WithFileUploads;
+    // public $form = [
+    //     'given_name' => '',
+    //     'middle_name' => '',
+    //     'family_name' => '',
+    //     'date_of_birth' => '',
+    //     'gender' => '',
+    //     'phone' => '',
+    //     'email' => '',
+    //     'national_id' => '',
+    //     'address' => '',
+    //     'city' => '',
+    //     'district' => '',
+    //     'country' => 'UGA',
+    //     'role_type' => '',
+    //     'role_title' => '',
+    //     'site' => '',
+    //     'start_date' => '',
+    //     'organization_id' => '',
+    //     'organization' => '',
+    // ];
 
-    // Step navigation removed
     public $form = [
         'given_name' => '',
         'middle_name' => '',
@@ -42,16 +58,20 @@ class PersonSelfRegistrationComponent extends Component
         'organization_id' => '',
     ];
 
-    // Documents step removed
     public $availableOrganizations = [];
 
     public function mount()
     {
-        $this->availableOrganizations = Organization::all();
+        $this->availableOrganizations = Organization::all()->toArray();
+
+        // Set default organization_id if available
+        if (!empty($this->availableOrganizations)) {
+            $this->form['organization_id'] = $this->availableOrganizations[0]['id'];
+        }
     }
 
 
-    public function submit()
+     public function submit()
     {
         $this->validate([
                 'form.given_name' => 'required|string|max:255',
@@ -127,7 +147,7 @@ class PersonSelfRegistrationComponent extends Component
 
             PersonAffiliation::create([
                 'person_id' => $person->id,
-                'organization_id' => $person->organization_id,
+                'organization_id' => $this->form['organization_id'], // Explicitly use form data
                 'role_type' => $this->form['role_type'] ?? 'STAFF',
                 'role_title' => $this->form['role_title'] ?? 'Organization Admin',
                 'start_date' => now(),
@@ -192,9 +212,36 @@ class PersonSelfRegistrationComponent extends Component
 
         // ...existing code...
     }
+
+    public function resetForm()
+    {
+        $this->form = [
+            'given_name' => '',
+            'middle_name' => '',
+            'family_name' => '',
+            'date_of_birth' => '',
+            'gender' => '',
+            'phone' => '',
+            'email' => '',
+            'national_id' => '',
+            'address' => '',
+            'city' => '',
+            'district' => '',
+            'country' => 'UGA',
+            'role_type' => '',
+            'role_title' => '',
+            'site' => '',
+            'start_date' => '',
+            'organization_id' => '',
+            'organization' => '',
+        ];
+
+    }
+
     public function render()
     {
-        return view('livewire.person.person-self-registration')
-        ->layout('layouts.auth-card');
+        return view('livewire.person.person-create-component', [
+            'availableOrganizations' => $this->availableOrganizations,
+        ]);
     }
 }

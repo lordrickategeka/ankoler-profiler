@@ -80,12 +80,17 @@ class FilterProfiles extends Component
     {
         $user = Auth::user();
         if ($user && $user->hasRole('Super Admin')) {
-            $this->availableOrganizations = Organization::select('id', 'display_name')
-                ->orderBy('display_name')
+            $this->availableOrganizations = Organization::select('id')
+                ->orderBy('id')
                 ->get()
                 ->toArray();
         } else {
             $this->availableOrganizations = [];
+        }
+
+        if (Auth::user()->hasRole('Super Admin')) {
+            $this->availableOrganizations = Organization::select('id')
+                ->where('is_active', 1)->orderBy('id')->get()->toArray();
         }
     }
 
@@ -95,8 +100,8 @@ class FilterProfiles extends Component
         $this->selectedOrganizationId = OrganizationHelper::getCurrentOrganization()?->id;
 
         if (Auth::user()->hasRole('Super Admin')) {
-            $this->availableOrganizations = Organization::select('id', 'display_name')
-                ->where('is_active', 1)->orderBy('display_name')->get()->toArray();
+            $this->availableOrganizations = Organization::select('id')
+                ->where('is_active', 1)->orderBy('id')->get()->toArray();
         }
     }
 

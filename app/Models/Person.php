@@ -17,7 +17,6 @@ class Person extends Model
     protected $fillable = [
         'person_id',
         'global_identifier',
-        'organization_id',
         'user_id',
 
         'given_name',
