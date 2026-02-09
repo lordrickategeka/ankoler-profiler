@@ -104,11 +104,13 @@ class Organization extends Model
         return $this->sites()->where('is_active', true);
     }
 
-    public function affiliations()
+    /**
+     * Alias for affiliations relationship
+     */
+    public function personAffiliations(): HasMany
     {
         return $this->hasMany(\App\Models\PersonAffiliation::class, 'organization_id');
     }
-
 
     /**
      * User who verified this Organization

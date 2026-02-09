@@ -122,11 +122,9 @@
                                 <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">
                                     Contact Information</th>
                                 <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">
-                                    Affiliations</th>
+                                    Affiliations & Classifications</th>
                                 <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">
-                                    Classifications</th>
-                                {{-- <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">
-                                    Location</th> --}}
+                                    Location</th>
                                 <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">
                                     Actions</th>
                             </tr>
@@ -266,12 +264,10 @@
                                                             class="font-medium">{{ ($affiliation->Organization->legal_name ?? 'Not-Provided') }}</span>
                                                         @if ($affiliation->role_title)
                                                             <div class="text-xs text-gray-400">
-                                                                {{ $affiliation->role_title }}</div>
+                                                              {{ $affiliation->role_type }}:  {{ $affiliation->role_title }}</div>
                                                         @endif
                                                     </div>
-                                                    <div class="px-1.5 py-1 whitespace-nowrap">
-                                                        {{ $affiliation->role_type }}
-                                                    </div>
+
                                                 </div>
                                             @empty
                                                 <div class="flex items-center">
@@ -297,8 +293,17 @@
                                         @if ($person->country || $person->city)
                                             <div class="flex flex-wrap gap-1">
                                                 <div>{{ $person->city }}</div>
-                                                @if ($person->district)
-                                                    <div class="text-gray-500">{{ $person->district }}</div>
+                                                @if ($person->district || $person->address)
+                                                    <div class="mb-1 flex items-start">
+                                                        <div class="flex-1">
+                                                            @if ($person->district)
+                                                                <div class="text-sm font-medium text-gray-900">{{ $person->district }}</div>
+                                                            @endif
+                                                            @if ($person->address)
+                                                                <div class="text-xs text-gray-400">{{ $person->address }}</div>
+                                                            @endif
+                                                        </div>
+                                                    </div>
                                                 @endif
                                             </div>
                                         @else
@@ -331,8 +336,7 @@
                                                 class="absolute right-0 mt-8 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10"
                                                 style="display: none;">
                                                 <div class="py-1">
-                                                    <button wire:click="viewPerson({{ $person->id }})"
-                                                        @click="open = false" type="button"
+                                                    <a href="{{ route('persons.show', ['id' => $person->id]) }}"
                                                         class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                                                         <svg class="w-4 h-4 mr-2" fill="none"
                                                             stroke="currentColor" viewBox="0 0 24 24">
@@ -345,7 +349,7 @@
                                                             </path>
                                                         </svg>
                                                         View Profile
-                                                    </button>
+                                                    </a>
                                                     <a href="{{ route('persons.create', ['edit' => $person->id]) }}"
                                                         class="flex px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 items-center">
                                                         <svg class="w-4 h-4 mr-2 text-yellow-600" fill="none"
@@ -440,66 +444,6 @@
         </div>
     </div>
 
-
-    {{-- Person Details Modal/Section --}}
-    @if ($viewPersonData)
-        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog"
-            aria-modal="true">
-            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-                    wire:click="$set('viewPersonData', null)"></div>
-                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                <div
-                    class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
-                    <div class="sm:flex sm:items-start">
-                        <div
-                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
-                            <svg class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
-                        </div>
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Person Details
-                            </h3>
-                            <div class="mt-2">
-                                <div class="text-sm text-gray-500">
-                                    <strong>Name:</strong> {{ $viewPersonData->full_name ?? 'N/A' }}<br>
-                                    <strong>ID:</strong> {{ $viewPersonData->person_id ?? 'N/A' }}<br>
-                                    <strong>Legal Name:</strong> {{ $viewPersonData->legal_name ?? 'N/A' }}<br>
-                                    <strong>Date of Birth:</strong> {{ $viewPersonData->date_of_birth ?? 'N/A' }}<br>
-                                    <strong>Gender:</strong> {{ $viewPersonData->gender ?? 'N/A' }}<br>
-                                    <strong>Status:</strong> {{ $viewPersonData->status ?? 'N/A' }}<br>
-                                    <strong>Phone(s):</strong>
-                                    {{ $viewPersonData->phones->pluck('number')->join(', ') ?? 'N/A' }}<br>
-                                    <strong>Email(s):</strong>
-                                    {{ $viewPersonData->emailAddresses->pluck('email')->join(', ') ?? 'N/A' }}<br>
-                                    <strong>Affiliations:</strong>
-                                    @if ($viewPersonData->affiliations->count() > 0)
-                                        <ul class="list-disc ml-4">
-                                            @foreach ($viewPersonData->affiliations as $aff)
-                                                <li>{{ $aff->Organization->display_name ?? ($aff->Organization->legal_name ?? 'N/A') }}
-                                                    ({{ $aff->role_title ?? 'N/A' }})</li>
-                                            @endforeach
-                                        </ul>
-                                    @else
-                                        N/A
-                                    @endif
-                                </div>
-                            </div>
-                            <div class="mt-4 flex justify-end">
-                                <button type="button" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-                                    wire:click="$set('viewPersonData', null)">Close</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endif
 
     {{-- Delete Confirmation Modal --}}
     @if ($showDeleteModal)

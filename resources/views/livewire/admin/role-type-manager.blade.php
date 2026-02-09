@@ -75,7 +75,7 @@
                             <tr>
                                 <td>
                                     <div class="font-medium">
-                                        {{ optional($roleType->organization)->display_name ?? optional($roleType->organization)->legal_name ?? 'No Provided' }}
+                                        {{ optional($roleType->organization)->legal_name ?? 'No Provided' }}
                                     </div>
                                 </td>
                                 <td>
@@ -203,7 +203,7 @@
                     <label class="label">
                         <span class="label-text">Organization</span>
                     </label>
-                    <input type="text" class="input input-bordered w-full bg-gray-100" value="{{ optional($organizations->first())->display_name ?? optional($organizations->first())->legal_name ?? 'No Provided' }}" readonly>
+                    <input type="text" class="input input-bordered w-full bg-gray-100" value="{{ optional($organizations->first())->legal_name ?? 'No Provided' }}" readonly>
                 </div>
                 @endif
                 <div class="form-control w-full mb-4">
@@ -280,7 +280,7 @@
                     <select wire:model="organization_id" class="select select-bordered w-full @error('organization_id') select-error @enderror">
                         <option value="">Select organization</option>
                         @foreach($organizations as $org)
-                            <option value="{{ $org->id }}">{{ $org->display_name ?? $org->legal_name ?? 'No Provided' }}</option>
+                            <option value="{{  $org->legal_name ?? 'No Provided' }}</option>
                         @endforeach
                     </select>
                     @error('organization_id') <span class="text-error text-sm">{{ $message }}</span> @enderror

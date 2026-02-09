@@ -43,7 +43,7 @@
                     <select wire:model.live="organizationFilter" class="select select-bordered">
                         <option value="all">All Organizations</option>
                         @foreach ($organizations as $org)
-                            <option value="{{ $org->id }}">{{ $org->display_name ?? $org->legal_name }}</option>
+                            <option value="{{ $org->id }}">{{ $org->legal_name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -115,14 +115,15 @@
                                     @endif
                                 </td>
                                 <td>
-                                    @if ($user->Organization)
+                                    @if ($user->person_affiliation && $user->person_affiliation->organization)
                                         <div class="font-medium">
-                                            {{ $user->Organization->display_name ?? $user->Organization->legal_name }}
+                                            {{ $user->person_affiliation->organization->legal_name }}
                                         </div>
-                                        <div class="text-sm text-gray-500">{{ $user->Organization->code }}</div>
+                                        <div class="text-sm text-gray-500">{{ $user->person_affiliation->organization->code }}</div>
                                     @else
                                         <div class="text-gray-400 italic">No organization</div>
                                     @endif
+
                                 </td>
                                 <td>
                                     <div class="flex flex-wrap gap-1">
@@ -292,7 +293,7 @@
                         <option value="">No Organization</option>
                         @foreach ($organizations as $org)
                             <option value="{{ $org->id }}">
-                                {{ $org->display_name ?? $org->legal_name }}
+                                {{ $org->legal_name }}
                                 @if ($org->code)
                                     ({{ $org->code }})
                                 @endif

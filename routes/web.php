@@ -230,3 +230,6 @@ Route::post('/webhooks/africastalking/delivery-reports', [SMSWebhookController::
 
 // Africa's Talking callback endpoint
 Route::post('/africastalking/callback', [AfricasTalkingCallbackController::class, 'handle'])->name('africastalking.callback');
+
+// Show page for a person
+Route::get('/persons/{id}', [App\Http\Controllers\PersonController::class, 'show'])->name('persons.show');

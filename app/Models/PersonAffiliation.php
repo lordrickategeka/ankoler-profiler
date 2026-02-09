@@ -124,6 +124,11 @@ class PersonAffiliation extends Model
         return $this->belongsTo(Organization::class);
     }
 
+    public function additionalData()
+    {
+        return $this->hasOne(AdditionalData::class, 'affiliation_id');
+    }
+
     /**
      * Check if affiliation is active
      */

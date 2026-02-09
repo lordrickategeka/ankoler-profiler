@@ -613,4 +613,9 @@ class Person extends Model
             }
         });
     }
+
+    public function personAffiliation(): HasMany
+    {
+        return $this->hasMany(PersonAffiliation::class);
+    }
 }

@@ -69,9 +69,31 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
+    /**
+     * PersonAffiliation relationship (links user to their organization via person affiliation)
+     */
+    public function personAffiliation()
+    {
+        return $this->hasOneThrough(
+            \App\Models\PersonAffiliation::class,
+            \App\Models\Person::class,
+            'user_id', // Foreign key on the persons table
+            'person_id', // Foreign key on the person_affiliations table
+            'id', // Local key on the users table
+            'id'  // Local key on the persons table
+        );
+    }
+
     public function Organization()
     {
-        return $this->belongsTo(Organization::class, 'organization_id');
+        return $this->hasOneThrough(
+            Organization::class,
+            PersonAffiliation::class,
+            'person_id', // Foreign key on person_affiliations table
+            'id', // Foreign key on organizations table
+            'id', // Local key on users table
+            'organization_id' // Local key on person_affiliations table
+        );
     }
 
     /**

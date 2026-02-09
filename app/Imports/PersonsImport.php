@@ -109,7 +109,7 @@ class PersonsImport implements ToCollection, WithHeadingRow, WithValidation, Wit
     }
 
     /**
-     * Skip the description row and start from row 3
+     * Skip the first two rows and start from row 3
      * Row 1: Headers (given_name, family_name, phone, email, etc.)
      * Row 2: Description/Instructions
      * Row 3+: Actual data
@@ -317,6 +317,7 @@ class PersonsImport implements ToCollection, WithHeadingRow, WithValidation, Wit
             'country' => $row['country'] ?? 'Uganda',
             'classification' => json_encode([$row['role_type'] ?? $this->defaultRoleType]),
             'created_by' => $this->createdBy,
+            'user_id' => $this->createdBy,
         ]);
     }
 

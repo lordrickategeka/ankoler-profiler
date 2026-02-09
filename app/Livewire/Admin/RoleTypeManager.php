@@ -70,7 +70,7 @@ class RoleTypeManager extends Component
             $query->where('organization_id', $orgId);
             $organizations = Organization::where('id', $orgId)->get();
         } else {
-            $organizations = Organization::orderBy('display_name')->get();
+            $organizations = Organization::orderBy('legal_name')->get();
         }
 
         $roleTypes = $query->orderBy('name')->paginate(15);

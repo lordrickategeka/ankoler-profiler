@@ -27,7 +27,7 @@ class UserManager extends Component
 
     public function render()
     {
-        $query = User::with(['roles', 'Organization']);
+        $query = User::with(['roles', 'personAffiliation.Organization']);
 
         if ($this->search) {
             $query->where(function($q) {
@@ -43,14 +43,19 @@ class UserManager extends Component
         }
 
         if ($this->organizationFilter !== 'all') {
-            $query->where('organization_id', $this->organizationFilter);
+            $query->whereHas('personAffiliation', function($q) {
+                $q->where('organization_id', $this->organizationFilter);
+            });
         }
 
         $users = $query->orderBy('name')->paginate(15);
         $roles = Role::orderBy('name')->get();
         $allRoles = Role::orderBy('name')->get();
-        $organizations = Organization::orderBy('legal_name')->get();
+        $organizations = Organization::whereHas('personAffiliations', function($query) {
+            $query->where('status', 'active');
+        })->orderBy('legal_name')->get();
 
+        
         return view('livewire.admin.user-manager', [
             'users' => $users,
             'roles' => $roles,
