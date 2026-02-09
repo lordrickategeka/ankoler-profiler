@@ -1,5 +1,8 @@
 <?php
 use Illuminate\Support\Facades\Auth;
+use App\Models\PersonAffiliation;
+use App\Models\User;
+
 // app/Helpers/OrganizationHelper.php
 
 use App\Models\Organization;
@@ -46,8 +49,9 @@ if (!function_exists('can_access_Organization')) {
      */
     function can_access_Organization($OrganizationId)
     {
+        /** @var \App\Models\User|null $user */
         $user = Auth::user();
-        return $user && method_exists($user, 'canAccessOrganization') && $user->canAccessOrganization($OrganizationId);
+        return $user && $user->canAccessOrganization($OrganizationId);
     }
 }
 
@@ -55,11 +59,9 @@ if (!function_exists('user_accessible_Organizations')) {
     // Get all Organizations current user can access
     function user_accessible_Organizations()
     {
+        /** @var \App\Models\User|null $user */
         $user = Auth::user();
-        if ($user && method_exists($user, 'accessibleOrganizations')) {
-            return $user->accessibleOrganizations();
-        }
-        return collect();
+        return $user ? $user->accessibleOrganizations() : collect();
     }
 }
 
@@ -69,7 +71,7 @@ if (!function_exists('user_accessible_Organizations')) {
 if (!function_exists('user_current_organization')) {
     function user_current_organization()
     {
-        $user = \Illuminate\Support\Facades\Auth::user();
+        $user = Auth::user();
 
         if (!$user) {
             return null;
@@ -77,65 +79,10 @@ if (!function_exists('user_current_organization')) {
 
         // For Super Admin, we need a different approach since they manage multiple organizations
         if (method_exists($user, 'hasRole') && $user->hasRole('Super Admin')) {
-            // 1. First check session (temporary working organization)
-            $sessionOrgId = session('current_organization_id');
-            if ($sessionOrgId && \App\Models\Organization::where('id', $sessionOrgId)->exists()) {
-                return \App\Models\Organization::find($sessionOrgId);
-            }
-
-            // 2. Check if Super Admin has any person affiliations (they might also be staff somewhere)
-            if (isset($user->person_id) && $user->person_id) {
-                $affiliation = \App\Models\PersonAffiliation::where('person_id', $user->person_id)
-                    ->where('status', 'active')
-                    ->with('Organization')
-                    ->orderBy('start_date', 'desc')
-                    ->first();
-
-                if ($affiliation && $affiliation->Organization) {
-                    // Store this as session for consistency
-                    session(['current_organization_id' => $affiliation->Organization->id]);
-                    return $affiliation->Organization;
-                }
-            }
-
-            // 3. Fallback to first active organization
-            $firstOrg = \App\Models\Organization::where('is_active', true)->first() ?? \App\Models\Organization::first();
-            if ($firstOrg) {
-                session(['current_organization_id' => $firstOrg->id]);
-                return $firstOrg;
-            }
-
-            return null;
+            return null; // Super Admin does not have a single current organization
         }
 
-        // For regular users - use database affiliations first, session as fallback
-        // 1. Use persons table: find person by user_id and return their organization_id
-        $person = \App\Models\Person::where('user_id', $user->id)->first();
-        if ($person && $person->organization_id) {
-            $org = \App\Models\Organization::find($person->organization_id);
-            if ($org) {
-                return $org;
-            }
-        }
-
-        // 2. Try session organization (if user switched context)
-        $sessionOrgId = session('current_organization_id');
-        if ($sessionOrgId) {
-            $org = \App\Models\Organization::find($sessionOrgId);
-            if ($org) {
-                return $org;
-            }
-        }
-
-        // 3. Try direct organization relationship (if exists)
-        if (isset($user->organization_id) && $user->organization_id) {
-            $org = \App\Models\Organization::find($user->organization_id);
-            if ($org) {
-                return $org;
-            }
-        }
-
-        return null;
+        return $user->Organization;
     }
 }
 
@@ -222,5 +169,28 @@ if (!function_exists('user_current_organization_name')) {
     {
         $org = user_current_organization();
         return $org?->display_name ?? $org?->legal_name ?? 'No organization';
+    }
+}
+
+if (!function_exists('get_current_user_organization')) {
+    /**
+     * Get the organization details for the current user.
+     *
+     * @return \App\Models\Organization|null
+     */
+    function get_current_user_organization()
+    {
+        $user = Auth::user();
+
+        if (!$user || !$user->person_id) {
+            return null;
+        }
+
+        $affiliation = PersonAffiliation::where('person_id', $user->person_id)
+            ->active()
+            ->with('organization')
+            ->first();
+
+        return $affiliation ? $affiliation->organization : null;
     }
 }

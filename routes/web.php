@@ -9,6 +9,8 @@ use App\Http\Controllers\AfricasTalkingCallbackController;
 use App\Http\Controllers\AllPersonsListController;
 use App\Livewire\Person\Notifications as PersonNotificationsLivewire;
 use App\Models\CustomField;
+use App\Models\User;
+use Illuminate\Auth\Events\Verified;
 
 
 use App\Exports\OrganizationTemplateExport;
@@ -100,24 +102,23 @@ Route::middleware([
         ->middleware('can:view-Organizations');
 
     // Person routes
-    // Route::get('/persons/all', App\Livewire\Person\PersonList::class)->name('persons.all');
-    // Route::get('/persons/all', App\Livewire\PersonsListComponent::class)->name('persons.all');
-
-    Route::get('/persons/all', [AllPersonsListController::class,'index'])->name('persons.all');
+     Route::get('/persons/all', [AllPersonsListController::class, 'index'])->name('persons.all');
 
     // Route::get('/persons/create', App\Livewire\Person\CreatePerson::class)->name('persons.create');
     Route::get('/persons/create', App\Livewire\Person\PersonsComponent::class)->name('persons.create');
     Route::get('/persons/import', App\Livewire\Person\ImportPersons::class)
         ->name('persons.import')
         ->middleware('can:import-org-persons');
+    // Show page for a person
+    Route::get('/persons/{id}', [App\Http\Controllers\PersonController::class, 'show'])->name('persons.show');
+
+
     Route::get('/persons/export', App\Livewire\Person\ExportPersons::class)
         ->name('persons.export');
-
 
     // Person Products page
     Route::get('/persons/products', App\Livewire\PersonProducts::class)
         ->name('person-products');
-
 
 
     // Person profile view
@@ -165,6 +166,9 @@ Route::middleware([
 
         Route::get('/users', App\Livewire\Admin\UserManager::class)
             ->name('users.index');
+
+            Route::get('/allow-email-domains', App\Livewire\Admin\AllowedEmailDomainManager::class)
+            ->name('allowEmailDomains.index');
     });
 
     // Organization Units routes
@@ -231,5 +235,19 @@ Route::post('/webhooks/africastalking/delivery-reports', [SMSWebhookController::
 // Africa's Talking callback endpoint
 Route::post('/africastalking/callback', [AfricasTalkingCallbackController::class, 'handle'])->name('africastalking.callback');
 
-// Show page for a person
-Route::get('/persons/{id}', [App\Http\Controllers\PersonController::class, 'show'])->name('persons.show');
+use App\Http\Requests\CustomVerifyEmailRequest;
+
+// Override the verification.verify route to use the custom request
+Route::get('/email/verify/{id}/{hash}', function (CustomVerifyEmailRequest $request) {
+    $user = User::findOrFail($request->route('id'));
+
+    if ($user->hasVerifiedEmail()) {
+        return redirect()->route('dashboard', ['verified' => 1]);
+    }
+
+    if ($user->markEmailAsVerified()) {
+        event(new Verified($user));
+    }
+
+    return redirect()->route('dashboard', ['verified' => 1]);
+})->middleware(['signed', 'throttle:6,1'])->name('verification.verify');

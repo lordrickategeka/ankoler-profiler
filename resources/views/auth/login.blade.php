@@ -76,11 +76,7 @@
     <!-- Divider -->
     <div class="divider"></div>
     <!-- Self Registration Link -->
-    <div class="flex justify-center mt-4">
-        <a href="{{ route('person.self-register') }}" class="link link-primary text-sm font-semibold">
-            Don't have an account? Self Register
-        </a>
-    </div>
+    
     <!-- Help Links -->
     {{-- <div class="flex justify-center space-x-4 text-sm">
         <a href="#" class="link link-secondary">Contact Support</a>

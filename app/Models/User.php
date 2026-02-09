@@ -10,6 +10,8 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use App\Notifications\CustomVerifyEmail;
+use Illuminate\Support\Facades\Cache;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -133,18 +135,23 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Check if user can access a specific organization
+     * Check if the user can access a specific organization.
+     *
+     * @param int $organizationId
+     * @return bool
      */
-    public function canAccessOrganization($organizationId)
+    public function canAccessOrganization(int $organizationId): bool
     {
-        // Super Admin can access all
+        // Super Admin can access all organizations
         if ($this->hasRole('Super Admin')) {
             return true;
         }
 
-        // Check if organization is in their accessible list
-        return $this->accessibleOrganizations()
-                    ->contains('id', $organizationId);
+        // Check if the user has an active affiliation with the organization
+        return PersonAffiliation::where('person_id', $this->person_id)
+            ->where('organization_id', $organizationId)
+            ->active()
+            ->exists();
     }
 
     /**
@@ -163,5 +170,10 @@ class User extends Authenticatable implements MustVerifyEmail
                                        ->first();
 
         return $affiliation ? $affiliation->roleType : null;
+    }
+
+    public function sendEmailVerificationNotification($temporaryPassword = null)
+    {
+        $this->notify(new CustomVerifyEmail($temporaryPassword));
     }
 }

@@ -18,7 +18,10 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use App\Models\AllowedEmailDomain;
+use Illuminate\Validation\ValidationException;
 
+#[\Livewire\Attributes\Layout('layouts.auth-card')]
 class PersonSelfRegistrationComponent extends Component
 {
     // Step navigation removed
@@ -48,6 +51,13 @@ class PersonSelfRegistrationComponent extends Component
     public function mount()
     {
         $this->availableOrganizations = Organization::all();
+
+        // Debug log for available organizations
+        Log::debug('Available organizations during mount', ['organizations' => $this->availableOrganizations]);
+
+        if ($this->availableOrganizations->isEmpty()) {
+            session()->flash('error', 'No organizations are available for registration.');
+        }
     }
 
 
@@ -67,6 +77,9 @@ class PersonSelfRegistrationComponent extends Component
                 'form.role_title' => 'required|string',
                 'form.organization_id' => 'required|exists:organizations,id',
             ]);
+
+        // Debug log for organization_id
+        Log::debug('Organization ID during registration', ['organization_id' => $this->form['organization_id']]);
 
         // Check if email exists and is not verified
         $existingUser = User::where('email', $this->form['email'])->first();
@@ -106,7 +119,6 @@ class PersonSelfRegistrationComponent extends Component
             $person = Person::create([
                 'person_id' => \App\Helpers\IdGenerator::generatePersonId(),
                 'global_identifier' => \App\Helpers\IdGenerator::generateGlobalIdentifier(),
-                'organization_id' => $this->form['organization_id'],
                 'given_name' => $this->form['given_name'],
                 'middle_name' => $this->form['middle_name'],
                 'family_name' => $this->form['family_name'],
@@ -127,7 +139,7 @@ class PersonSelfRegistrationComponent extends Component
 
             PersonAffiliation::create([
                 'person_id' => $person->id,
-                'organization_id' => $person->organization_id,
+                'organization_id' => $this->form['organization_id'],
                 'role_type' => $this->form['role_type'] ?? 'STAFF',
                 'role_title' => $this->form['role_title'] ?? 'Organization Admin',
                 'start_date' => now(),
@@ -140,9 +152,9 @@ class PersonSelfRegistrationComponent extends Component
             $user->assignRole('Organization Admin');
             Log::info('Role assigned', ['user_id' => $user->id]);
 
-            // Send email verification notification first
-            $user->sendEmailVerificationNotification();
-            Log::info('Verification notification sent', ['user_id' => $user->id]);
+            // Send custom email verification notification with plain text temporary password
+            $user->sendEmailVerificationNotification($temporaryPassword);
+            Log::info('Custom verification notification sent with plain text temporary password', ['user_id' => $user->id, 'temporary_password' => $temporaryPassword]);
 
             DB::commit();
             Log::info('DB commit successful', ['user_id' => $user->id, 'person_id' => $person->id]);
@@ -156,7 +168,15 @@ class PersonSelfRegistrationComponent extends Component
                 $user->delete();
             }
             DB::rollBack();
-            session()->flash('error', 'Registration failed. Please try again.');
+
+            // Map technical error to user-friendly message
+            $errorMessage = 'Registration failed. Please try again later.';
+            if (str_contains($e->getMessage(), "Column 'organization_id' cannot be null")) {
+                $errorMessage = 'The selected organization is invalid. Please select a valid organization.';
+            }
+
+            session()->flash('error', $errorMessage);
+            session()->flash('error_reason', $e->getMessage()); // Keep technical error for debugging
             Log::error('Registration DB error: ' . $e->getMessage(), ['exception' => $e]);
             return;
         }
@@ -179,6 +199,29 @@ class PersonSelfRegistrationComponent extends Component
 
         // Email
         if (!empty($this->form['email'])) {
+            $email = $this->form['email'];
+            $domain = strtolower(substr(strrchr($email, "@"), 1));
+
+            $allowed = AllowedEmailDomain::where('domain', $domain)
+                ->where('is_active', true)
+                ->exists();
+
+            if (! $allowed) {
+                session()->flash('error', 'Registration failed.');
+                session()->flash('error_reason', 'Your organization is not authorized to register.');
+                throw ValidationException::withMessages([
+                    'email' => 'Your organization is not authorized to register.',
+                ]);
+            }
+
+            // $blocked = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com'];
+
+            // if (in_array($domain, $blocked)) {
+            //     throw ValidationException::withMessages([
+            //         'email' => 'Email addresses from this domain are not allowed.',
+            //     ]);
+            // }
+
             EmailAddress::create([
                 'person_id' => $person->id,
                 'email_id' => \App\Helpers\IdGenerator::generateEmailId(),
@@ -194,7 +237,6 @@ class PersonSelfRegistrationComponent extends Component
     }
     public function render()
     {
-        return view('livewire.person.person-self-registration')
-        ->layout('layouts.auth-card');
+        return view('livewire.person.person-self-registration');
     }
 }
