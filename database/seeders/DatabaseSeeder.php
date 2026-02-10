@@ -42,11 +42,11 @@ class DatabaseSeeder extends Seeder
                 UserSeeder::class,
 
                 // Organization structure
-                OrganizationSeeder::class,
+                // OrganizationSeeder::class,
                 // OrganizationSiteSeeder::class,
 
                 // Person data
-                PersonSeeder::class,
+                // PersonSeeder::class,
                 // PersonAffiliationSeeder::class,
 
                 // Relationship system (run after persons and affiliations exist)
@@ -56,19 +56,19 @@ class DatabaseSeeder extends Seeder
                 // CommunicationSeeder::class,
 
 
-                PersonTestDataSeeder::class,
-                PersonViewPermissionSeeder::class,
-                RoleTypeSeeder::class,
-                FilterConfigurationSeeder::class,
+                // PersonTestDataSeeder::class,
+                // PersonViewPermissionSeeder::class,
+                // RoleTypeSeeder::class,
+                // FilterConfigurationSeeder::class,
                 // DomainRecordsSeeder::class,
 
-                RelationshipSeeder::class,
-                DioceseSpecificSeeder::class,
-                TestDiscoverySeeder::class,
+                // RelationshipSeeder::class,
+                // DioceseSpecificSeeder::class,
+                // TestDiscoverySeeder::class,
 
-                CommunicationPermissionSeeder::class,
+                // CommunicationPermissionSeeder::class,
                 // CommunicationTemplateSeeder::class,
-                OrganizationUnitsSeeder::class,
+                // OrganizationUnitsSeeder::class,
             ]);
 
             // Re-enable foreign key checks
