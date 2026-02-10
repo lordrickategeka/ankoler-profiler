@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::table('organizations', function (Blueprint $table) {
             $table->softDeletes();
+            if (!Schema::hasColumn('organizations', 'deleted_at')) {
+                Schema::table('organizations', function (Blueprint $table) {
+                    $table->timestamp('deleted_at')->nullable();
+                });
+            }
         });
     }
 
