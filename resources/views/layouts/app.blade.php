@@ -85,6 +85,12 @@
         // Load saved theme
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
+
+        document.addEventListener('livewire:load', () => {
+            Livewire.on('swal', (data) => {
+                Swal.fire(data);
+            });
+        });
     </script>
 
     {{-- Sweet Alert Component for Error Handling --}}

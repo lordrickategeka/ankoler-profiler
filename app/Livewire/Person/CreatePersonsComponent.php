@@ -76,7 +76,13 @@ class CreatePersonsComponent extends Component
                 session()->flash('info', 'This email is already registered but not verified. Verification email sent.');
                 return;
             } else {
-                session()->flash('error', 'Email address already exists and is verified.');
+                $this->dispatch('swal', [
+                    'position' => 'top-end',
+                    'icon' => 'error',
+                    'title' => 'Email address already exists and is verified.',
+                    'showConfirmButton' => false,
+                    'timer' => 1500
+                ]);
                 return;
             }
         }
@@ -148,14 +154,27 @@ class CreatePersonsComponent extends Component
             DB::commit();
             Log::info('DB commit successful', ['user_id' => $user->id, 'person_id' => $person->id]);
 
-            session()->flash('success', 'Registration successful! Please check your email to verify your account.');
+            session()->flash('info', 'Registered.');
+            // $this->dispatch('swal', [
+            //     'position' => 'top-end',
+            //     'icon' => 'success',
+            //     'title' => 'Registration successful! Please check your email to verify your account.',
+            //     'showConfirmButton' => false,
+            //     'timer' => 1500
+            // ]);
             return redirect()->route('persons.all');
         } catch (\Exception $e) {
             if ($user) {
                 $user->delete();
             }
             DB::rollBack();
-            session()->flash('error', 'Registration failed. Please try again.');
+            $this->dispatch('swal', [
+                'position' => 'top-end',
+                'icon' => 'error',
+                'title' => 'Registration failed. Please try again.',
+                'showConfirmButton' => false,
+                'timer' => 1500
+            ]);
             Log::error('Registration DB error: ' . $e->getMessage(), ['exception' => $e]);
             return;
         }

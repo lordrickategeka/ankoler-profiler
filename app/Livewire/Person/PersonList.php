@@ -117,13 +117,19 @@ class PersonList extends Component
         try {
             $user = Auth::user();
             if (!$user) {
-                session()->flash('error', 'You must be logged in to delete persons.');
+                $this->dispatch('alert', [
+                    'type' => 'error',
+                    'message' => 'You must be logged in to delete persons.'
+                ]);
                 return;
             }
 
             $person = Person::find($personId);
             if (!$person) {
-                session()->flash('error', 'Person not found.');
+                $this->dispatch('alert', [
+                    'type' => 'error',
+                    'message' => 'Person not found.'
+                ]);
                 return;
             }
 
@@ -136,7 +142,10 @@ class PersonList extends Component
                     ->exists();
 
                 if (!$hasAffiliation) {
-                    session()->flash('error', 'You do not have permission to delete this person.');
+                    $this->dispatch('alert', [
+                        'type' => 'error',
+                        'message' => 'You do not have permission to delete this person.'
+                    ]);
                     return;
                 }
             }
@@ -145,7 +154,10 @@ class PersonList extends Component
             $this->showDeleteModal = true;
         } catch (\Exception $e) {
             Log::error('Confirm delete exception: ' . $e->getMessage());
-            session()->flash('error', 'An error occurred while preparing to delete the person.');
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'message' => 'An error occurred while preparing to delete the person.'
+            ]);
         }
     }
 
@@ -154,14 +166,20 @@ class PersonList extends Component
         try {
             $user = Auth::user();
             if (!$user || !$this->personToDeleteId) {
-                session()->flash('error', 'Invalid delete request.');
+                $this->dispatch('alert', [
+                    'type' => 'error',
+                    'message' => 'Invalid delete request.'
+                ]);
                 $this->cancelDelete();
                 return;
             }
 
             $person = Person::find($this->personToDeleteId);
             if (!$person) {
-                session()->flash('error', 'Person not found.');
+                $this->dispatch('alert', [
+                    'type' => 'error',
+                    'message' => 'Person not found.'
+                ]);
                 $this->cancelDelete();
                 return;
             }
@@ -175,7 +193,10 @@ class PersonList extends Component
                     ->exists();
 
                 if (!$hasAffiliation) {
-                    session()->flash('error', 'You do not have permission to delete this person.');
+                    $this->dispatch('alert', [
+                        'type' => 'error',
+                        'message' => 'You do not have permission to delete this person.'
+                    ]);
                     $this->cancelDelete();
                     return;
                 }
@@ -208,7 +229,10 @@ class PersonList extends Component
                 $this->showDeleteModal = false;
                 $this->personToDeleteId = null;
 
-                session()->flash('message', "Person '{$personName}' has been successfully deleted.");
+                $this->dispatch('alert', [
+                    'type' => 'success',
+                    'message' => "Person '{$personName}' has been successfully deleted."
+                ]);
                 $this->clearPersonListCache();
                 $this->resetPage();
 
@@ -218,7 +242,10 @@ class PersonList extends Component
             }
         } catch (\Exception $e) {
             Log::error('Delete person exception: ' . $e->getMessage());
-            session()->flash('error', 'Failed to delete person: ' . $e->getMessage());
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'message' => 'Failed to delete person: ' . $e->getMessage()
+            ]);
             $this->cancelDelete();
         }
     }
@@ -251,7 +278,10 @@ class PersonList extends Component
                 } else {
                     $this->viewPersonId = null;
                     $this->viewPersonData = null;
-                    session()->flash('error', 'Person not found.');
+                    $this->dispatch('alert', [
+                        'type' => 'error',
+                        'message' => 'Person not found.'
+                    ]);
                 }
             }
 
@@ -269,7 +299,10 @@ class PersonList extends Component
             // Optionally reset edit state
             $this->editPersonId = null;
             $this->editPersonData = [];
-            session()->flash('message', 'Person updated successfully.');
+            $this->dispatch('alert', [
+                'type' => 'success',
+                'message' => 'Person updated successfully.'
+            ]);
             // Optionally refresh list or emit event
             $this->clearPersonListCache();
             $this->resetPage();
@@ -354,7 +387,10 @@ class PersonList extends Component
                 });
             }
             $persons = $query->paginate(10);
-            session()->flash('warning', 'Some filters could not be applied. Showing basic results.');
+            $this->dispatch('alert', [
+                'type' => 'warning',
+                'message' => 'Some filters could not be applied. Showing basic results.'
+            ]);
         }
 
         // Get additional data

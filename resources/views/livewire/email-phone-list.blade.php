@@ -10,6 +10,7 @@
                 <thead>
                     <tr>
                         <th>Email</th>
+                        <th>Temp Pass</th>
                         <th>Phone Number</th>
                         <th>Email Type</th>
                         <th>Phone Type</th>
@@ -25,6 +26,8 @@
                     @foreach ($emails as $index => $email)
                         <tr>
                             <td>{{ $email->email }}</td>
+                            <td>{{ $user->temporary_password	 ?? 'N/A' }}</td>
+
                             <td>{{ $phones[$index]->number ?? 'N/A' }}</td>
                             <td>{{ $email->type }}</td>
                             <td>{{ $phones[$index]->type ?? 'N/A' }}</td>

@@ -1,22 +1,41 @@
 @props(['success' => session('success'), 'error' => session('error'), 'errorReason' => session('error_reason'), 'info' => session('info')])
 
+<!-- Include SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- SweetAlert2 Alert Component -->
 @if ($success)
-    <div class="alert alert-success mb-6">
-        <p class="text-sm font-medium">{{ $success }}</p>
-    </div>
+    <script>
+        Swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title: '{{ $success }}',
+            showConfirmButton: false,
+            timer: 1500
+        });
+    </script>
 @endif
 
 @if ($error)
-    <div class="alert alert-error mb-6">
-        <p class="text-sm font-medium">{{ $error }}</p>
-        @if ($errorReason)
-            <p class="text-sm text-gray-600">Reason: {{ $errorReason }}</p>
-        @endif
-    </div>
+    <script>
+        Swal.fire({
+            position: 'top-end',
+            icon: 'error',
+            title: '{{ $error }}',
+            showConfirmButton: false,
+            timer: 1500
+        });
+    </script>
 @endif
 
 @if ($info)
-    <div class="alert alert-info mb-6">
-        <p class="text-sm font-medium">{{ $info }}</p>
-    </div>
+    <script>
+        Swal.fire({
+            position: 'top-end',
+            icon: 'info',
+            title: '{{ $info }}',
+            showConfirmButton: false,
+            timer: 1500
+        });
+    </script>
 @endif

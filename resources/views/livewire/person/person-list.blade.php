@@ -1,17 +1,16 @@
 <div class="h-[calc(100vh-8rem)] overflow-y-auto" wire:key="person-list-component">
     <div class="p-8">
+        <!-- Include the alert component -->
+        <x-alerts />
 
         <div class="flex justify-between items-center mb-4">
             <div class="flex items-center space-x-4">
                 <!-- Search Input -->
                 <div class="relative mr-4">
-                    <input
-                        type="text"
+                    <input type="text"
                         class="input input-bordered w-full border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Search persons..."
-                            wire:model.live.debounce.500ms="filters.search"
-                        autocomplete="off"
-                    />
+                        placeholder="Search persons..." wire:model.live.debounce.500ms="filters.search"
+                        autocomplete="off" />
 
                 </div>
                 <div class="flex items-center">
@@ -111,7 +110,7 @@
             </div>
 
             @if ($persons->count() > 0)
-                <div class="overflow-x-auto" wire:key="persons-table">
+                <div class="" wire:key="persons-table">
                     <table class="min-w-full divide-y divide-gray-200 text-[11px]">
                         <thead class="bg-gray-50 text-[11px]">
                             <tr>
@@ -261,10 +260,11 @@
                                                     </div>
                                                     <div class="flex-1">
                                                         <span
-                                                            class="font-medium">{{ ($affiliation->Organization->legal_name ?? 'Not-Provided') }}</span>
+                                                            class="font-medium">{{ $affiliation->Organization->legal_name ?? 'Not-Provided' }}</span>
                                                         @if ($affiliation->role_title)
                                                             <div class="text-xs text-gray-400">
-                                                              {{ $affiliation->role_type }}:  {{ $affiliation->role_title }}</div>
+                                                                {{ $affiliation->role_type }}:
+                                                                {{ $affiliation->role_title }}</div>
                                                         @endif
                                                     </div>
 
@@ -297,10 +297,12 @@
                                                     <div class="mb-1 flex items-start">
                                                         <div class="flex-1">
                                                             @if ($person->district)
-                                                                <div class="text-sm font-medium text-gray-900">{{ $person->district }}</div>
+                                                                <div class="text-sm font-medium text-gray-900">
+                                                                    {{ $person->district }}</div>
                                                             @endif
                                                             @if ($person->address)
-                                                                <div class="text-xs text-gray-400">{{ $person->address }}</div>
+                                                                <div class="text-xs text-gray-400">
+                                                                    {{ $person->address }}</div>
                                                             @endif
                                                         </div>
                                                     </div>
