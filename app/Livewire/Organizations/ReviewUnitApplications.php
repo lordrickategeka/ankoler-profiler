@@ -24,6 +24,9 @@ class ReviewUnitApplications extends Component
     {
         $user = \Illuminate\Support\Facades\Auth::user();
         if (!$user || !\Illuminate\Support\Facades\Gate::allows('approve-unit-membership')) {
+            if ($user) {
+                return redirect()->route('dashboard'); // Redirect logged-in users to the dashboard
+            }
             abort(403, 'You do not have permission to approve unit memberships.');
         }
         $application = DB::table('organization_unit_applications')->where('id', $id)->first();
@@ -54,6 +57,9 @@ class ReviewUnitApplications extends Component
     {
         $user = \Illuminate\Support\Facades\Auth::user();
         if (!$user || !\Illuminate\Support\Facades\Gate::allows('approve-unit-membership')) {
+            if ($user) {
+                return redirect()->route('dashboard'); // Redirect logged-in users to the dashboard
+            }
             abort(403, 'You do not have permission to reject unit memberships.');
         }
         $application = DB::table('organization_unit_applications')->where('id', $id)->first();

@@ -35,6 +35,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'current_team_id',
         'profile_photo_path',
+        'temporary_password', 
     ];
 
     /**

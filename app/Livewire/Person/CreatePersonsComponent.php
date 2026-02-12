@@ -18,28 +18,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
 
-class PersonsComponent extends Component
+class CreatePersonsComponent extends Component
 {
-    // public $form = [
-    //     'given_name' => '',
-    //     'middle_name' => '',
-    //     'family_name' => '',
-    //     'date_of_birth' => '',
-    //     'gender' => '',
-    //     'phone' => '',
-    //     'email' => '',
-    //     'national_id' => '',
-    //     'address' => '',
-    //     'city' => '',
-    //     'district' => '',
-    //     'country' => 'UGA',
-    //     'role_type' => '',
-    //     'role_title' => '',
-    //     'site' => '',
-    //     'start_date' => '',
-    //     'organization_id' => '',
-    //     'organization' => '',
-    // ];
 
     public $form = [
         'given_name' => '',
@@ -102,7 +82,6 @@ class PersonsComponent extends Component
         }
 
         $temporaryPassword = Str::random(10);
-        $Organization = Organization::find($this->form['organization_id']);
         $user = null;
         DB::beginTransaction();
         try {
@@ -110,9 +89,14 @@ class PersonsComponent extends Component
             $user = User::create([
                 'name' => $this->form['given_name'] . ' ' . $this->form['family_name'],
                 'email' => $this->form['email'],
-                'password' => bcrypt($temporaryPassword),
+                'password' => bcrypt($temporaryPassword), // Save the temporary password
             ]);
-            // Store the temporary password encrypted in cache so it can be included in the welcome email
+
+            // Store the temporary password in the database
+            $user->temporary_password = $temporaryPassword;
+            $user->save();
+
+            // Store the temporary password encrypted in cache for later use
             try {
                 if (!empty($temporaryPassword)) {
                     Cache::put('temp_password_user_' . $user->id, Crypt::encryptString($temporaryPassword), now()->addDays(7));
@@ -120,6 +104,7 @@ class PersonsComponent extends Component
             } catch (\Exception $e) {
                 Log::warning('Failed to cache temporary password for user', ['user_id' => $user->id, 'error' => $e->getMessage()]);
             }
+
             Log::info('User created', ['user_id' => $user->id]);
 
             // Create Person with user_id
@@ -147,7 +132,7 @@ class PersonsComponent extends Component
 
             PersonAffiliation::create([
                 'person_id' => $person->id,
-                'organization_id' => $this->form['organization_id'], // Explicitly use form data
+                'organization_id' => $this->form['organization_id'],
                 'role_type' => $this->form['role_type'] ?? 'STAFF',
                 'role_title' => $this->form['role_title'] ?? 'Organization Admin',
                 'start_date' => now(),
@@ -157,20 +142,14 @@ class PersonsComponent extends Component
             Log::info('Person affiliation created', ['person_id' => $person->id]);
 
             // Assign Organization Admin role
-            $user->assignRole('Organization Admin');
+            $user->assignRole('Person');
             Log::info('Role assigned', ['user_id' => $user->id]);
-
-            // Send email verification notification first
-            $user->sendEmailVerificationNotification();
-            Log::info('Verification notification sent', ['user_id' => $user->id]);
 
             DB::commit();
             Log::info('DB commit successful', ['user_id' => $user->id, 'person_id' => $person->id]);
 
-            // Only send welcome email after user verifies their email (handled elsewhere, not here)
-
             session()->flash('success', 'Registration successful! Please check your email to verify your account.');
-            return redirect()->route('login');
+            return redirect()->route('persons.all');
         } catch (\Exception $e) {
             if ($user) {
                 $user->delete();

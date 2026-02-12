@@ -71,13 +71,7 @@ class Sidebar extends Component
                     ],
 
                     [
-                        'label' => 'My Products',
-                        'icon' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
-                        'route' => 'person-products',
-                        'permission' => 'view-persons'
-                    ],
-                    [
-                        'label' => 'My Organizations',
+                        'label' => 'My Projects',
                         'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 4h1m4 0h1M9 16h1',
                         'route' => 'dashboard',
                         'permission' => 'view-org-persons'

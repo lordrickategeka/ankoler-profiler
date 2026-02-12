@@ -67,7 +67,7 @@
             @foreach ($domains as $domain)
                 <tr>
                     <td class="px-6 py-4 whitespace-nowrap">{{ $domain->domain }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ $domain->organization->legal_name}}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">{{ $domain->organization->legal_name ?? 'not provided'}}</td>
                     <td class="px-6 py-4 whitespace-nowrap">{{ $domain->is_active ? 'Yes' : 'No' }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <button wire:click="edit({{ $domain->id }})"

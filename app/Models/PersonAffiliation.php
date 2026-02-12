@@ -111,22 +111,10 @@ class PersonAffiliation extends Model
         return $prefix . time() . '-' . rand(1000, 9999);
     }
 
-    /**
-     * Relationships
-     */
-    // public function person(): BelongsTo
-    // {
-    //     return $this->belongsTo(Person::class);
-    // }
 
     public function Organization(): BelongsTo
     {
         return $this->belongsTo(Organization::class);
-    }
-
-    public function additionalData()
-    {
-        return $this->hasOne(AdditionalData::class, 'affiliation_id');
     }
 
     /**

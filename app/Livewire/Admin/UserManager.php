@@ -24,6 +24,7 @@ class UserManager extends Component
     public $selectedOrganization = null;
     public $selectedUsers = []; // Array to store selected user IDs
     public $selectAll = false; // Flag to handle select all functionality
+    public $activeTab = 'users'; // Default active tab
 
     public function render()
     {
@@ -54,13 +55,15 @@ class UserManager extends Component
         $organizations = Organization::whereHas('personAffiliations', function($query) {
             $query->where('status', 'active');
         })->orderBy('legal_name')->get();
+        $organizationsWithContacts = Organization::select('legal_name', 'contact_email', 'contact_phone')->get();
 
-        
+
         return view('livewire.admin.user-manager', [
             'users' => $users,
             'roles' => $roles,
             'allRoles' => $allRoles,
             'organizations' => $organizations,
+            'organizationsWithContacts' => $organizationsWithContacts,
         ]);
     }
 

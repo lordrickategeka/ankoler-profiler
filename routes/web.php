@@ -105,7 +105,7 @@ Route::middleware([
      Route::get('/persons/all', [AllPersonsListController::class, 'index'])->name('persons.all');
 
     // Route::get('/persons/create', App\Livewire\Person\CreatePerson::class)->name('persons.create');
-    Route::get('/persons/create', App\Livewire\Person\PersonsComponent::class)->name('persons.create');
+    Route::get('/persons/create', App\Livewire\Person\CreatePersonsComponent::class)->name('persons.create');
     Route::get('/persons/import', App\Livewire\Person\ImportPersons::class)
         ->name('persons.import')
         ->middleware('can:import-org-persons');

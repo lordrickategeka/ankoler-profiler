@@ -24,7 +24,7 @@
                     </svg>
                 </div>
                 <h3 class="card-title text-base font-bold mb-1">My Affiliations</h3>
-                <p class="text-base-content/70 text-xs mb-3">See your organizations, groups, and roles.</p>
+                <p class="text-base-content/70 text-xs mb-3">See your Projects, groups, and roles.</p>
                 <a href="{{ route('dashboard') }}" class="btn btn-outline btn-info btn-sm">View Affiliations</a>
             </div>
         </div>
@@ -124,13 +124,13 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                 </div>
-                <h3 class="card-title text-base font-bold mb-1">Organizations</h3>
-                <p class="text-base-content/70 text-xs mb-3">Manage organizational hierarchy and structures.</p>
+                <h3 class="card-title text-base font-bold mb-1">Projects</h3>
+                <p class="text-base-content/70 text-xs mb-3">Manage Projects hierarchy and structures.</p>
                 <a href="{{ route('organizations.index') }}" class="btn btn-outline btn-info btn-sm gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5" />
                     </svg>
-                    View Organizations
+                    View Projects
                 </a>
             </div>
         </div>
@@ -231,7 +231,7 @@
             <div class="card bg-base-100 shadow-md hover:shadow-lg transition-all duration-200 border border-base-300">
                 <div class="card-body p-4 text-center">
                     <div class="text-2xl font-bold text-info mb-1">{{ number_format($stats['total_organizations'] ?? 0) }}</div>
-                    <div class="text-xs text-base-content/70">Organizations</div>
+                    <div class="text-xs text-base-content/70">Projects</div>
                     @if(($stats['new_organizations'] ?? 0) > 0)
                         <div class="badge badge-info badge-xs mt-1">{{ $stats['new_organizations'] }} new</div>
                     @endif

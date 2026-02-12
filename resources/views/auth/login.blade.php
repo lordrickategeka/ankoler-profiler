@@ -1,6 +1,7 @@
 @extends('layouts.auth-card')
 @section('content')
-    <h3 class="card-title text-2xl font-bold text-center justify-center mb-6" style="max-width: 400px; margin: 0 auto;">Sign In</h3>
+    <h3 class="card-title text-2xl font-bold text-center justify-center mb-6" style="max-width: 400px; margin: 0 auto;">Sign
+        In</h3>
     <!-- Session Status -->
     @if (session('status'))
         <div class="alert alert-success mb-4">
@@ -20,9 +21,8 @@
                 <label class="label" for="email">
                     <span class="label-text font-medium">Email address</span>
                 </label>
-                <input id="email" name="email" type="email" value="{{ old('email') }}"
-                    autocomplete="email" required
-                    class="input input-bordered input-lg w-full @error('email') input-error @enderror"
+                <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email"
+                    required class="input input-bordered input-lg w-full @error('email') input-error @enderror"
                     placeholder="Enter your email">
                 @error('email')
                     <label class="label">
@@ -35,8 +35,8 @@
                 <label class="label" for="password">
                     <span class="label-text font-medium">Password</span>
                 </label>
-                <input id="password" name="password" type="password" autocomplete="current-password"
-                    required class="input input-bordered input-lg w-full @error('password') input-error @enderror"
+                <input id="password" name="password" type="password" autocomplete="current-password" required
+                    class="input input-bordered input-lg w-full @error('password') input-error @enderror"
                     placeholder="Enter your password">
                 @error('password')
                     <label class="label">
@@ -47,8 +47,7 @@
             <!-- Remember Me & Forgot Password -->
             <div class="flex items-center justify-between mt-6">
                 <label class="label cursor-pointer">
-                    <input id="remember_me" name="remember" type="checkbox"
-                        class="checkbox checkbox-secondary checkbox-sm">
+                    <input id="remember_me" name="remember" type="checkbox" class="checkbox checkbox-secondary checkbox-sm">
                     <span class="label-text ml-2">Remember me</span>
                 </label>
                 @if (Route::has('password.request'))
@@ -76,7 +75,7 @@
     <!-- Divider -->
     <div class="divider"></div>
     <!-- Self Registration Link -->
-    
+
     <!-- Help Links -->
     {{-- <div class="flex justify-center space-x-4 text-sm">
         <a href="#" class="link link-secondary">Contact Support</a>

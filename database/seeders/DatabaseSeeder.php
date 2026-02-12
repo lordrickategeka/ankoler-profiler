@@ -29,58 +29,23 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        $this->command->info('Starting comprehensive database seeding...');
+        $this->command->info('Running only the UserSeeder...');
 
         // Disable foreign key checks for seeding
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
         try {
-            // Core setup seeders (run these first)
+            // Run only the UserSeeder
             $this->call([
-                // Basic system setup
                 RolePermissionSeeder::class,
                 UserSeeder::class,
-
-                // Organization structure
-                // OrganizationSeeder::class,
-                // OrganizationSiteSeeder::class,
-
-                // Person data
-                // PersonSeeder::class,
-                // PersonAffiliationSeeder::class,
-
-                // Relationship system (run after persons and affiliations exist)
-                // RelationshipSeeder::class,
-
-                // Communication system
-                // CommunicationSeeder::class,
-
-
-                // PersonTestDataSeeder::class,
-                // PersonViewPermissionSeeder::class,
-                // RoleTypeSeeder::class,
-                // FilterConfigurationSeeder::class,
-                // DomainRecordsSeeder::class,
-
-                // RelationshipSeeder::class,
-                // DioceseSpecificSeeder::class,
-                // TestDiscoverySeeder::class,
-
-                // CommunicationPermissionSeeder::class,
-                // CommunicationTemplateSeeder::class,
-                // OrganizationUnitsSeeder::class,
             ]);
-
-            // Re-enable foreign key checks
+        } finally {
+            // Re-enable foreign key checks after seeding
             DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-
-            $this->command->info('Database seeding completed successfully!');
-            $this->displaySeedingSummary();
-        } catch (\Exception $e) {
-            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-            $this->command->error('Seeding failed: ' . $e->getMessage());
-            throw $e;
         }
+
+        $this->command->info('UserSeeder has been executed successfully.');
     }
 
     /**
