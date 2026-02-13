@@ -113,11 +113,28 @@ class CreatePersonsComponent extends Component
 
             Log::info('User created', ['user_id' => $user->id]);
 
+            $currentOrganization = user_current_organization();
+            $isSuperAdmin = method_exists($user, 'hasRole') && $user->hasRole('Super Admin');
+
+            if (!$isSuperAdmin) {
+                if (!$currentOrganization) {
+                    session()->flash('error', 'You are not associated with any organization.');
+                    return;
+                }
+                $this->form['organization_id'] = $currentOrganization->id;
+            } else {
+                // Validate that the organization_id is provided for Super Admins
+                if (empty($this->form['organization_id']) || !\App\Models\Organization::find($this->form['organization_id'])) {
+                    session()->flash('error', 'Please select a valid organization.');
+                    return;
+                }
+            }
+
             // Create Person with user_id
             $person = Person::create([
                 'person_id' => \App\Helpers\IdGenerator::generatePersonId(),
                 'global_identifier' => \App\Helpers\IdGenerator::generateGlobalIdentifier(),
-                'organization_id' => $this->form['organization_id'],
+                'organization_id' => $this->form['organization_id'], // Use form input for Super Admin or current organization for others
                 'given_name' => $this->form['given_name'],
                 'middle_name' => $this->form['middle_name'],
                 'family_name' => $this->form['family_name'],
@@ -138,7 +155,7 @@ class CreatePersonsComponent extends Component
 
             PersonAffiliation::create([
                 'person_id' => $person->id,
-                'organization_id' => $this->form['organization_id'],
+                'organization_id' => $currentOrganization->id, // Use current user's organization
                 'role_type' => $this->form['role_type'] ?? 'STAFF',
                 'role_title' => $this->form['role_title'] ?? 'Organization Admin',
                 'start_date' => now(),

@@ -93,16 +93,13 @@ Route::middleware([
 
     // Organizations routes
     Route::get('/organizations', App\Livewire\Organizations\Index::class)
-        ->name('organizations.index')
-        ->middleware('can:view-Organizations');
+        ->name('organizations.index');
 
     Route::get('/organizations/create', App\Livewire\Organizations\Create::class)
-        ->name('organizations.create')
-        ->middleware('can:create-Organizations');
+        ->name('organizations.create');
 
     Route::get('/organizations/{id}', App\Livewire\Organizations\Show::class)
-        ->name('organizations.show')
-        ->middleware('can:view-Organizations');
+        ->name('organizations.show');
 
     // Person routes
      Route::get('/persons/all', [AllPersonsListController::class, 'index'])->name('persons.all');
@@ -110,8 +107,7 @@ Route::middleware([
     // Route::get('/persons/create', App\Livewire\Person\CreatePerson::class)->name('persons.create');
     Route::get('/persons/create', App\Livewire\Person\CreatePersonsComponent::class)->name('persons.create');
     Route::get('/persons/import', App\Livewire\Person\ImportPersons::class)
-        ->name('persons.import')
-        ->middleware('can:import-org-persons');
+        ->name('persons.import');
     // Show page for a person
     Route::get('/persons/{id}', [App\Http\Controllers\PersonController::class, 'show'])->name('persons.show');
 
@@ -137,17 +133,14 @@ Route::middleware([
 
     // Organization Units - User listing and application
     Route::get('/organization-units', App\Livewire\Organizations\ListOrganizationUnits::class)
-        ->name('organization-units.index')
-        ->middleware('can:view-Organization-units');
+        ->name('organization-units.index');
 
     Route::get('/organization-units/create', App\Livewire\Organizations\CreateOrganizationUnit::class)
-        ->name('organization-units.create')
-        ->middleware('can:create-units');
+        ->name('organization-units.create');
 
     // Organization Units - Admin review of applications
     Route::get('/organization-units/applications', App\Livewire\Organizations\ReviewUnitApplications::class)
-        ->name('organization-units.applications')
-        ->middleware('can:review-organization-units');
+        ->name('organization-units.applications');
 
 
     // Route::resource('persons', PersonSearchController::class);
@@ -157,7 +150,7 @@ Route::middleware([
     Route::post('persons/search/export', [PersonSearchController::class, 'export'])->name('persons.search.export');
 
     // Admin routes - Role and Permission Management
-    Route::prefix('admin')->name('admin.')->middleware('can:manage-roles')->group(function () {
+    Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/permissions', App\Livewire\Admin\PermissionManager::class)
             ->name('permissions.index');
 
