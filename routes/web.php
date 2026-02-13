@@ -62,7 +62,7 @@ Route::get('/person/self-register', App\Livewire\Person\PersonSelfRegistrationCo
 
 
 Route::get('/', function () {
-    if (auth()->check()) {
+    if (\Illuminate\Support\Facades\Auth::check()) {
         return redirect()->route('dashboard');
     }
     return view('auth.login'); // Replace 'welcome' with your desired guest view
@@ -105,7 +105,7 @@ Route::middleware([
      Route::get('/persons/all', [AllPersonsListController::class, 'index'])->name('persons.all');
 
     // Route::get('/persons/create', App\Livewire\Person\CreatePerson::class)->name('persons.create');
-    Route::get('/persons/create', App\Livewire\Person\CreatePersonsComponent::class)->name('persons.create');
+    Route::get('/persons/create/{edit?}', App\Livewire\Person\CreatePersonsComponent::class)->name('persons.create');
     Route::get('/persons/import', App\Livewire\Person\ImportPersons::class)
         ->name('persons.import');
     // Show page for a person
