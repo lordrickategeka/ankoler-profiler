@@ -112,6 +112,22 @@ class Organization extends Model
     }
 
     /**
+     * Department relationship
+     */
+    public function departments(): HasMany
+    {
+        return $this->hasMany(Department::class, 'organization_id');
+    }
+
+    /**
+     * Projects through departments
+     */
+    public function projects()
+    {
+        return $this->hasManyThrough(Project::class, Department::class, 'organization_id', 'department_id');
+    }
+
+    /**
      * User who verified this Organization
      */
     public function verifiedBy(): BelongsTo
