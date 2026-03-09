@@ -24,6 +24,25 @@ class StoreProjectRequest extends FormRequest
                     return $query->where('department_id', $this->input('department_id'));
                 }),
             ],
+            'department_sub_category_id' => [
+                'nullable',
+                'exists:department_sub_categories,id',
+                function ($attribute, $value, $fail) {
+                    if (!$value || !$this->input('department_id')) {
+                        return;
+                    }
+
+                    $belongsToDepartment = \App\Models\DepartmentSubCategory::query()
+                        ->where('id', $value)
+                        ->where('department_id', $this->input('department_id'))
+                        ->exists();
+
+                    if (!$belongsToDepartment) {
+                        $fail('Selected category does not belong to the selected department.');
+                    }
+                },
+            ],
+            'sub_category' => ['nullable', 'string', 'max:255'],
             'code' => [
                 'nullable',
                 'string',
@@ -37,6 +56,9 @@ class StoreProjectRequest extends FormRequest
             'starts_on' => ['nullable', 'date'],
             'ends_on' => ['nullable', 'date', 'after_or_equal:starts_on'],
             'is_active' => ['nullable', 'boolean'],
+            'project_departments' => ['nullable', 'array'],
+            'project_departments.*.name' => ['required_with:project_departments', 'string', 'max:255'],
+            'project_departments.*.is_active' => ['nullable', 'boolean'],
         ];
     }
 }

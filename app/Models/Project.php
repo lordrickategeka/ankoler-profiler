@@ -12,7 +12,9 @@ class Project extends Model
 
     protected $fillable = [
         'department_id',
+        'department_sub_category_id',
         'name',
+        'sub_category',
         'code',
         'description',
         'admin_user_id',
@@ -32,6 +34,11 @@ class Project extends Model
         return $this->belongsTo(Department::class);
     }
 
+    public function departmentSubCategory()
+    {
+        return $this->belongsTo(DepartmentSubCategory::class, 'department_sub_category_id');
+    }
+
     public function admin()
     {
         return $this->belongsTo(User::class, 'admin_user_id');
@@ -40,6 +47,11 @@ class Project extends Model
     public function affiliations()
     {
         return $this->hasMany(ProjectAffiliation::class);
+    }
+
+    public function projectDepartments()
+    {
+        return $this->hasMany(ProjectDepartment::class);
     }
 
     public function persons()

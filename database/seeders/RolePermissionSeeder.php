@@ -150,6 +150,7 @@ class RolePermissionSeeder extends Seeder
 
             // Department and project permissions
             'view-departments',
+            'view-departments-dashboard',
             'create-departments',
             'edit-departments',
             'delete-departments',
@@ -201,6 +202,7 @@ class RolePermissionSeeder extends Seeder
             'create-users',
             'manage-users',
             'view-departments',
+            'view-departments-dashboard',
             'create-departments',
             'edit-departments',
             'delete-departments',
@@ -219,6 +221,7 @@ class RolePermissionSeeder extends Seeder
         $deptManager = Role::firstOrCreate(['name' => 'Department Manager']);
         $deptManager->syncPermissions([
             'view-dashboard',
+            'view-departments-dashboard',
             'view-dept-team',
             'manage-dept-team',
             'view-dept-staff',

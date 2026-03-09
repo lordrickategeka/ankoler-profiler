@@ -4,6 +4,7 @@ use App\Exports\OrganizationTemplateExport;
 use App\Http\Controllers\AfricasTalkingCallbackController;
 use App\Http\Controllers\AllPersonsListController;
 use App\Http\Controllers\CommunicationController;
+use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\PersonSearchController;
 use App\Http\Controllers\ProjectController;
@@ -11,6 +12,8 @@ use App\Http\Controllers\RelationshipController;
 use App\Http\Controllers\SMSWebhookController;
 use App\Http\Requests\CustomVerifyEmailRequest;
 use App\Livewire\Dashboard\DashboardComponent;
+use App\Livewire\Departments\DepartmentComponent;
+use App\Livewire\Departments\DepartmentsDashboard;
 use App\Livewire\Organizations\ImportOrganizations;
 use App\Livewire\Person\Notifications as PersonNotificationsLivewire;
 use App\Models\CustomField;
@@ -157,6 +160,26 @@ Route::middleware($authVerifiedMiddleware)->group(function () {
         Route::put('/{project}/persons', [ProjectController::class, 'syncPersons'])
             ->name('persons.sync')
             ->middleware('can:manage-project-persons');
+    });
+
+    Route::prefix('departments')->name('departments.')->group(function () {
+        Route::get('/', DepartmentComponent::class)
+            ->name('index');
+
+        Route::get('/dashboard', DepartmentsDashboard::class)
+            ->name('dashboard');
+
+        Route::post('/', [DepartmentController::class, 'store'])
+            ->name('store');
+
+        Route::get('/{department}', [DepartmentController::class, 'show'])
+            ->name('show');
+
+        Route::put('/{department}', [DepartmentController::class, 'update'])
+            ->name('update');
+
+        Route::delete('/{department}', [DepartmentController::class, 'destroy'])
+            ->name('destroy');
     });
 
     Route::prefix('admin')->name('admin.')->group(function () {

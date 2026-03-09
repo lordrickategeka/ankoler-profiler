@@ -6,10 +6,12 @@ use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\SyncProjectPersonsRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use App\Models\Department;
+use App\Models\DepartmentSubCategory;
 use App\Models\PersonAffiliation;
 use App\Models\Project;
 use App\Models\ProjectAffiliation;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class ProjectController extends Controller
 {
@@ -40,6 +42,10 @@ class ProjectController extends Controller
     {
         $user = $request->user();
         $data = $request->validated();
+        $projectDepartments = $data['project_departments'] ?? [];
+        unset($data['project_departments']);
+
+        $this->resolveProjectSubCategory($data);
 
         abort_unless(
             $user->hasRole('Super Admin') || in_array($data['department_id'], $this->allowedDepartmentIds($user), true),
@@ -48,8 +54,9 @@ class ProjectController extends Controller
         );
 
         $project = Project::create($data);
+        $this->syncProjectDepartments($project, $projectDepartments);
 
-        return response()->json($project->load(['department.organization', 'admin']), 201);
+        return response()->json($project->load(['department.organization', 'departmentSubCategory', 'admin', 'projectDepartments']), 201);
     }
 
     public function show(Project $project, Request $request)
@@ -69,6 +76,10 @@ class ProjectController extends Controller
     {
         $user = $request->user();
         $data = $request->validated();
+        $projectDepartments = $data['project_departments'] ?? null;
+        unset($data['project_departments']);
+
+        $this->resolveProjectSubCategory($data);
 
         $this->authorizeProjectAdminAction($user, $project);
 
@@ -80,7 +91,11 @@ class ProjectController extends Controller
 
         $project->update($data);
 
-        return response()->json($project->load(['department.organization', 'admin']));
+        if (is_array($projectDepartments)) {
+            $this->syncProjectDepartments($project, $projectDepartments);
+        }
+
+        return response()->json($project->load(['department.organization', 'departmentSubCategory', 'admin', 'projectDepartments']));
     }
 
     public function destroy(Project $project, Request $request)
@@ -212,5 +227,100 @@ class ProjectController extends Controller
             ->all();
 
         return array_values(array_unique($departmentIds));
+    }
+
+    private function syncProjectDepartments(Project $project, array $projectDepartments): void
+    {
+        $normalized = collect($projectDepartments)
+            ->map(function (array $item) {
+                return [
+                    'name' => trim((string) ($item['name'] ?? '')),
+                    'is_active' => array_key_exists('is_active', $item) ? (bool) $item['is_active'] : true,
+                ];
+            })
+            ->filter(fn (array $item) => $item['name'] !== '')
+            ->unique('name')
+            ->values();
+
+        $project->projectDepartments()->delete();
+
+        if ($normalized->isNotEmpty()) {
+            $project->projectDepartments()->createMany($normalized->all());
+        }
+    }
+
+    private function resolveProjectSubCategory(array &$data): void
+    {
+        $departmentId = (int) ($data['department_id'] ?? 0);
+        $subCategoryId = $data['department_sub_category_id'] ?? null;
+        $subCategoryText = isset($data['sub_category']) ? trim((string) $data['sub_category']) : '';
+
+        if ($departmentId <= 0) {
+            return;
+        }
+
+        if ($subCategoryId) {
+            $subCategory = DepartmentSubCategory::query()
+                ->where('id', $subCategoryId)
+                ->where('department_id', $departmentId)
+                ->first();
+
+            if (!$subCategory) {
+                throw ValidationException::withMessages([
+                    'department_sub_category_id' => 'Selected category does not belong to the selected department.',
+                ]);
+            }
+
+            $data['department_sub_category_id'] = $subCategory->id;
+            $data['sub_category'] = $subCategory->name;
+
+            return;
+        }
+
+        if ($subCategoryText !== '') {
+            $subCategory = DepartmentSubCategory::query()->firstOrCreate(
+                [
+                    'department_id' => $departmentId,
+                    'name' => $subCategoryText,
+                ],
+                [
+                    'is_active' => true,
+                ]
+            );
+
+            $data['department_sub_category_id'] = $subCategory->id;
+            $data['sub_category'] = $subCategory->name;
+
+            return;
+        }
+
+        $organizationCategory = Department::query()
+            ->where('id', $departmentId)
+            ->with('organization:id,category')
+            ->first()
+            ?->organization
+            ?->category;
+
+        if (is_string($organizationCategory) && trim($organizationCategory) !== '') {
+            $fallbackCategory = trim($organizationCategory);
+
+            $subCategory = DepartmentSubCategory::query()->firstOrCreate(
+                [
+                    'department_id' => $departmentId,
+                    'name' => $fallbackCategory,
+                ],
+                [
+                    'is_active' => true,
+                ]
+            );
+
+            $data['department_sub_category_id'] = $subCategory->id;
+            $data['sub_category'] = $subCategory->name;
+
+            return;
+        }
+
+        $data['department_sub_category_id'] = null;
+        $data['sub_category'] = null;
     }
 }

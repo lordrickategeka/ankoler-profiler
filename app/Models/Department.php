@@ -13,6 +13,7 @@ class Department extends Model
     protected $fillable = [
         'organization_id',
         'name',
+        'sub_category',
         'code',
         'description',
         'admin_user_id',
@@ -42,6 +43,11 @@ class Department extends Model
     public function projects()
     {
         return $this->hasMany(Project::class);
+    }
+
+    public function subCategories()
+    {
+        return $this->hasMany(DepartmentSubCategory::class);
     }
 
     public function projectAffiliations()

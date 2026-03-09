@@ -13,6 +13,7 @@ class PersonAffiliation extends Model
         'affiliation_id',
         'person_id',
         'organization_id',
+        'department_id',
         'user_id',
 
         'site',
