@@ -304,6 +304,38 @@
         </div>
     </div>
 
+    {{-- Persons Registered Per Project Chart --}}
+    @if(!empty($registrationChartData['datasets']))
+        <div class="card bg-base-100 border border-base-300 shadow-sm">
+            <div class="card-body">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <h2 class="text-lg font-semibold">Persons Registered Per Project</h2>
+                    <div class="btn-group">
+                        <button wire:click="setChartPeriod('weekly')"
+                            class="btn btn-sm {{ $chartPeriod === 'weekly' ? 'btn-primary' : 'btn-outline' }}">
+                            Weekly
+                        </button>
+                        <button wire:click="setChartPeriod('monthly')"
+                            class="btn btn-sm {{ $chartPeriod === 'monthly' ? 'btn-primary' : 'btn-outline' }}">
+                            Monthly
+                        </button>
+                        <button wire:click="setChartPeriod('yearly')"
+                            class="btn btn-sm {{ $chartPeriod === 'yearly' ? 'btn-primary' : 'btn-outline' }}">
+                            Yearly
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-4" style="position: relative; height: 350px;"
+                     wire:key="chart-{{ $chartPeriod }}-{{ $activeDepartmentId }}"
+                     x-data="registrationChart()"
+                     x-init="render(@js($registrationChartData), '{{ ucfirst($chartPeriod) }}')">
+                    <canvas x-ref="canvas"></canvas>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <div class="card bg-base-100 border border-base-300 shadow-sm">
         <div class="card-body">
             <h2 class="text-lg font-semibold">Department Projects</h2>
@@ -417,3 +449,63 @@
         </div>
     </div>
 </div>
+
+@if(!empty($registrationChartData['datasets']))
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>
+    function registrationChart() {
+        return {
+            chart: null,
+            render(chartData, periodLabel) {
+                this.$nextTick(() => {
+                    const canvas = this.$refs.canvas;
+                    if (!canvas) return;
+
+                    if (this.chart) {
+                        this.chart.destroy();
+                    }
+
+                    this.chart = new Chart(canvas, {
+                        type: 'line',
+                        data: {
+                            labels: chartData.labels,
+                            datasets: chartData.datasets
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: {
+                                mode: 'index',
+                                intersect: false
+                            },
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: { usePointStyle: true, padding: 16 }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return context.dataset.label + ': ' + context.parsed.y.toLocaleString() + ' persons';
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: { precision: 0 },
+                                    title: { display: true, text: 'Persons Registered' }
+                                },
+                                x: {
+                                    title: { display: true, text: periodLabel + ' Period' }
+                                }
+                            }
+                        }
+                    });
+                });
+            }
+        };
+    }
+</script>
+@endif

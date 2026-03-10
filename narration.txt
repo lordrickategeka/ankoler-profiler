@@ -17,7 +17,8 @@ The department_admin role->
 -view full counts of associates for each project.
 -can communication to all project admins and associates
 
-The project_admin role → this assigned to all persons registered by the department_admin, where project admin is true.
+The project_admin role → this assigned to all persons registered by the department_admin,
+where project admin is true.
 
 -The Organization --Ankole Diocese has departments
 -The organization has Projects under departments
@@ -43,7 +44,8 @@ the person being
 
 Validation:
 The department admins can add multiple project admin,
-so meaning the departments should have projects under them, so that we can return projects that belong to a given department under the diocese.
+so meaning the departments should have projects under them,
+so that we can return projects that belong to a given department under the diocese.
 Department admins can do all CRUD on projects and persons that belong to their projects .
 
 Role Definitions:
@@ -53,10 +55,14 @@ project_admin — manages one or more projects (people, staff, records)
 staff — day-to-day users within a project
 
 UI-projections:
-The project admin can then get dashboards where they manage the person under their given projects  both staff and associates, like staff under that particular church and the persons that attend in that particular church.
+The project admin can then get dashboards where they manage the person under
+their given projects  both staff and associates, like staff under that particular
+church and the persons that attend in that particular church.
 
-after that we can introduce filtering the person by relationships, say eg. a parent of a student in a given school, a father of a child that attends a given check,
-we can have death statistics and so on,
+----------------
+after that we can introduce filtering the person by relationships,
+say eg. a parent of a student in a given school, a father of a child that attends
+a given check, we can have death statistics and so on,
 
 Organization → Department Relationship:
 Organization → Department Relationship:
@@ -92,4 +98,5 @@ Final structure:
      *           └── Project  (e.g. Mbarara High School, St Peter's Church)
      *                 └── ProjectAffiliation (staff, parishioners, students …)
 
+----------------------
 

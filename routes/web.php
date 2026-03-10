@@ -105,6 +105,7 @@ Route::middleware($authVerifiedMiddleware)->group(function () {
 
     Route::prefix('organizations')->name('organizations.')->group(function () {
         Route::get('/', App\Livewire\Organizations\Index::class)->name('index');
+        Route::get('/current-project', App\Livewire\Organizations\CurrentProject::class)->name('current-project');
         Route::get('/create', App\Livewire\Organizations\Create::class)->name('create');
         Route::get('/{id}', App\Livewire\Organizations\Show::class)->name('show');
     });

@@ -15,6 +15,7 @@ class DepartmentsDashboard extends Component
 {
     public $activeDepartmentId = null;
     public $asOfDate = null;
+    public $chartPeriod = 'monthly';
 
     public function mount(): void
     {
@@ -45,6 +46,113 @@ class DepartmentsDashboard extends Component
     public function selectDepartment(int $departmentId): void
     {
         $this->activeDepartmentId = $departmentId;
+    }
+
+    public function setChartPeriod(string $period): void
+    {
+        if (in_array($period, ['weekly', 'monthly', 'yearly'])) {
+            $this->chartPeriod = $period;
+        }
+    }
+
+    private function buildRegistrationChartData($departmentOrganizations, Carbon $asOfDate): array
+    {
+        if ($departmentOrganizations->isEmpty()) {
+            return ['labels' => [], 'datasets' => []];
+        }
+
+        $orgIds = $departmentOrganizations->pluck('id')->all();
+
+        // Determine date range and grouping based on period
+        switch ($this->chartPeriod) {
+            case 'weekly':
+                $startDate = $asOfDate->copy()->subWeeks(11)->startOfWeek();
+                $dateFormat = '%x-W%v'; // ISO year-week
+                $periods = collect();
+                $current = $startDate->copy();
+                while ($current->lte($asOfDate)) {
+                    $periods->push($current->format('o-\WW'));
+                    $current->addWeek();
+                }
+                break;
+            case 'yearly':
+                $startDate = $asOfDate->copy()->subYears(4)->startOfYear();
+                $dateFormat = '%Y';
+                $periods = collect();
+                $current = $startDate->copy();
+                while ($current->year <= $asOfDate->year) {
+                    $periods->push($current->format('Y'));
+                    $current->addYear();
+                }
+                break;
+            default: // monthly
+                $startDate = $asOfDate->copy()->subMonths(11)->startOfMonth();
+                $dateFormat = '%Y-%m';
+                $periods = collect();
+                $current = $startDate->copy();
+                while ($current->lte($asOfDate)) {
+                    $periods->push($current->format('Y-m'));
+                    $current->addMonth();
+                }
+                break;
+        }
+
+        // Query registration counts grouped by org and period
+        $rows = PersonAffiliation::where('status', 'active')
+            ->whereIn('organization_id', $orgIds)
+            ->where('created_at', '>=', $startDate)
+            ->where('created_at', '<=', $asOfDate->copy()->endOfDay())
+            ->select(
+                'organization_id',
+                DB::raw("DATE_FORMAT(created_at, '{$dateFormat}') as period"),
+                DB::raw('COUNT(DISTINCT person_id) as count')
+            )
+            ->groupBy('organization_id', 'period')
+            ->get();
+
+        // Organise into datasets per org
+        $rowsByOrg = $rows->groupBy('organization_id');
+
+        $colors = [
+            'rgba(59,130,246,0.8)', 'rgba(16,185,129,0.8)', 'rgba(245,158,11,0.8)',
+            'rgba(239,68,68,0.8)', 'rgba(139,92,246,0.8)', 'rgba(236,72,153,0.8)',
+            'rgba(20,184,166,0.8)', 'rgba(249,115,22,0.8)', 'rgba(99,102,241,0.8)',
+            'rgba(34,197,94,0.8)',
+        ];
+
+        $datasets = [];
+        $colorIndex = 0;
+
+        foreach ($departmentOrganizations as $org) {
+            $orgRows = $rowsByOrg->get($org->id, collect())->keyBy('period');
+            $data = $periods->map(fn($p) => (int) ($orgRows->get($p)?->count ?? 0))->values()->all();
+
+            $color = $colors[$colorIndex % count($colors)];
+            $datasets[] = [
+                'label' => $org->display_name ?: $org->legal_name,
+                'data' => $data,
+                'backgroundColor' => $color,
+                'borderColor' => $color,
+                'borderWidth' => 2,
+                'tension' => 0.3,
+                'fill' => false,
+            ];
+            $colorIndex++;
+        }
+
+        // Format labels for display
+        $labels = $periods->map(function ($p) {
+            if (str_contains($p, '-W')) {
+                return $p; // Week format
+            }
+            if (strlen($p) === 4) {
+                return $p; // Year
+            }
+            // Monthly: Y-m → Mon YYYY
+            return Carbon::createFromFormat('Y-m', $p)->format('M Y');
+        })->values()->all();
+
+        return ['labels' => $labels, 'datasets' => $datasets];
     }
 
     public function render()
@@ -257,6 +365,9 @@ class DepartmentsDashboard extends Component
             'total_projects' => $departments->sum('projects_count'),
         ];
 
+        // Build registration trend chart data per project (organization)
+        $registrationChartData = $this->buildRegistrationChartData($departmentOrganizations, $asOfDate);
+
         return view('livewire.departments.departments-dashboard', [
             'departments' => $departments,
             'summary' => $summary,
@@ -269,6 +380,7 @@ class DepartmentsDashboard extends Component
             'isOrgAdmin' => $isOrgAdmin,
             'ankoleDepartments' => $ankoleDepartments,
             'nonAnkoleDepartments' => $nonAnkoleDepartments,
+            'registrationChartData' => $registrationChartData,
         ]);
     }
 }
