@@ -16,6 +16,7 @@ class DepartmentsDashboard extends Component
     public $activeDepartmentId = null;
     public $asOfDate = null;
     public $chartPeriod = 'monthly';
+    public $selectedOrganizationPersons = [];
 
     public function mount(): void
     {
@@ -382,5 +383,19 @@ class DepartmentsDashboard extends Component
             'nonAnkoleDepartments' => $nonAnkoleDepartments,
             'registrationChartData' => $registrationChartData,
         ]);
+    }
+
+    public function showOrganizationPersons($organizationId)
+    {
+        $persons = [];
+        $projects = \App\Models\Project::whereHas('department.organization', function ($q) use ($organizationId) {
+            $q->where('id', $organizationId);
+        })->get();
+        foreach ($projects as $project) {
+            foreach ($project->persons as $person) {
+                $persons[] = $person;
+            }
+        }
+        $this->selectedOrganizationPersons = collect($persons)->unique('id')->values()->all();
     }
 }

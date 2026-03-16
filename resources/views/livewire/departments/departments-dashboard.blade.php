@@ -28,12 +28,12 @@
                 </div>
             </div>
 
-            <div class="card bg-base-100 border border-base-300 shadow-sm">
+            {{-- <div class="card bg-base-100 border border-base-300 shadow-sm">
                 <div class="card-body p-4">
                     <p class="text-sm text-base-content/70">Total Projects</p>
                     <p class="text-2xl font-bold">{{ number_format($summary['total_projects']) }}</p>
                 </div>
-            </div>
+            </div> --}}
 
             <div class="card bg-base-100 border border-primary/30 shadow-sm">
                 <div class="card-body p-4">
@@ -196,9 +196,9 @@
                             <p class="text-sm font-medium mb-2">Organizations in {{ $selectedDepartment->name }} scope ({{ $selectedDepartment->subCategories->pluck('name')->join('/') }})</p>
                             <div class="flex flex-wrap gap-2">
                                 @forelse($departmentOrganizations as $organization)
-                                    <span class="badge badge-outline">
+                                    <button type="button" class="badge badge-outline cursor-pointer" wire:click="showOrganizationPersons({{ $organization->id }})">
                                         {{ $organization->display_name ?: $organization->legal_name }} ({{ ucfirst(strtolower($organization->category)) }})
-                                    </span>
+                                    </button>
                                 @empty
                                     <span class="text-sm text-base-content/70">No organizations found matching {{ $selectedDepartment->subCategories->pluck('name')->join('/') }} categories.</span>
                                 @endforelse
@@ -363,7 +363,11 @@
                             @forelse($selectedDepartmentProjects as $index => $project)
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
-                                    <td>{{ $project->name }}</td>
+                                    <td>
+                                        <a href="{{ route('projects.persons', ['project' => $project->id]) }}" class="link link-primary">
+                                            {{ $project->name }}
+                                        </a>
+                                    </td>
                                     <td>{{ $project->department?->organization?->display_name ?: ($project->department?->organization?->legal_name ?? '—') }}</td>
                                     <td>{{ $project->department?->organization?->category ? ucfirst(strtolower(trim($project->department->organization->category))) : '—' }}</td>
                                     <td>{{ $project->departmentSubCategory?->name ?? $project->sub_category ?? '—' }}</td>

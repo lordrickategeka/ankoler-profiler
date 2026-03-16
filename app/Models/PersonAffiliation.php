@@ -168,7 +168,6 @@ class PersonAffiliation extends Model
         return $query->where('organization_id', $OrganizationId);
     }
 
-
     public function roleType()
     {
         return $this->belongsTo(RoleType::class, 'role_type', 'code');

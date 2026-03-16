@@ -15,6 +15,28 @@ use Livewire\WithPagination;
 
 class DepartmentComponent extends Component
 {
+
+    public $selectedOrganizationPersons = [];
+
+    public function showOrganizationPersons($organizationId)
+    {
+        $persons = [];
+        $projects = \App\Models\Project::whereHas('department.organization', function ($q) use ($organizationId) {
+            $q->where('id', $organizationId);
+        })->get();
+        foreach ($projects as $project) {
+            foreach ($project->persons as $person) {
+                $persons[] = $person;
+            }
+        }
+        $this->selectedOrganizationPersons = collect($persons)->unique('id')->values()->all();
+    }
+    public function clearProjectDeptSearch()
+    {
+        $this->projectDeptSearch = '';
+    }
+
+    public $projectDeptSearch = '';
     use WithPagination;
 
     public $search = '';
@@ -33,6 +55,7 @@ class DepartmentComponent extends Component
         'admin_user_id' => '',
         'is_active' => true,
     ];
+
     public $editForm = [
         'organization_id' => '',
         'name' => '',
@@ -296,14 +319,22 @@ class DepartmentComponent extends Component
                 if ($subCategoryNames->isNotEmpty()) {
                     $lowerNames = $subCategoryNames->map(fn($n) => strtolower(trim($n)))->all();
                     $placeholders = implode(',', array_fill(0, count($lowerNames), '?'));
-                    $orgAdminOrganizations = Organization::whereRaw(
+                    $orgQuery = Organization::whereRaw(
                             "LOWER(TRIM(category)) IN ($placeholders)", $lowerNames
                         )
                         ->where('is_super', false)
                         ->orderBy('category')
-                        ->orderBy('legal_name')
-                        ->get()
-                        ->groupBy('category');
+                        ->orderBy('legal_name');
+                    if ($this->projectDeptSearch !== '') {
+                        $searchTerm = strtolower(trim($this->projectDeptSearch));
+                        $orgQuery->where(function ($q) use ($searchTerm) {
+                            $q->whereRaw('LOWER(legal_name) LIKE ?', ["%{$searchTerm}%"])
+                              ->orWhereRaw('LOWER(code) LIKE ?', ["%{$searchTerm}%"])
+                              ->orWhereRaw('LOWER(address) LIKE ?', ["%{$searchTerm}%"])
+                              ->orWhereRaw('LOWER(contact_email) LIKE ?', ["%{$searchTerm}%"]);
+                        });
+                    }
+                    $orgAdminOrganizations = $orgQuery->get()->groupBy('category');
                 }
             }
         }

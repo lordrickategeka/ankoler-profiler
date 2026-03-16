@@ -25,6 +25,7 @@
             @endif
             <!-- FORM -->
             <form wire:submit.prevent="submit" class="grid grid-cols-1 md:grid-cols-2 gap-4" id="selfRegForm" novalidate>
+                @csrf
                 {{-- Error Summary Section --}}
                 <div>
                     <label class="block text-gray-600 font-medium mb-1 text-sm">First Name*</label>

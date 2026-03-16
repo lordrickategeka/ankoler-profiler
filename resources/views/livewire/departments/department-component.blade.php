@@ -77,10 +77,20 @@
 
             {{-- Project Departments: Organizations grouped by sub-category --}}
             <div class="bg-base-100 border border-primary/30 rounded-lg p-4">
-                <h3 class="font-semibold text-base-content mb-3 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-                    My Project Departments
-                </h3>
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-semibold text-base-content mb-3 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                        My Project Departments
+                    </h3>
+                    <div class="w-64">
+                        <div class="flex gap-2">
+                            <input type="text" class="input input-bordered input-sm w-full" placeholder="Search organizations..." wire:model.live.debounce.300ms="projectDeptSearch">
+                            <button type="button" class="btn btn-sm btn-ghost" wire:click="clearProjectDeptSearch" title="Clear search" @if(empty($projectDeptSearch)) disabled @endif>
+                               clear search <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 <p class="text-sm text-base-content/60 mb-4">Organizations matching your department sub-categories.</p>
 
                 @if($orgAdminOrganizations->isNotEmpty())
@@ -96,10 +106,11 @@
                                         <thead>
                                             <tr>
                                                 <th>#</th>
-                                                <th>Name</th>
                                                 <th>Code</th>
-                                                <th>Type</th>
-                                                <th>District</th>
+                                                <th>Registration number</th>
+                                                <th>Name</th>
+                                                <th>Address</th>
+                                                <th>Contact</th>
                                                 <th>Status</th>
                                             </tr>
                                         </thead>
@@ -107,10 +118,19 @@
                                             @foreach($orgs as $org)
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
-                                                    <td class="font-medium">{{ $org->legal_name }}</td>
                                                     <td>{{ $org->code ?? '—' }}</td>
-                                                    <td>{{ $org->organization_type ?? '—' }}</td>
-                                                    <td>{{ $org->district ?? '—' }}</td>
+                                                    <td>{{ $org->registration_number ?? '—' }}</td>
+                                                    <td class="font-medium">
+                                                        <button type="button" class="link link-primary" wire:click="showOrganizationPersons({{ $org->id }})">
+                                                            {{ $org->legal_name }}
+                                                        </button>
+                                                    </td>
+                                                    <td>{{ $org->address ?? '—' }}</td>
+                                                    <td>{{ $org->contact_email ?? '—' }}
+                                                        @if($org->contact_phone)
+                                                            <br>{{ $org->contact_phone ?? '—' }}
+                                                        @endif
+                                                    </td>
                                                     <td>
                                                         @if($org->is_active)
                                                             <span class="badge badge-success badge-xs">Active</span>
@@ -426,3 +446,15 @@
         @endif
     </div>
 </div>
+            @if(!empty($selectedOrganizationPersons))
+                <div class="mt-6 card bg-base-100 border border-info/30 shadow-sm">
+                    <div class="card-body">
+                        <h3 class="text-lg font-semibold mb-2">Persons in Selected Project/Organization</h3>
+                        <ul class="list-disc ml-6">
+                            @foreach($selectedOrganizationPersons as $person)
+                                <li>{{ $person->given_name }} {{ $person->family_name }} ({{ $person->email ?? 'No email' }})</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            @endif

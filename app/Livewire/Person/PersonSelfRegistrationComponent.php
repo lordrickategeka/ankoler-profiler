@@ -160,8 +160,7 @@ class PersonSelfRegistrationComponent extends Component
 
             // Only send welcome email after user verifies their email (handled elsewhere, not here)
 
-            session()->flash('success', 'Registration successful! Please check your email to verify your account.');
-            return redirect()->route('login');
+            return redirect()->route('login')->with('self_register_success', true);
         } catch (\Exception $e) {
             if ($user) {
                 $user->delete();

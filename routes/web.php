@@ -66,6 +66,9 @@ Route::prefix('organizations')->name('organizations.')->group(function () use ($
         Route::get('/import', ImportOrganizations::class)->name('import');
     });
 });
+Route::get('/login', function () {
+    return view('auth.login');
+})->name('login');
 
 Route::get('/person/self-register', App\Livewire\Person\PersonSelfRegistrationComponent::class)
     ->name('person.self-register');
@@ -138,6 +141,11 @@ Route::middleware($authVerifiedMiddleware)->group(function () {
     });
 
     Route::prefix('projects')->name('projects.')->group(function () {
+                Route::get('/{project}/persons', function ($projectId) {
+                    $project = \App\Models\Project::with('persons')->findOrFail($projectId);
+                    $persons = $project->persons;
+                    return view('projects.persons', compact('project', 'persons'));
+                })->name('persons')->middleware('can:view-projects');
         Route::get('/', [ProjectController::class, 'index'])
             ->name('index')
             ->middleware('can:view-projects');
@@ -188,27 +196,23 @@ Route::middleware($authVerifiedMiddleware)->group(function () {
         Route::get('/roles', App\Livewire\Admin\RoleManager::class)->name('roles.index');
         Route::get('/role-types', App\Livewire\Admin\RoleTypeManager::class)->name('role-types.index');
         Route::get('/users', App\Livewire\Admin\UserManager::class)->name('users.index');
-        Route::get('/allow-email-domains', App\Livewire\Admin\AllowedEmailDomainManager::class)->name('allowEmailDomains.index');
+        Route::get('/allow-email-domains', App\Livewire\Admin\AllowedEmailDomainManager::class)->name('allowEmailDomains');
     });
 
     Route::prefix('communication')->name('communication.')->group(function () {
         Route::get('/', [CommunicationController::class, 'index'])->name('index');
 
         Route::get('/send', [CommunicationController::class, 'sendMessage'])
-            ->name('send')
-            ->middleware('can:send-communications');
+            ->name('send');
 
         Route::get('/filter-profiles', App\Livewire\Communication\FilterProfiles::class)
-            ->name('filter-profiles')
-            ->middleware('can:send-communications');
+            ->name('filter-profiles');
 
         Route::get('/history', [CommunicationController::class, 'history'])
-            ->name('history')
-            ->middleware('can:view-communications');
+            ->name('history');
 
         Route::get('/settings', [CommunicationController::class, 'settings'])
-            ->name('settings')
-            ->middleware('can:manage-communications');
+            ->name('settings');
     });
 });
 

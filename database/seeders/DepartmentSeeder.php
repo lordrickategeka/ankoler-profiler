@@ -24,7 +24,7 @@ class DepartmentSeeder extends Seeder
                 'country' => 'UGA',
                 'country_of_registration' => 'UGA',
                 'is_active' => true,
-                'is_super' => false,
+                'is_super' => true,
             ]
         );
 

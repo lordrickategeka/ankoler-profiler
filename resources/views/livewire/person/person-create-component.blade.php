@@ -197,7 +197,7 @@
 
                     <div class="form-control">
                         <label class="label pb-1">
-                            <span class="label-text text-sm font-medium">Role Type</span>
+                            <span class="label-text text-sm font-medium">Association Type:</span>
                         </label>
                         <input type="text" wire:model.defer="form.role_type" class="input input-bordered w-full"
                             placeholder="Enter role type">
@@ -208,7 +208,7 @@
 
                     <div class="form-control">
                         <label class="label pb-1">
-                            <span class="label-text text-sm font-medium">Role Title</span>
+                            <span class="label-text text-sm font-medium">Occupation:</span>
                         </label>
                         <input type="text" wire:model.defer="form.role_title" class="input input-bordered w-full"
                             placeholder="Enter role title">
